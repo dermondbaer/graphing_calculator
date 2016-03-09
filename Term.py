@@ -1,6 +1,6 @@
 # Pascal Mehnert
 # 09.03.2016
-# Speichern von konstanten und von variablen abhängingen Termen
+# Speichern konstanter und von variablen abhänginger Terme
 # V 0.1
 
 
