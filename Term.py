@@ -4,7 +4,7 @@
 # V 0.1
 
 
-class Term(object):
+class Expression(object):
     def __init__(self, expression, parsed_expression, variable=False):
         self.__expression = expression
         self.__parsed_expression = parsed_expression
