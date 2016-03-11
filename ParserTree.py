@@ -92,14 +92,3 @@ class ParserTree:
 
             if node.is_factored_out():
                 print(')', end='')
-
-t = ParserTree()
-op1 = t.add_operation('+')
-op2 = t.add_operation('/', op1, 'l')
-op3 = t.add_operation('*', op1, 'r', True)
-val1 = t.add_value(5, op2, 'l')
-val2 = t.add_value(27, op2, 'r')
-val3 = t.add_value(567, op3, 'l')
-val4 = t.add_value(5459, op3, 'r')
-
-t.print()
