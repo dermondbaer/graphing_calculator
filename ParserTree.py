@@ -1,7 +1,7 @@
-# ddr
+# Pascal Mehnert
 # 11.03.2016
-# Externer Code; Quelle: Stackoverflow; User: http://stackoverflow.com/users/2805357/ddr
-# V 1.0
+# Datentyp zum Speichern von gerparsten Termen
+# V 0.1
 
 
 class Operation:
