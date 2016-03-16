@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+    <operation name="sin" variables="1"></operation>
+    <operation name="cos" variables="1"></operation>
+    <operation name="tan" variables="1"></operation>
+    <operation name="pow" variables="2"></operation>
+    <operation name="root" variables="2"></operation>
+    <operation name="log" variables="2"></operation>
+</data>
