@@ -76,19 +76,28 @@ class ParserTree:
 
     def _print(self, node):
         if node is not None:
-            if node.is_factored_out():
-                print('(', end='')
-
-            if node.get_left() is not None:
-                self._print(node.get_left())
-
+            value = node.get_value()
             if node.is_operation():
-                print(' ', node.get_value(), ' ', sep='', end='')
+                if value in ['+', '-', '+', '/']:
+                    if node.is_factored_out():
+                        print('(', end='')
+
+                    if node.get_left() is not None:
+                        self._print(node.get_left())
+
+                    print('', value, end=' ')
+
+                    if node.get_right() is not None:
+                        self._print(node.get_right())
+
+                    if node.is_factored_out():
+                        print(')', end='')
+                else:
+                    pass
+
             else:
-                print(node.get_value(), end='')
+                if node.is_factored_out():
+                    print('(', value, ')', sep='', end='')
 
-            if node.get_right() is not None:
-                self._print(node.get_right())
-
-            if node.is_factored_out():
-                print(')', end='')
+                else:
+                    print(value, end='')
