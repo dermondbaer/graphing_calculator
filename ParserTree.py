@@ -48,7 +48,7 @@ class ParserTree:
             self.__root = Node(value, factored_out=factored_out)
             return self.__root
 
-        if parent.is_operation():
+        elif parent.is_operation():
             if side == 'l':
                 if parent.get_left() is None:
                     return parent.set_left(Node(value, factored_out=factored_out))
@@ -62,7 +62,7 @@ class ParserTree:
                 self.__root = Node(value, is_operation=False)
                 return self.__root
 
-        else:
+        elif parent.is_operation():
             if side == 'l':
                 if parent.get_left() is None:
                     return parent.set_left(Node(value, is_operation=False, factored_out=factored_out))
@@ -72,28 +72,38 @@ class ParserTree:
 
     def print(self):
         if self.__root is not None:
-            self._print(self.__root)
+            self.__print(self.__root)
 
-    def _print(self, node):
+    def __print(self, node):
         if node is not None:
             value = node.get_value()
             if node.is_operation():
-                if value in ['+', '-', '+', '/']:
+                if value in ['+', '-', '*', '/']:
                     if node.is_factored_out():
                         print('(', end='')
 
                     if node.get_left() is not None:
-                        self._print(node.get_left())
+                        self.__print(node.get_left())
 
                     print('', value, end=' ')
 
                     if node.get_right() is not None:
-                        self._print(node.get_right())
+                        self.__print(node.get_right())
 
                     if node.is_factored_out():
                         print(')', end='')
                 else:
-                    pass
+                    print(value, end='(')
+
+                    if node.get_left() is not None:
+                        self.__print(node.get_left())
+
+                    print(', ', end='')
+
+                    if node.get_right() is not None:
+                        self.__print(node.get_right())
+
+                    print(')', end='')
 
             else:
                 if node.is_factored_out():
@@ -101,3 +111,16 @@ class ParserTree:
 
                 else:
                     print(value, end='')
+
+
+'''
+T = ParserTree()
+op0 = T.add_operation('*')
+op1 = T.add_operation('cos', parent=op0, side='r')
+op2 = T.add_operation('+', parent=op1, side='r', factored_out=True)
+val0 = T.add_value(34, parent=op0, side='l')
+val1 = T.add_value(24, parent=op1, side='l')
+val2 = T.add_value(35, parent=op2, side='l')
+val3 = T.add_value(35, parent=op2, side='r')
+T.print()
+'''
