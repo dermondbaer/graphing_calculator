@@ -17,8 +17,7 @@ class Parser(object):
             attributes = child.attrib
             self.__supported_operations[attributes['name']] = attributes['variables']
 
-        self.__pattern = '\d+\.\d+|\d+|[+-/*(),]|[a-z]+'
-        self.__regex = re.compile(self.__pattern)
+        self.__regex = re.compile('\d+\.\d+|\d+|[+-/*(),]|[a-z]+')
 
     def parse_expression(self, expression):
         parser_tree = ParserTree()
