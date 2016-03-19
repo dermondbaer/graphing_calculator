@@ -81,7 +81,6 @@ class ParserTree:
         else:
             raise SyntaxError('Error while parsing the expression')
 
-'''
     def print(self):
         if self.__root is not None:
             self.__print(self.__root)
@@ -89,46 +88,6 @@ class ParserTree:
     def __print(self, node):
         if node is not None:
             value = node.get_value()
-            if node.is_operation():
-                if value in ['+', '-', '*', '/']:
-                    if node.is_factored_out():
-                        print('(', end='')
-
-                    for index, child in enumerate(node.get_child_list()):
-                        if index == 0:
-                            is_first_child = True
-                        else:
-                            is_first_child = False
-                            
-                        if is_first_child:
-                            self.__print(child)
-                        else:
-                            print('', value, end=' ')
-                            self.__print(child)
-
-                    if node.is_factored_out():
-                        print(')', end='')
-                else:
-                    print(value, end='(')
-
-                    for index, child in enumerate(node.get_child_list()):
-                        if index == 0:
-                            is_first_child = True
-                        else:
-                            is_first_child = False
-                            
-                        if is_first_child:
-                            self.__print(child)
-                        else:
-                            print(', ', end='')
-                            self.__print(child)
-
-                    print(')', end='')
-
-            elif not node.is_operation():
-                if node.is_factored_out():
-                    print('(', value, ')', sep='', end='')
-
-                else:
-                    print(value, end='')
-'''
+            for child in node.get_child_list():
+                self.__print(child)
+            print(value, end=' ')
