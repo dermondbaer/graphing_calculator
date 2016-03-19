@@ -5,26 +5,26 @@
 
 
 class Node:
-    def __init__(self, value, is_operation=True, factored_out=False):
-        self.__left = None
-        self.__right = None
+    def __init__(self, value, is_operation=False, is_value=False, is_variable=False):
+        self.__children = []
         self.__value = value
-        self.__is_operation = is_operation
-        self.__factored_out = factored_out
+        if is_operation ^ is_value ^ is_variable:
+            self.__is_operation = is_operation
+            self.__is_value = is_value
+            self.__is_variable = is_variable
 
-    def get_left(self):
-        return self.__left
+    def get_child_list(self):
+        return self.__children
 
-    def get_right(self):
-        return self.__right
+    def get_child(self, index):
+        return self.__children[index]
 
-    def set_left(self, value):
-        self.__left = value
-        return value
+    def add_child(self, child):
+        self.__children.append(child)
+        return child
 
-    def set_right(self, value):
-        self.__right = value
-        return value
+    def get_child_count(self):
+        return len(self.__children)
 
     def get_value(self):
         return self.__value
@@ -32,8 +32,11 @@ class Node:
     def is_operation(self):
         return self.__is_operation
 
-    def is_factored_out(self):
-        return self.__factored_out
+    def is_value(self):
+        return self.__is_value
+
+    def is_variable(self):
+        return self.__is_variable
 
 
 class ParserTree:
@@ -43,33 +46,42 @@ class ParserTree:
     def get_root(self):
         return self.__root
 
-    def add_operation(self, value, parent=None, side=None, factored_out=False):
+    def add_operation(self, value, parent=None):
         if parent is None:
-            self.__root = Node(value, factored_out=factored_out)
+            self.__root = Node(value, is_operation=True)
             return self.__root
 
         elif parent.is_operation():
-            if side == 'l':
-                if parent.get_left() is None:
-                    return parent.set_left(Node(value, factored_out=factored_out))
-            elif side == 'r':
-                if parent.get_right() is None:
-                    return parent.set_right(Node(value, factored_out=factored_out))
+            return parent.add_child(Node(value, is_operation=True))
 
-    def add_value(self, value, parent=None, side=None, factored_out=False):
+        else:
+            raise SyntaxError('Error while parsing the expression')
+
+    def add_value(self, value, parent=None):
         if parent is None:
             if self.__root is None:
-                self.__root = Node(value, is_operation=False)
+                self.__root = Node(value, is_value=True)
                 return self.__root
 
         elif parent.is_operation():
-            if side == 'l':
-                if parent.get_left() is None:
-                    return parent.set_left(Node(value, is_operation=False, factored_out=factored_out))
-            elif side == 'r':
-                if parent.get_right() is None:
-                    return parent.set_right(Node(value, is_operation=False, factored_out=factored_out))
+            return parent.add_child(Node(value, is_value=True))
 
+        else:
+            raise SyntaxError('Error while parsing the expression')
+
+    def add_variable(self, value, parent=None):
+        if parent is None:
+            if self.__root is None:
+                self.__root = Node(value, is_variable=True)
+                return self.__root
+
+        elif parent.is_operation():
+            return parent.add_child(Node(value, is_variable=True))
+
+        else:
+            raise SyntaxError('Error while parsing the expression')
+
+'''
     def print(self):
         if self.__root is not None:
             self.__print(self.__root)
@@ -82,45 +94,41 @@ class ParserTree:
                     if node.is_factored_out():
                         print('(', end='')
 
-                    if node.get_left() is not None:
-                        self.__print(node.get_left())
-
-                    print('', value, end=' ')
-
-                    if node.get_right() is not None:
-                        self.__print(node.get_right())
+                    for index, child in enumerate(node.get_child_list()):
+                        if index == 0:
+                            is_first_child = True
+                        else:
+                            is_first_child = False
+                            
+                        if is_first_child:
+                            self.__print(child)
+                        else:
+                            print('', value, end=' ')
+                            self.__print(child)
 
                     if node.is_factored_out():
                         print(')', end='')
                 else:
                     print(value, end='(')
 
-                    if node.get_left() is not None:
-                        self.__print(node.get_left())
-
-                    print(', ', end='')
-
-                    if node.get_right() is not None:
-                        self.__print(node.get_right())
+                    for index, child in enumerate(node.get_child_list()):
+                        if index == 0:
+                            is_first_child = True
+                        else:
+                            is_first_child = False
+                            
+                        if is_first_child:
+                            self.__print(child)
+                        else:
+                            print(', ', end='')
+                            self.__print(child)
 
                     print(')', end='')
 
-            else:
+            elif not node.is_operation():
                 if node.is_factored_out():
                     print('(', value, ')', sep='', end='')
 
                 else:
                     print(value, end='')
-
-
-'''
-T = ParserTree()
-op0 = T.add_operation('*')
-op1 = T.add_operation('cos', parent=op0, side='r')
-op2 = T.add_operation('+', parent=op1, side='r', factored_out=True)
-val0 = T.add_value(34, parent=op0, side='l')
-val1 = T.add_value(24, parent=op1, side='l')
-val2 = T.add_value(35, parent=op2, side='l')
-val3 = T.add_value(35, parent=op2, side='r')
-T.print()
 '''
