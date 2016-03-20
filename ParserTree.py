@@ -6,7 +6,7 @@
 
 class Node:
     def __init__(self, value, is_operation=False, is_value=False, is_constant=False, is_variable=False):
-        self.__children = []
+        self.__child_list = []
         self.__value = value
         if is_operation ^ is_value ^ is_constant ^ is_variable:
             self.__is_operation = is_operation
@@ -15,17 +15,20 @@ class Node:
             self.__is_variable = is_variable
 
     def get_child_list(self):
-        return self.__children
+        return self.__child_list
 
     def get_child(self, index):
-        return self.__children[index]
+        return self.__child_list[index]
 
-    def add_child(self, child):
-        self.__children.append(child)
+    def add_child(self, child, reverse=False):
+        if reverse is False:
+            self.__child_list.append(child)
+        else:
+            self.__child_list.insert(0, child)
         return child
 
     def get_child_count(self):
-        return len(self.__children)
+        return len(self.__child_list)
 
     def get_value(self):
         return self.__value
@@ -50,49 +53,49 @@ class ParserTree:
     def get_root(self):
         return self.__root
 
-    def add_operation(self, value, parent=None):
+    def add_operation(self, value, reverse=True, parent=None):
         if parent is None:
             self.__root = Node(value, is_operation=True)
             return self.__root
 
         elif parent.is_operation():
-            return parent.add_child(Node(value, is_operation=True))
+            return parent.add_child(Node(value, is_operation=True), reverse=reverse)
 
         else:
             raise SyntaxError('Error while parsing the expression')
 
-    def add_value(self, value, parent=None):
+    def add_value(self, value, reverse=True, parent=None):
         if parent is None:
             if self.__root is None:
                 self.__root = Node(value, is_value=True)
                 return self.__root
 
         elif parent.is_operation():
-            return parent.add_child(Node(value, is_value=True))
+            return parent.add_child(Node(value, is_value=True), reverse=reverse)
 
         else:
             raise SyntaxError('Error while parsing the expression')
 
-    def add_constant(self, value, parent=None):
+    def add_constant(self, value, reverse=True, parent=None):
         if parent is None:
             if self.__root is None:
                 self.__root = Node(value, is_constant=True)
                 return self.__root
 
         elif parent.is_operation():
-            return parent.add_child(Node(value, is_constant=True))
+            return parent.add_child(Node(value, is_constant=True), reverse=reverse)
 
         else:
             raise SyntaxError('Error while parsing the expression')
 
-    def add_variable(self, value, parent=None):
+    def add_variable(self, value, reverse=True, parent=None):
         if parent is None:
             if self.__root is None:
                 self.__root = Node(value, is_variable=True)
                 return self.__root
 
         elif parent.is_operation():
-            return parent.add_child(Node(value, is_variable=True))
+            return parent.add_child(Node(value, is_variable=True), reverse=reverse)
 
         else:
             raise SyntaxError('Error while parsing the expression')
