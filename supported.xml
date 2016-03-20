@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+    <operators>
+        <operator name="^" precedence="4" associativity="r"/>
+        <operator name="*" precedence="3" associativity="l"/>
+        <operator name="/" precedence="3" associativity="l"/>
+        <operator name="-" precedence="2" associativity="l"/>
+        <operator name="+" precedence="2" associativity="l"/>
+    </operators>
+    <functions>
+        <functoion name="sin" variables="1"/>
+        <functoion name="cos" variables="1"/>
+        <functoion name="tan" variables="1"/>
+        <functoion name="sqrt" variables="1"/>
+        <functoion name="root" variables="2"/>
+        <functoion name="log" variables="2"/>
+        <functoion name="max" variables="2"/>
+    </functions>
+    <constants>
+        <constant name="e"/>
+        <constant name="pi"/>
+    </constants>
+    <varibales>
+        <variable name="x"/>
+    </varibales>
+</data>

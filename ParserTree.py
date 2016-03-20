@@ -1,30 +1,34 @@
 # Pascal Mehnert
-# 11.03.2016
+# 20.03.2016
 # Datentyp zum Speichern von geparsten Termen
-# V 0.1
+# V 1.0
 
 
 class Node:
-    def __init__(self, value, is_operation=True, factored_out=False):
-        self.__left = None
-        self.__right = None
+    def __init__(self, value, is_operation=False, is_value=False, is_constant=False, is_variable=False):
+        self.__child_list = []
         self.__value = value
-        self.__is_operation = is_operation
-        self.__factored_out = factored_out
+        if is_operation ^ is_value ^ is_constant ^ is_variable:
+            self.__is_operation = is_operation
+            self.__is_value = is_value
+            self.__is_constant = is_constant
+            self.__is_variable = is_variable
 
-    def get_left(self):
-        return self.__left
+    def get_child_list(self):
+        return self.__child_list
 
-    def get_right(self):
-        return self.__right
+    def get_child(self, index):
+        return self.__child_list[index]
 
-    def set_left(self, value):
-        self.__left = value
-        return value
+    def add_child(self, child, reverse=False):
+        if reverse is False:
+            self.__child_list.append(child)
+        else:
+            self.__child_list.insert(0, child)
+        return child
 
-    def set_right(self, value):
-        self.__right = value
-        return value
+    def get_child_count(self):
+        return len(self.__child_list)
 
     def get_value(self):
         return self.__value
@@ -32,8 +36,14 @@ class Node:
     def is_operation(self):
         return self.__is_operation
 
-    def is_factored_out(self):
-        return self.__factored_out
+    def is_value(self):
+        return self.__is_value
+
+    def is_constant(self):
+        return self.__is_constant
+
+    def is_variable(self):
+        return self.__is_variable
 
 
 class ParserTree:
@@ -43,52 +53,42 @@ class ParserTree:
     def get_root(self):
         return self.__root
 
-    def add_operation(self, value, parent=None, side=None, factored_out=False):
-        if parent is None:
-            self.__root = Node(value, factored_out=factored_out)
-            return self.__root
+    def add_operation(self, value, reverse=True, parent=None):
+        return self.__add_node(value, is_operation=True, reverse=reverse, parent=parent)
 
-        if parent.is_operation():
-            if side == 'l':
-                if parent.get_left() is None:
-                    return parent.set_left(Node(value, factored_out=factored_out))
-            elif side == 'r':
-                if parent.get_right() is None:
-                    return parent.set_right(Node(value, factored_out=factored_out))
+    def add_value(self, value, reverse=True, parent=None):
+        return self.__add_node(value, is_value=True, reverse=reverse, parent=parent)
 
-    def add_value(self, value, parent=None, side=None, factored_out=False):
+    def add_constant(self, value, reverse=True, parent=None):
+        return self.__add_node(value, is_constant=True, reverse=reverse, parent=parent)
+
+    def add_variable(self, value, reverse=True, parent=None):
+        return self.__add_node(value, is_variable=True, reverse=reverse, parent=parent)
+
+    def __add_node(self, value, is_operation=False, is_value=False, is_constant=False, is_variable=False, reverse=True,
+                   parent=None):
         if parent is None:
             if self.__root is None:
-                self.__root = Node(value, is_operation=False)
+                self.__root = Node(value, is_operation=is_operation, is_value=is_value, is_constant=is_constant,
+                                   is_variable=is_variable)
                 return self.__root
 
+        elif parent.is_operation():
+            child = Node(value, is_operation=is_operation, is_value=is_value, is_constant=is_constant,
+                         is_variable=is_variable)
+            return parent.add_child(child, reverse=reverse)
+
         else:
-            if side == 'l':
-                if parent.get_left() is None:
-                    return parent.set_left(Node(value, is_operation=False, factored_out=factored_out))
-            elif side == 'r':
-                if parent.get_right() is None:
-                    return parent.set_right(Node(value, is_operation=False, factored_out=factored_out))
+            raise SyntaxError('Error while parsing the expression')
 
     def print(self):
         if self.__root is not None:
-            self._print(self.__root)
+            self.__print(self.__root)
+        print()
 
-    def _print(self, node):
+    def __print(self, node):
         if node is not None:
-            if node.is_factored_out():
-                print('(', end='')
-
-            if node.get_left() is not None:
-                self._print(node.get_left())
-
-            if node.is_operation():
-                print(' ', node.get_value(), ' ', sep='', end='')
-            else:
-                print(node.get_value(), end='')
-
-            if node.get_right() is not None:
-                self._print(node.get_right())
-
-            if node.is_factored_out():
-                print(')', end='')
+            value = node.get_value()
+            for child in node.get_child_list():
+                self.__print(child)
+            print(value, end=' ')
