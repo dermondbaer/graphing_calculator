@@ -5,12 +5,13 @@
 
 
 class Node:
-    def __init__(self, value, is_operation=False, is_value=False, is_variable=False):
+    def __init__(self, value, is_operation=False, is_value=False, is_constant=False, is_variable=False):
         self.__children = []
         self.__value = value
-        if is_operation ^ is_value ^ is_variable:
+        if is_operation ^ is_value ^ is_constant ^ is_variable:
             self.__is_operation = is_operation
             self.__is_value = is_value
+            self.__is_constant = is_constant
             self.__is_variable = is_variable
 
     def get_child_list(self):
@@ -34,6 +35,9 @@ class Node:
 
     def is_value(self):
         return self.__is_value
+
+    def is_constant(self):
+        return self.__is_constant
 
     def is_variable(self):
         return self.__is_variable
@@ -65,6 +69,18 @@ class ParserTree:
 
         elif parent.is_operation():
             return parent.add_child(Node(value, is_value=True))
+
+        else:
+            raise SyntaxError('Error while parsing the expression')
+
+    def add_constant(self, value, parent=None):
+        if parent is None:
+            if self.__root is None:
+                self.__root = Node(value, is_constant=True)
+                return self.__root
+
+        elif parent.is_operation():
+            return parent.add_child(Node(value, is_constant=True))
 
         else:
             raise SyntaxError('Error while parsing the expression')
