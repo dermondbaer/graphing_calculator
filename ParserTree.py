@@ -1,7 +1,7 @@
 # Pascal Mehnert
-# 11.03.2016
+# 20.03.2016
 # Datentyp zum Speichern von geparsten Termen
-# V 0.1
+# V 1.0
 
 
 class Node:
@@ -54,48 +54,29 @@ class ParserTree:
         return self.__root
 
     def add_operation(self, value, reverse=True, parent=None):
-        if parent is None:
-            self.__root = Node(value, is_operation=True)
-            return self.__root
-
-        elif parent.is_operation():
-            return parent.add_child(Node(value, is_operation=True), reverse=reverse)
-
-        else:
-            raise SyntaxError('Error while parsing the expression')
+        return self.__add_node(value, is_operation=True, reverse=reverse, parent=parent)
 
     def add_value(self, value, reverse=True, parent=None):
-        if parent is None:
-            if self.__root is None:
-                self.__root = Node(value, is_value=True)
-                return self.__root
-
-        elif parent.is_operation():
-            return parent.add_child(Node(value, is_value=True), reverse=reverse)
-
-        else:
-            raise SyntaxError('Error while parsing the expression')
+        return self.__add_node(value, is_value=True, reverse=reverse, parent=parent)
 
     def add_constant(self, value, reverse=True, parent=None):
-        if parent is None:
-            if self.__root is None:
-                self.__root = Node(value, is_constant=True)
-                return self.__root
-
-        elif parent.is_operation():
-            return parent.add_child(Node(value, is_constant=True), reverse=reverse)
-
-        else:
-            raise SyntaxError('Error while parsing the expression')
+        return self.__add_node(value, is_constant=True, reverse=reverse, parent=parent)
 
     def add_variable(self, value, reverse=True, parent=None):
+        return self.__add_node(value, is_variable=True, reverse=reverse, parent=parent)
+
+    def __add_node(self, value, is_operation=False, is_value=False, is_constant=False, is_variable=False, reverse=True,
+                   parent=None):
         if parent is None:
             if self.__root is None:
-                self.__root = Node(value, is_variable=True)
+                self.__root = Node(value, is_operation=is_operation, is_value=is_value, is_constant=is_constant,
+                                   is_variable=is_variable)
                 return self.__root
 
         elif parent.is_operation():
-            return parent.add_child(Node(value, is_variable=True), reverse=reverse)
+            child = Node(value, is_operation=is_operation, is_value=is_value, is_constant=is_constant,
+                         is_variable=is_variable)
+            return parent.add_child(child, reverse=reverse)
 
         else:
             raise SyntaxError('Error while parsing the expression')
@@ -103,6 +84,7 @@ class ParserTree:
     def print(self):
         if self.__root is not None:
             self.__print(self.__root)
+        print()
 
     def __print(self, node):
         if node is not None:

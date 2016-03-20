@@ -1,7 +1,7 @@
 # Pascal Mehnert
 # 09.03.2016
-# Algorithmus zum analysieren und aufgliedern mathematischer Ausdrücke
-# V 0.1
+# Algorithmen zum logischen aufgliedern mathematischer Ausdrücke
+# V 1.0
 
 import re
 import xml.etree.ElementTree as Et
@@ -40,11 +40,15 @@ class Parser(object):
         parser_tree = ParserTree()
         infix = self.partition(expression)
         postfix = self.__make_postfix(infix)
-        print(postfix)
         self.__parse(postfix, current_token_index=len(postfix)-1, parser_tree=parser_tree)
         parser_tree.print()
-        print()
         return parser_tree
+
+    def make_expression_postfix(self, expression):
+        infix = self.partition(expression)
+        postfix = self.__make_postfix(infix)
+        postfix = ' '.join(postfix)
+        return postfix
 
     def __make_postfix(self, expression):
         output_queue = []
@@ -150,11 +154,3 @@ class Parser(object):
             expression.pop()
 
         return expression
-
-parser = Parser('supported.xml')
-# parser.parse_expression('5 - 45 - 75 - 15')
-parser.parse_expression('5.34 - cos(456) + 456 * 5 / 6')
-# parser.parse_expression('sin ( max ( 2 , 3 ) / 3 * 3.1415 )')
-# parser.parse_expression('3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3')
-
-
