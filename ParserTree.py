@@ -6,8 +6,23 @@
 
 class Node:
     def __init__(self, value, is_operation=False, is_value=False, is_constant=False, is_variable=False):
+        """
+        :param value: The value of the Node.
+        :type value: string
+        :param is_operation: Defines whether the Node represents an operation.
+        :type is_operation: Bool
+        :param is_value: Defines whether the Node represents a value.
+        :type is_value: Bool
+        :param is_constant: Defines whether the Node represents a constant.
+        :type is_constant: Bool
+        :param is_variable: Defines whether the Node represents a variable.
+        :type is_variable: Bool
+        :return: The Node that has been created.
+        :rtype: Node
+        """
         self.__child_list = []
         self.__value = value
+
         if is_operation ^ is_value ^ is_constant ^ is_variable:
             self.__is_operation = is_operation
             self.__is_value = is_value
@@ -19,13 +34,6 @@ class Node:
 
     def get_child(self, index):
         return self.__child_list[index]
-
-    def add_child(self, child, reverse=False):
-        if reverse is False:
-            self.__child_list.append(child)
-        else:
-            self.__child_list.insert(0, child)
-        return child
 
     def get_child_count(self):
         return len(self.__child_list)
@@ -44,6 +52,24 @@ class Node:
 
     def is_variable(self):
         return self.__is_variable
+
+    def add_child(self, child, reverse=False):
+        """
+        Adds an child element to a Node
+
+        :param child: The value to add as a child
+        :type child: Node
+        :param reverse: If True: Adds the child as new left child; Else: Adds the child as new right child
+        :type reverse: Bool
+        :return: The value that was added as child
+        :rtype: Node
+        """
+
+        if reverse is False:
+            self.__child_list.append(child)
+        else:
+            self.__child_list.insert(0, child)
+        return child
 
 
 class ParserTree:
