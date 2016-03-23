@@ -138,7 +138,7 @@ class Parser(object):
             current_token_index -= 1
 
         elif re.match('^-?\d+(\.\d+)?$', token):
-            parser_tree.add_value(token, parent=parent)
+            parser_tree.add_number(token, parent=parent)
             current_token_index -= 1
 
         return current_token_index
