@@ -15,6 +15,7 @@
         <functoion name="root" variables="2"/>
         <functoion name="log" variables="2"/>
         <functoion name="max" variables="2"/>
+        <functoion name="abs" variables="1"/>
     </functions>
     <constants>
         <constant name="e"/>
