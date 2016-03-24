@@ -4,5 +4,6 @@
 .idea/modules.xml
 .idea/misc.xml
 .idea/vcs.xml
+.idea/.name
 __pycache__/ParserTree.cpython-35.pyc
 __pycache__/*.*
