@@ -1,6 +1,6 @@
 # Pascal Mehnert
 # 09.03.2016
-# Algorithmen zum logischen aufgliedern mathematischer Ausdrücke
+# Multiple algorithms, used to manipulate the structure of mathematical expression.
 # V 1.0
 
 import re

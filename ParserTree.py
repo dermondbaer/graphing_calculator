@@ -1,6 +1,6 @@
 # Pascal Mehnert
 # 20.03.2016
-# Datentyp zum Speichern von geparsten Termen
+# Data type that is used to save a parsed mathematical expression to it.
 # V 1.0
 
 
