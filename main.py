@@ -4,16 +4,22 @@
 # V 0.1
 
 
-from Gui import Gui *
+from Gui import *
 
 class Application(object):
-  def __init__(self):
-    self.__gui = Gui()
+    def __init__(self, title):
+        self.__title = title
+        self.__gui = Gui(self, title)
   
-  def start(self):
-    self.__gui.start()
+    def start(self):
+        self.__gui.start(self.__title)
 
+    def stop(self):
+        raise SystemExit
+
+  # config
+title = "Not so graphing calculator"
 
 # main
-app = Application()
+app = Application(title)
 app.start()
