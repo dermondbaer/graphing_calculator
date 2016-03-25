@@ -1,6 +1,6 @@
 # Pascal Mehnert
 # 09.03.2016
-# Multiple algorithms, used to manipulate the structure of mathematical expression.
+# Multiple algorithms, used to restructure and parse mathematical expression.
 # V 1.0
 
 import re
@@ -10,38 +10,38 @@ from ParserTree import ParserTree
 
 class Parser(object):
     def __init__(self, xml_file):
-        self.__operators = []
-        self.__operator_precedence = {}
-        self.__operator_associativity = {}
-        self.__supported_functions = {}
-        self.__supported_constants = []
-        self.__supported_variables = []
+        self.__operators = []               # List of available operators
+        self.__operator_precedence = {}     # List of available operators and their corresponding precedence
+        self.__operator_associativity = {}  # List of available operators and their corresponding associativity
+        self.__supported_functions = {}     # List of available functions
+        self.__supported_constants = []     # List of available constants
+        self.__supported_variables = []     # List of available variables
         self.__operations_xml = Et.parse(xml_file)
         self.__xml_root = self.__operations_xml.getroot()
-        for child in self.__xml_root[0]:
+        for child in self.__xml_root[0]:    # Iterating over the operators defined in the XML-File
             attributes = child.attrib
             self.__operators.append(attributes['name'])
             self.__operator_precedence[attributes['name']] = attributes['precedence']
             self.__operator_associativity[attributes['name']] = attributes['associativity']
 
-        for child in self.__xml_root[1]:
+        for child in self.__xml_root[1]:    # Iterating over the functions defined in the XML-File
             attributes = child.attrib
             self.__supported_functions[attributes['name']] = int(attributes['variables'])
 
-        for child in self.__xml_root[2]:
+        for child in self.__xml_root[2]:    # Iterating over the constants defined in the XML-File
             attributes = child.attrib
             self.__supported_constants.append(attributes['name'])
 
-        for child in self.__xml_root[3]:
+        for child in self.__xml_root[3]:    # Iterating over the variables defined in the XML-File
             attributes = child.attrib
             self.__supported_variables.append(attributes['name'])
 
     def parse_expression(self, expression):
+        """Parses a """
         parser_tree = ParserTree()
         infix = self.partition(expression)
         postfix = self.__make_postfix(infix)
         self.__parse(postfix, current_token_index=len(postfix)-1, parser_tree=parser_tree)
-        parser_tree.print()
         return parser_tree
 
     def make_expression_postfix(self, expression):
@@ -154,3 +154,6 @@ class Parser(object):
             expression.pop()
 
         return expression
+
+p = Parser('supported.xml')
+p.parse_expression('6 - cos(-3 * 5)').print()
