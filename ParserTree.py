@@ -47,7 +47,7 @@ class Node:
     def add_child(self, child, reverse=False):
         """Adds a child element to this Node."""
         if reverse is False:
-            self.__child_list.append(child)     # adding as most right child
+            self.__child_list.append(child)         # adding as most right child
         else:
             self.__child_list.insert(0, child)      # adding as most left child
         return child
@@ -61,6 +61,23 @@ class ParserTree:
     def get_root(self):
         """Returns the root Node of this Parser Tree."""
         return self.__root
+
+    def get_variables(self):
+        """Returns all variables in this ParserTree. If there are none, returns False."""
+        variable_list = []
+        self.__is_variable(self.__root, variable_list)
+        if not variable_list:       # Return False, if the list is empty
+            return False
+        else:                       # Else returns the list itself
+            return variable_list
+
+    def __is_variable(self, node, variable_list):
+        """Checks if a Node is a variable and calls itself for every child of the Node."""
+        if node.is_variable():
+            variable_list.append(node.get_value())
+        elif node.is_operation():
+            for child in node.get_child_list():
+                self.__is_variable(child, variable_list)
 
     def add_operation(self, value, reverse=True, parent=None):
         """Adds an operation as child of a Node."""
@@ -81,16 +98,16 @@ class ParserTree:
     def __add_node(self, value, is_operation=False, is_number=False, is_constant=False, is_variable=False, reverse=True,
                    parent=None):
         """Adds a child to a Node in this Parser Tree."""
-        if parent is None:
+        if parent is None:              # Adding the Node as root
             if self.__root is None:
                 self.__root = Node(value, is_operation=is_operation, is_number=is_number, is_constant=is_constant,
-                                   is_variable=is_variable)     # Adding as root
+                                   is_variable=is_variable)
                 return self.__root
 
-        elif parent.is_operation():
+        elif parent.is_operation():     # Adding the Node as child of an operation
             child = Node(value, is_operation=is_operation, is_number=is_number, is_constant=is_constant,
                          is_variable=is_variable)
-            return parent.add_child(child, reverse=reverse)     # Adding as child of an operation
+            return parent.add_child(child, reverse=reverse)
 
         else:
             raise SyntaxError('Error while parsing the expression')
