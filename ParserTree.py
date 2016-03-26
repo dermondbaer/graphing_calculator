@@ -65,7 +65,8 @@ class ParserTree:
     def get_variables(self):
         """Returns all variables in this ParserTree. If there are none, returns False."""
         variable_list = []
-        self.__is_variable(self.__root, variable_list)
+        if self.__root is not None:
+            self.__is_variable(self.__root, variable_list)      # Checks if there are variables in this ParserTree
         if not variable_list:       # Return False, if the list is empty
             return False
         else:                       # Else returns the list itself
@@ -110,13 +111,13 @@ class ParserTree:
             return parent.add_child(child, reverse=reverse)
 
         else:
-            raise SyntaxError('Error while parsing the expression')
+            raise ValueError('Error while parsing the expression')
 
     def print(self):
         """Initializes the print for this Parser Tree."""
         if self.__root is not None:
             self.__print(self.__root)   # Calls the __print() function for the root of this Parser Tree
-        print()
+            print()
 
     def __print(self, node):
         """Prints the given Node and initializes the print for every child element."""
