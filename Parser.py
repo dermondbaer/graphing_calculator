@@ -204,7 +204,3 @@ class Parser(object):
             expression.pop()
 
         return expression
-
-p = Parser('supported.xml')
-expr = p.parse_expression('(4 + 5) * 3')
-expr.get_parsed_expression().print()
