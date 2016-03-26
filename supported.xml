@@ -25,5 +25,7 @@
     </constants>
     <varibales>
         <variable name="x"/>
+        <variable name="y"/>
+        <variable name="z"/>
     </varibales>
 </data>
