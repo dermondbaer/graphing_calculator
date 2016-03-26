@@ -206,7 +206,3 @@ class Parser(object):
                 if len(expression) == 0:
                     break
         return expression
-
-p = Parser('supported.xml')
-expr = p.parse_expression('')
-expr.get_parsed_expression().print()
