@@ -12,9 +12,12 @@
         <functoion name="cos" variables="1"/>
         <functoion name="tan" variables="1"/>
         <functoion name="sqrt" variables="1"/>
-        <functoion name="root" variables="2"/>
-        <functoion name="log" variables="2"/>
+        <functoion name="nth_root" variables="2"/>
+        <functoion name="log" variables="1"/>
+        <functoion name="ln" variables="1"/>
+        <functoion name="log_n" variables="2"/>
         <functoion name="max" variables="2"/>
+        <functoion name="abs" variables="1"/>
     </functions>
     <constants>
         <constant name="e"/>
@@ -22,5 +25,7 @@
     </constants>
     <varibales>
         <variable name="x"/>
+        <variable name="y"/>
+        <variable name="z"/>
     </varibales>
 </data>
