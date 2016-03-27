@@ -6,7 +6,6 @@
 import re
 import xml.etree.ElementTree as Et
 from ParserTree import ParserTree
-from Expression import Expression
 
 
 class Parser(object):
@@ -39,18 +38,17 @@ class Parser(object):
 
     def parse_expression(self, infix):
         """
-        Parses a mathematical expression and saves it as an Expression.
+        Parses a mathematical expression and returns it as a ParserTree.  Its purpose is NOT graphic display.
 
-        :arg infix: Mathematical expression, given in infix notation.
+        :arg infix: A mathematical expression, given in infix notation.
         :type infix: str
-        :rtype: Expression
+        :rtype: ParserTree
         """
         postfix = self.__make_postfix(self.partition(infix))    # Converts the expression to postfix notation
         parser_tree = ParserTree()
         if len(postfix) > 0:
             self.__parse(postfix, current_token_index=len(postfix)-1, parser_tree=parser_tree)
-        variables = parser_tree.get_variables()
-        return Expression(infix, parser_tree, variables)
+        return parser_tree
 
     def make_expression_postfix(self, expression):
         """
@@ -181,7 +179,7 @@ class Parser(object):
             current_token_index -= 1
 
         elif re.match('^-?\d+(\.\d+)?$', token):                # If the token is a number
-            parser_tree.add_number(token, parent=parent)        # Add the token as Node
+            parser_tree.add_number(float(token), parent=parent)        # Add the token as Node
             current_token_index -= 1
 
         return current_token_index          # Return the current token index
