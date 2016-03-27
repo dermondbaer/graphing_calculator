@@ -45,10 +45,10 @@ class Parser(object):
         :type infix: str
         :rtype: Expression
         """
-
         postfix = self.__make_postfix(self.partition(infix))    # Converts the expression to postfix notation
         parser_tree = ParserTree()
-        self.__parse(postfix, current_token_index=len(postfix)-1, parser_tree=parser_tree)
+        if len(postfix) > 0:
+            self.__parse(postfix, current_token_index=len(postfix)-1, parser_tree=parser_tree)
         variables = parser_tree.get_variables()
         return Expression(infix, parser_tree, variables)
 
@@ -93,7 +93,7 @@ class Parser(object):
                     operator = operator_stack.pop()     # Pop operators off the operator stack
                     output_queue.append(operator)       # Add them to the output queue
                     if len(operator_stack) == 0:        # If there are no left parenthesis, raise an Error
-                        raise SyntaxError('Error while parsing the Expression: Parenthesis mismatched')
+                        raise ValueError('Error while parsing the Expression: Parenthesis mismatched')
 
             elif token in self.__operators:             # If the token is an operator
                 if len(operator_stack) > 0:
@@ -125,7 +125,7 @@ class Parser(object):
                     operator = operator_stack.pop()     # Pop operator off the operator stack
                     output_queue.append(operator)       # Add them to the output queue
                     if len(operator_stack) == 0:        # If there are no left parenthesis, raise an Error
-                        raise SyntaxError('Error while parsing the Expression: Parenthesis mismatched')
+                        raise ValueError('Error while parsing the Expression: Parenthesis mismatched')
 
                 operator_stack.pop()                    # Pop the left parenthesis off the stack
 
@@ -137,7 +137,7 @@ class Parser(object):
 
         while len(operator_stack) > 0:              # While there are operators on the operator stack
             if operator_stack[-1] == '(':           # If there is a left parenthesis at the top of the operator stack
-                raise SyntaxError('Error while parsing the Expression: Parenthesis mismatched')     # Raise an Error
+                raise ValueError('Error while parsing the Expression: Parenthesis mismatched')     # Raise an Error
 
             else:                                   # If there is an operator at the top of the operator stack
                 operator = operator_stack.pop()     # Pop it off the operator stack
@@ -200,11 +200,9 @@ class Parser(object):
         expression = expression.replace(',', ' , ')
         expression = re.sub('\s+', ' ', expression)
         expression = expression.split(' ')
-        while expression[-1] == '':
-            expression.pop()
-
+        if len(expression) > 0:
+            while expression[-1] == '':
+                expression.pop()
+                if len(expression) == 0:
+                    break
         return expression
-
-p = Parser('supported.xml')
-expr = p.parse_expression('(4 + 5) * 3')
-expr.get_parsed_expression().print()
