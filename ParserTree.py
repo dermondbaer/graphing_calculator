@@ -28,6 +28,21 @@ class Node:
         """Returns the value of this Node."""
         return self.__value
 
+    def set_value(self, value, is_operation=False, is_number=False, is_constant=False, is_variable=False):
+        """Changes the value of this Node and therefor redetermines its type."""
+        self.__value = value
+
+        if is_number or is_constant or is_variable:
+            self.__child_list = []
+
+        if is_operation ^ is_number ^ is_constant ^ is_variable:
+            self.__is_operation = is_operation
+            self.__is_number = is_number
+            self.__is_constant = is_constant
+            self.__is_variable = is_variable
+
+        return value
+
     def is_operation(self):
         """Determines if this Node represents an operation."""
         return self.__is_operation
