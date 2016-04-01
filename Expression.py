@@ -5,12 +5,7 @@
 
 
 class Expression(object):
-    """A mathematical expression and its ParserTree."""
     def __init__(self, expression, parsed_expression):
-        """
-        :type expression: str
-        :type parsed_expression: ParserTree()
-        """
         self.__expression = expression
         self.__parsed_expression = parsed_expression
 
@@ -26,7 +21,6 @@ class Expression(object):
 
 
 class Function(Expression):
-    """"""
     def __init__(self, expression, parsed_expression, simplified_parsed_expression):
         Expression.__init__(self, expression, parsed_expression)
         self.__simplified_parsed_expression = simplified_parsed_expression
