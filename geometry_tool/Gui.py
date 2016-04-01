@@ -2,18 +2,17 @@
 #   29.01.2016
 #
 #   V 0.1
-import parser
-from tkinter import *
-from math import *
 
-from CoordinateSystem import CoordinateSystem
-from GuiOutput import GuiOutput
-from UserInput import UserInput
-from ValidateInput import validate_axis_size
-from Function import Function
-from Point import Point
-from Distance import Distance
-from Line import Line
+from tkinter import *
+
+from geometry_tool.coordinate_system import CoordinateSystem
+from geometry_tool.gui_output import GuiOutput
+from geometry_tool.user_input import UserInput
+# from geometry_tool import validate_axis_size
+from geometry_tool.function import Function
+from geometry_tool.point import Point
+from geometry_tool.distance import Distance
+from geometry_tool.line import Line
 
 
 class Gui(object):
@@ -143,6 +142,7 @@ class Gui(object):
 
 class GuiDialog(object):
     def __init__(self):
+        self.__size_x = self.__size_y = False
         master = Tk()
         dialog = Frame(master).grid(pady=2)
 
@@ -167,8 +167,9 @@ class GuiDialog(object):
         def get_size():
             is_float = re.compile(r'^-?\d+(\.\d+)?$')
 
-            neg = validate_axis_size(is_float, input_neg_x)
-            pos = validate_axis_size(is_float, input_pos_x)
+            x = y = False
+            neg = self.validate_axis_size(is_float, input_neg_x)
+            pos = self.validate_axis_size(is_float, input_pos_x)
             if neg and pos:
                 x = True
             if not neg:
@@ -177,8 +178,8 @@ class GuiDialog(object):
             if not pos:
                 input_pos_x.delete(0, END)
 
-            neg = validate_axis_size(is_float, input_neg_y)
-            pos = validate_axis_size(is_float, input_pos_y)
+            neg = self.validate_axis_size(is_float, input_neg_y)
+            pos = self.validate_axis_size(is_float, input_pos_y)
             if neg and pos:
                 y = True
             if not neg:
@@ -204,3 +205,10 @@ class GuiDialog(object):
 
     def get_gui_size(self):
         return self.__size_x, self.__size_y
+
+    @staticmethod
+    def validate_axis_size(expression, entry_dialog):
+        if expression.match(entry_dialog.get()):
+            return True
+        else:
+            return False

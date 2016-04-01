@@ -2,8 +2,7 @@
 #   29.01.2016
 #
 #   V 0.1
-from Gui import Gui
-import time
+from geometry_tool.gui import Gui
 
 gui = Gui()
 
