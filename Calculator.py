@@ -94,20 +94,6 @@ class Calculator(object):
         :rtype: bool
         """
         can_be_simplified = True
-        if node.is_operation():
-            if node.get_value() in self.__operators:                # If this Node is an operator
-                operator = self.__operators[node.get_value()]       # Get the actual operator
-                node.set_value(operator, is_operation=True)         # Set the value of this Node
-
-            elif node.get_value() in self.__supported_functions:    # If this Node is a function
-                function = getattr(math, node.get_value())          # Get the actual function
-                node.set_value(function, is_operator=True)          # Set the value of this Node
-
-        elif node.is_constant():
-            if node.get_value() in self.__supported_constants:      # If this Node is a constant
-                constant = vars(math)[node.get_value()]             # Get the value of the constant
-                node.set_value(constant, is_number=True)            # Set the value of this Node
-
         for child in node.get_child_list():     # Try to simplify each child
             if not self._simplify(child):       # If one child can't be simplified
                 can_be_simplified = False       # Then this Node can also be not simplified
@@ -118,7 +104,7 @@ class Calculator(object):
         if can_be_simplified:
             if node.is_operation():
                 if node.get_value() in self.__operators:            # If this Node is an operator
-                    operation = node.get_value()                    # Get the operator
+                    operation = self.__operators[node.get_value()]  # Get the operator
                     operand_0 = node.get_child(0).get_value()       # Get the values of the children
                     operand_1 = node.get_child(1).get_value()
                     operands = (operand_0, operand_1)
@@ -129,7 +115,7 @@ class Calculator(object):
                     arguments = []
                     for child in node.get_child_list():                 # Get the value  of each child
                         arguments.append(child.get_value())
-                    function = node.get_value()
+                    function = getattr(math, node.get_value())
                     value = function(*arguments)                        # Calculate the value of this Node
                     node.set_value(value, is_number=True)               # Set the value of this Node
 
@@ -137,6 +123,11 @@ class Calculator(object):
 
             elif node.is_number():      # If this Node is a number
                 return True             # Do nothing and return
+
+            elif node.is_constant():                    # If the Node is a constant
+                value = vars(math)[node.get_value()]    # Get the value of the constant
+                node.set_value(value, is_number=True)   # Set the value of this Node
+                return True
 
         else:
             return False
@@ -152,16 +143,16 @@ class Calculator(object):
         :rtype: float
         """
         if node.is_operation():
-            if node.get_value() in self.__operators:        # If the Node is an operator
-                operation = node.get_value()                # Get the operator
+            if node.get_value() in self.__operators:            # If the Node is an operator
+                operation = self.__operators[node.get_value()]  # Get the operator
                 operand_1 = self._calculate(node.get_child(0), variables=variables)
                 operand_2 = self._calculate(node.get_child(1), variables=variables)
-                operands = (operand_1, operand_2)           # Calculate the values of both children
-                value = operation(*operands)                # Calculate the value of this Node
+                operands = (operand_1, operand_2)               # Calculate the values of both children
+                value = operation(*operands)                    # Calculate the value of this Node
                 return value
 
             elif node.get_value() in self.__supported_functions:        # If the Node is a function
-                function = node.get_value()                             # Get the function
+                function = getattr(math, node.get_value())              # Get the function
                 arguments = []
                 for child in node.get_child_list():                     # Calculate the value of each child
                     arguments.append(self._calculate(child, variables=variables))
@@ -173,4 +164,4 @@ class Calculator(object):
 
         elif node.is_variable():                    # If the Node is a variable
             value = variables[node.get_value()]     # Get the value of the Node from the dictionary
-            return value                            # Return the value``
+            return value                            # Return the value
