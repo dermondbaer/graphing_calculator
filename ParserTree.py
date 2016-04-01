@@ -60,7 +60,15 @@ class Node:
         return self.__is_variable
 
     def add_child(self, child, reverse=False):
-        """Adds a child element to this Node."""
+        """
+        Adds a child element to this Node.
+
+        :arg child: The element to add as child.
+        :type child: Node
+        :arg reverse: Determines whether to add the element as most left or most right child.
+        :type reverse: bool
+        :rtype: Node
+        """
         if reverse is False:
             self.__child_list.append(child)         # adding as most right child
         else:
@@ -69,13 +77,23 @@ class Node:
 
 
 class ParserTree:
-    """Used to save a mathematical Expression as a Tree."""
-    def __init__(self):
+    def __init__(self, expression=False):
+        """
+        Used to save a mathematical Expression as a Tree.
+
+        :arg expression: The expression saved in this ParserTree.
+        :type expression: str
+        """
         self.__root = None
+        self.__expression = expression
 
     def get_root(self):
         """Returns the root Node of this Parser Tree."""
         return self.__root
+
+    def get_expression(self):
+        """Returns the expression saved in this ParserTree"""
+        return self.__expression
 
     def get_variables(self):
         """Returns all variables in this ParserTree. If there are none, returns False."""
@@ -131,13 +149,13 @@ class ParserTree:
     def print(self):
         """Initializes the print for this Parser Tree."""
         if self.__root is not None:
-            self.__print(self.__root)   # Calls the __print() function for the root of this Parser Tree
-            print()
+            self._print(self.__root)    # Calls the _print() function for the root of this Parser Tree
+        print()
 
-    def __print(self, node):
+    def _print(self, node):
         """Prints the given Node and initializes the print for every child element."""
         if node is not None:
             value = node.get_value()
             for child in node.get_child_list():
-                self.__print(child) # Calls the __print() function for every child element of this Node
+                self._print(child)      # Calls the _print() function for every child element of this Node
             print(value, end=' ')
