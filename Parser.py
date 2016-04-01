@@ -36,18 +36,18 @@ class Parser(object):
             attributes = child.attrib
             self.__supported_variables.append(attributes['name'])
 
-    def parse_expression(self, infix):
+    def parse_expression(self, expression):
         """
         Parses a mathematical expression and returns it as a ParserTree.  Its purpose is NOT graphic display.
 
-        :arg infix: A mathematical expression, given in infix notation.
-        :type infix: str
+        :arg expression: A mathematical expression, given in infix notation.
+        :type expression: str
         :rtype: ParserTree
         """
-        postfix = self.__make_postfix(self.partition(infix))    # Converts the expression to postfix notation
-        parser_tree = ParserTree()
+        postfix = self._make_postfix(self.partition(expression))    # Converts the expression to postfix notation
+        parser_tree = ParserTree(expression)
         if len(postfix) > 0:
-            self.__parse(postfix, current_token_index=len(postfix)-1, parser_tree=parser_tree)
+            self._parse(postfix, current_token_index=len(postfix) - 1, parser_tree=parser_tree)
         return parser_tree
 
     def make_expression_postfix(self, expression):
@@ -59,11 +59,11 @@ class Parser(object):
         :rtype: str
         """
         infix = self.partition(expression)      # Sequences the given expression
-        postfix = self.__make_postfix(infix)    # Invokes the actual conversion of the expression
+        postfix = self._make_postfix(infix)    # Invokes the actual conversion of the expression
         postfix = ' '.join(postfix)             # Joins the sequenced expression back together
         return postfix
 
-    def __make_postfix(self, expression):
+    def _make_postfix(self, expression):
         """
         Uses the shunting-yard algorithm to convert from infix to postfix notation.
 
@@ -143,7 +143,7 @@ class Parser(object):
 
         return output_queue
 
-    def __parse(self, expression, current_token_index, parser_tree, parent=None):
+    def _parse(self, expression, current_token_index, parser_tree, parent=None):
         """
         Parser an expression, given in postfix notation and writes it to a ParserTree.
 
@@ -161,14 +161,14 @@ class Parser(object):
         if token in self.__operators:       # If the token is an operator
             parent = parser_tree.add_operation(token, parent=parent)
             current_token_index -= 1
-            current_token_index = self.__parse(expression, current_token_index, parser_tree, parent=parent)
-            current_token_index = self.__parse(expression, current_token_index, parser_tree, parent=parent)
+            current_token_index = self._parse(expression, current_token_index, parser_tree, parent=parent)
+            current_token_index = self._parse(expression, current_token_index, parser_tree, parent=parent)
 
         elif token in self.__supported_functions:                           # If the token is a function
             parent = parser_tree.add_operation(token, parent=parent)        # Add the token as Node
             current_token_index -= 1
             for argument in range(0, self.__supported_functions[token]):    # Add each argument as child
-                current_token_index = self.__parse(expression, current_token_index, parser_tree, parent=parent)
+                current_token_index = self._parse(expression, current_token_index, parser_tree, parent=parent)
 
         elif token in self.__supported_constants:               # If the token is a constant
             parser_tree.add_constant(token, parent=parent)      # Add the token as Node
