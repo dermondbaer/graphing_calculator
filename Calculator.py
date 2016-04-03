@@ -64,25 +64,25 @@ class Calculator(object):
         :type variables: dict
         :rtype: float
         """
-        print('{:<14}'.format('Calculating:'), parser_tree.get_expression(), sep='')
-        print('{:<14}'.format('Variables:'), end='')
-        first = True
-        for variable in variables:
-            if first:
-                print(variable, '=', variables[variable], sep=' ', end='')
-                first = False
-            else:
-                print(';', variable, '=', variables[variable], sep=' ', end='')
-                pass
-        print()
+        # print('{:<14}'.format('Calculating:'), parser_tree.get_expression(), sep='')
+        # print('{:<14}'.format('Variables:'), end='')
+        # first = True
+        # for variable in variables:
+        # if first:
+        # print(variable, '=', variables[variable], sep=' ', end='')
+        # first = False
+        # else:
+        # print(';', variable, '=', variables[variable], sep=' ', end='')
+        # pass
+        # print()
         if parser_tree.get_root() is not None:
             result = self._calculate(parser_tree.get_root(), variables)
-            print('{:<14}'.format('Result:'), result, sep='')
-            print()
+            # print('{:<14}'.format('Result:'), result, sep='')
+            # print()
             return result
         else:
-            print('Error')
-            print()
+            # print('Error')
+            # print()
             return False
 
     def _simplify(self, node):

@@ -4,39 +4,41 @@
 #   V 0.1
 
 from tkinter import *
-from math import *
-import parser
+from Calculator import Calculator
+# from math import *
+# import parser
 
 
 class CoordinateSystem(object):
-    def __init__(self, gui, master, size):
+    def __init__(self, gui, master, axis_size):
         self.__gui = gui
-        self.__axis_size = size
         self.__master = master
+        self.__calculator = Calculator('../supported.xml')
 
-        size_x, size_y = size
-        neg_x, pos_x = size_x
-        neg_y, pos_y = size_y
+        size_x, size_y = axis_size
+        neg_size_x, pos_size_x = size_x
+        neg_size_y, pos_size_y = size_y
+        self.__axis_size = axis_size
 
-        self.__origin = (abs(neg_x), abs(pos_y))
+        origin_x = abs(neg_size_x)
+        origin_y = abs(pos_size_x)
+        self.__origin = (origin_x, origin_y)
 
-        canvas_width = pos_x - neg_x
-        canvas_height = pos_y - neg_y
+        canvas_width = pos_size_x + abs(neg_size_x)
+        canvas_height = pos_size_y + abs(neg_size_y)
+        self.__canvas_size = (canvas_width, canvas_height)
 
         self.__frame = Frame(self.__master, borderwidth=1, background='black')
         self.__frame.pack(side=RIGHT)
 
         self.__canvas = Canvas(self.__frame, width=canvas_width, height=canvas_height, highlightthickness=0)
         self.__canvas.pack()
-        self.__canvas_size = (canvas_width, canvas_height)
-        self.__canvas.create_line((abs(neg_x), 0), (abs(neg_x), canvas_height))
-        self.__canvas.create_line((0, pos_y), (canvas_width, pos_y))
-
-        self.__canvas.create_line((abs(neg_x) - 10, 10), (abs(neg_x), 0), (abs(neg_x) + 11, 11))
-        width = canvas_width
-        self.__canvas.create_line((width - 11, pos_y - 10), (width - 1, pos_y), (width - 12, pos_y + 11))
+        self.__canvas.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
+        self.__canvas.create_line((0, pos_size_y), (canvas_width, pos_size_y))
 
         unit_size_x, unit_size_y = self.__gui.get_scale()
+
+        print(unit_size_x, unit_size_y)
 
         if unit_size_x < 25:
             multiplicand_x = 0
@@ -76,7 +78,10 @@ class CoordinateSystem(object):
         else:
             multiplicand_y = 1
 
-        units = self.__gui.get_size()
+        print(unit_size_x, unit_size_y)
+        print()
+
+        units = self.__gui.get_units()
         units_x, units_y = units
         neg_units_x, pos_units_x = units_x
         neg_units_y, pos_units_y = units_y
@@ -85,8 +90,6 @@ class CoordinateSystem(object):
         pos_units_x = abs(int(pos_units_x / multiplicand_x))
         neg_units_y = abs(int(neg_units_y / multiplicand_y))
         pos_units_y = abs(int(pos_units_y / multiplicand_y))
-
-        origin_x, origin_y = self.__origin
 
         for i in range(0, neg_units_x):
             margin = origin_x - (i * unit_size_x)
@@ -108,7 +111,7 @@ class CoordinateSystem(object):
             margin = origin_y + (i * unit_size_y)
             self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
             if i > 0:
-                self.__canvas.create_text((origin_x - 15, margin), text=(-i * multiplicand_y), font="arial 7")
+                self.__canvas.create_text((origin_x-10, margin), text=(-i*multiplicand_y), font="arial 7", anchor='e')
             margin = origin_y + ((i + 0.5) * unit_size_y)
             self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
 
@@ -116,7 +119,7 @@ class CoordinateSystem(object):
             margin = origin_y - (i * unit_size_y)
             self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
             if i > 0:
-                self.__canvas.create_text((origin_x + 15, margin), text=(i * multiplicand_y), font="arial 7")
+                self.__canvas.create_text((origin_x+10, margin), text=(i*multiplicand_y), font="arial 7", anchor='w')
             margin = origin_y - ((i + 0.5) * unit_size_y)
             self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
 
@@ -173,40 +176,33 @@ class CoordinateSystem(object):
         return pos_a, pos_b, tkinter_objects
 
     def create_line(self, coord_sup, coord_dir):
-        pos_sup = self.get_absolute_position(coord_sup)
-        pos_dir = self.get_absolute_position(coord_dir)
-        sup_x, sup_y = coord_sup
-        dir_x, dir_y = coord_dir
-        size_x, size_y = self.__gui.get_size()
-        neg_x, pos_x = size_x
-        neg_y, pos_y = size_y
+        pos_sup_vec = self.get_absolute_position(coord_sup)
+        pos_dir_vec = self.get_absolute_position(coord_dir)
+        coord_sup_x, coord_sup_y = coord_sup
+        coord_dir_x, coord_dir_y = coord_dir
+        units_x, units_y = self.__gui.get_units()
+        neg_units_x, pos_units_x = units_x
+        neg_units_y, pos_units_y = units_y
 
-        if pos_x >= abs(neg_x):
-            max_x = pos_x
-        else:
-            max_x = abs(neg_x)
-
-        if pos_y >= abs(neg_y):
-            max_y = pos_y
-        else:
-            max_y = abs(neg_y)
+        bound_x = max(pos_units_x, abs(neg_units_x))
+        bound_y = max(pos_units_y, abs(neg_units_y))
 
         x = y = 0
-        t = 10
+        t = 1
 
-        while abs(x) < max_x and abs(y) < max_y:
-            x = sup_x + t * dir_x
-            y = sup_y + t * dir_y
-            t += 10
+        while abs(x) < bound_x and abs(y) < bound_y:
+            x = coord_sup_x + t * coord_dir_x
+            y = coord_sup_y + t * coord_dir_y
+            t *= 2
         point_a = (x, y)
 
         x = y = 0
-        t = -10
+        t = -1
 
-        while abs(x) < max_x and abs(y) < max_y:
-            x = sup_x + t * dir_x
-            y = sup_y + t * dir_y
-            t -= 10
+        while abs(x) < bound_x and abs(y) < bound_y:
+            x = coord_sup_x + t * coord_dir_x
+            y = coord_sup_y + t * coord_dir_y
+            t *= 2
         point_b = (x, y)
 
         pos_a = self.get_absolute_position(point_a)
@@ -214,16 +210,69 @@ class CoordinateSystem(object):
 
         tkinter_object = self.__canvas.create_line(pos_a, pos_b)
 
-        return pos_sup, pos_dir, tkinter_object
+        return pos_sup_vec, pos_dir_vec, tkinter_object
 
     def create_function_graph(self, function_term):
-        function = parser.expr(function_term).compile()
+        parsed_function = self.__calculator.calculate_expression(function_term)
 
-        size_x, size_y = self.__gui.get_size()
-        neg_x, pos_x = size_x
+        canvas_size_x, canvas_size_y = self.__canvas_size
+        overhang = canvas_size_y
+
+        units_x, units_y = self.__gui.get_units()
+        neg_units_x, pos_units_x = units_x
         scale_x, scale_y = self.__gui.get_scale()
-        graph = [[]]
+        graph = []
+        temp_graph = []
 
+        if scale_x <= 1:
+            for x in range(int(neg_units_x), int(pos_units_x+1)):
+                try:
+                    y = self.__calculator.calculate_function_value(parsed_function, x=x)
+                    position_x, position_y = self.get_absolute_position((x, y))
+                    if position_y < -overhang:
+                        if temp_graph:
+                            temp_graph.append((position_x, -overhang))
+                            graph.append(temp_graph)
+                            temp_graph = []
+                    elif position_y > canvas_size_y + overhang:
+                        if temp_graph:
+                            temp_graph.append((position_x, canvas_size_y + overhang))
+                            graph.append(temp_graph)
+                            temp_graph = []
+                    else:
+                        temp_graph.append((position_x, position_y))
+
+                except ZeroDivisionError:
+                    if temp_graph:
+                        graph.append(temp_graph)
+                        temp_graph = []
+
+        else:
+            for unit in range(int(neg_units_x), int(pos_units_x)):
+                for fraction in range(0, int(scale_x)):
+                    x = unit + (fraction / int(scale_x))
+                    try:
+                        y = self.__calculator.calculate_function_value(parsed_function, x=x)
+                        position_x, position_y = self.get_absolute_position((x, y))
+                        if position_y < -overhang:
+                            if temp_graph:
+                                temp_graph.append((position_x, -overhang))
+                                graph.append(temp_graph)
+                                temp_graph = []
+                        elif position_y > canvas_size_y + overhang:
+                            if temp_graph:
+                                temp_graph.append((position_x, canvas_size_y + overhang))
+                                graph.append(temp_graph)
+                                temp_graph = []
+                        else:
+                            temp_graph.append((position_x, position_y))
+
+                    except ZeroDivisionError:
+                        if temp_graph:
+                            graph.append(temp_graph)
+                            temp_graph = []
+
+        """
         if scale_x >= 1:
             for a in range(neg_x, pos_x):
                 for b in range(0, scale_x):
@@ -250,6 +299,7 @@ class CoordinateSystem(object):
                 except ValueError:
                     if graph[-1]:
                         graph.append([])
+        """
 
         tkinter_objects = []
         for a in graph:
