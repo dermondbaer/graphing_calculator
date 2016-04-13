@@ -10,7 +10,7 @@ class Line(object):
         self.__coordinates_direction_vector = coord_dir
         self.__position_support_vector = pos_sup
         self.__position_direction_vector = pos_dir
-        self.__tkinter_object = tkinter
+        self.__tkinter_objects = [tkinter]
 
     def get_coordinates_support_vector(self):
         return self.__coordinates_support_vector
@@ -24,5 +24,5 @@ class Line(object):
     def get_position_direction_vector(self):
         return self.__position_direction_vector
 
-    def get_tkinter_object(self):
-        return self.__tkinter_object
+    def get_tkinter_objects(self):
+        return self.__tkinter_objects

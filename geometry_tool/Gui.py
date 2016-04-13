@@ -54,6 +54,7 @@ class Gui(object):
         print('Y-range: ', neg_units_y, '; ', pos_units_y, sep='')
         print('X-scale:', scale_x)
         print('Y-scale:', scale_y)
+        print()
 
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
@@ -63,7 +64,8 @@ class Gui(object):
         self.__master.resizable(0, 0)
 
         self.__menu = Menu(master=self.__master)
-        self.__menu.add_command(label="Quit", command=self.stop)
+        self.__menu.add_command(label='Quit', command=self.stop)
+        self.__menu.add_command(label='Clear', command=self.clear_figures)
         self.__master.config(menu=self.__menu)
 
         self.__in_out_container = Frame(self.__master)
@@ -87,6 +89,13 @@ class Gui(object):
         """Destroys the Gui."""
         self.__master.destroy()
         del self
+
+    def clear_figures(self):
+        """Removes all figures from the coordinate system"""
+        for figure in self.__figures:
+            for tkinter_object in figure.get_tkinter_objects():
+                self.__coordinate_system.del_tkinter_object(tkinter_object)
+        self.__figures = []
 
     def get_units(self):
         """Returns the amount of units on the negative and positive parts of the x- and y-axis as
@@ -187,7 +196,7 @@ class Gui(object):
         :type point: Point
         """
         self.__figures.remove(point)
-        self.__coordinate_system.del_tkinter_object(point.get_tkinter_object())
+        self.__coordinate_system.del_tkinter_object(point.get_tkinter_objects())
 
     def del_distance(self, distance):
         """
@@ -208,7 +217,7 @@ class Gui(object):
         :type line: Line
         """
         self.__figures.remove(line)
-        self.__coordinate_system.del_tkinter_object(line.get_tkinter_object())
+        self.__coordinate_system.del_tkinter_object(line.get_tkinter_objects())
 
     def del_function_graph(self, function):
         """

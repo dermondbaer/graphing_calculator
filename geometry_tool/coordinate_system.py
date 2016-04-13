@@ -38,8 +38,6 @@ class CoordinateSystem(object):
 
         unit_size_x, unit_size_y = self.__gui.get_scale()
 
-        print(unit_size_x, unit_size_y)
-
         if unit_size_x < 25:
             multiplicand_x = 0
             temp = unit_size_x
@@ -77,9 +75,6 @@ class CoordinateSystem(object):
             unit_size_y *= multiplicand_y
         else:
             multiplicand_y = 1
-
-        print(unit_size_x, unit_size_y)
-        print()
 
         units = self.__gui.get_units()
         units_x, units_y = units
@@ -216,13 +211,13 @@ class CoordinateSystem(object):
         parsed_function = self.__calculator.calculate_expression(function_term)
 
         canvas_size_x, canvas_size_y = self.__canvas_size
-        overhang = canvas_size_y
+        overhang = canvas_size_y * 2
 
         units_x, units_y = self.__gui.get_units()
         neg_units_x, pos_units_x = units_x
         scale_x, scale_y = self.__gui.get_scale()
-        graph = []
-        temp_graph = []
+        full_graph = []
+        current_graph_section = []
 
         if scale_x <= 1:
             for x in range(int(neg_units_x), int(pos_units_x+1)):
@@ -230,79 +225,53 @@ class CoordinateSystem(object):
                     y = self.__calculator.calculate_function_value(parsed_function, x=x)
                     position_x, position_y = self.get_absolute_position((x, y))
                     if position_y < -overhang:
-                        if temp_graph:
-                            temp_graph.append((position_x, -overhang))
-                            graph.append(temp_graph)
-                            temp_graph = []
+                        if current_graph_section:
+                            current_graph_section.append((position_x, -overhang))
+                            full_graph.append(current_graph_section)
+                            current_graph_section = []
                     elif position_y > canvas_size_y + overhang:
-                        if temp_graph:
-                            temp_graph.append((position_x, canvas_size_y + overhang))
-                            graph.append(temp_graph)
-                            temp_graph = []
+                        if current_graph_section:
+                            current_graph_section.append((position_x, canvas_size_y + overhang))
+                            full_graph.append(current_graph_section)
+                            current_graph_section = []
                     else:
-                        temp_graph.append((position_x, position_y))
+                        current_graph_section.append((position_x, position_y))
 
                 except ZeroDivisionError:
-                    if temp_graph:
-                        graph.append(temp_graph)
-                        temp_graph = []
+                    if current_graph_section:
+                        full_graph.append(current_graph_section)
+                        current_graph_section = []
 
         else:
-            for unit in range(int(neg_units_x), int(pos_units_x)):
-                for fraction in range(0, int(scale_x)):
-                    x = unit + (fraction / int(scale_x))
+            for unit in range(int(neg_units_x), int(pos_units_x)+1):
+                for fraction in range(0, int(scale_x / 10)):
+                    x = unit + (fraction / (int(scale_x / 10)))
                     try:
                         y = self.__calculator.calculate_function_value(parsed_function, x=x)
                         position_x, position_y = self.get_absolute_position((x, y))
                         if position_y < -overhang:
-                            if temp_graph:
-                                temp_graph.append((position_x, -overhang))
-                                graph.append(temp_graph)
-                                temp_graph = []
+                            if current_graph_section:
+                                current_graph_section.append((position_x, -overhang))
+                                full_graph.append(current_graph_section)
+                                current_graph_section = []
                         elif position_y > canvas_size_y + overhang:
-                            if temp_graph:
-                                temp_graph.append((position_x, canvas_size_y + overhang))
-                                graph.append(temp_graph)
-                                temp_graph = []
+                            if current_graph_section:
+                                current_graph_section.append((position_x, canvas_size_y + overhang))
+                                full_graph.append(current_graph_section)
+                                current_graph_section = []
                         else:
-                            temp_graph.append((position_x, position_y))
+                            current_graph_section.append((position_x, position_y))
 
                     except ZeroDivisionError:
-                        if temp_graph:
-                            graph.append(temp_graph)
-                            temp_graph = []
+                        if current_graph_section:
+                            full_graph.append(current_graph_section)
+                            current_graph_section = []
 
-        """
-        if scale_x >= 1:
-            for a in range(neg_x, pos_x):
-                for b in range(0, scale_x):
-                    x = a + (b / scale_x)
-                    try:
-                        y = eval(function)
-                        pos = self.get_absolute_position((x, y))
-                        graph[-1].append(pos)
-                    except ZeroDivisionError:
-                        if graph[-1]:
-                            graph.append([])
-                    except ValueError:
-                        if graph[-1]:
-                            graph.append([])
-        else:
-            for x in range(neg_x, pos_x):
-                try:
-                    y = eval(function)
-                    pos = self.get_absolute_position((x, y))
-                    graph[-1].append(pos)
-                except ZeroDivisionError:
-                    if graph[-1]:
-                        graph.append([])
-                except ValueError:
-                    if graph[-1]:
-                        graph.append([])
-        """
+        if current_graph_section:
+            full_graph.append(current_graph_section)
 
         tkinter_objects = []
-        for a in graph:
+        for a in full_graph:
             tkinter_objects.append(self.__canvas.create_line(a))
 
         return tkinter_objects
