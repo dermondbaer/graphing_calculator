@@ -3,35 +3,16 @@
 # Calculator for mathematical expressions
 # V 0.1
 
-import math
-import time
-import xml.etree.ElementTree as Et
+import Math
 from operator import *
 from Parser import Parser
 from ParserTree import ParserTree
 
 
 class Calculator(object):
-    def __init__(self, xml_file):
-        self.__parser = Parser(xml_file)
+    def __init__(self):
+        self.__parser = Parser()
         self.__operators = {'+': add, '-': sub, '*': mul, '/': truediv, '^': pow}
-        self.__supported_functions = {}     # List of available functions
-        self.__supported_constants = []     # List of available constants
-        self.__supported_variables = []     # List of available variables
-        self.__operations_xml = Et.parse(xml_file)
-        self.__xml_root = self.__operations_xml.getroot()
-
-        for child in self.__xml_root[1]:    # Iterating over the functions, defined in the XML-File
-            attributes = child.attrib
-            self.__supported_functions[attributes['name']] = int(attributes['variables'])
-
-        for child in self.__xml_root[2]:    # Iterating over the constants, defined in the XML-File
-            attributes = child.attrib
-            self.__supported_constants.append(attributes['name'])
-
-        for child in self.__xml_root[3]:    # Iterating over the variables, defined in the XML-File
-            attributes = child.attrib
-            self.__supported_variables.append(attributes['name'])
 
     def calculate_expression(self, expression):
         """
@@ -64,25 +45,10 @@ class Calculator(object):
         :type variables: dict
         :rtype: float
         """
-        # print('{:<14}'.format('Calculating:'), parser_tree.get_expression(), sep='')
-        # print('{:<14}'.format('Variables:'), end='')
-        # first = True
-        # for variable in variables:
-        # if first:
-        # print(variable, '=', variables[variable], sep=' ', end='')
-        # first = False
-        # else:
-        # print(';', variable, '=', variables[variable], sep=' ', end='')
-        # pass
-        # print()
         if parser_tree.get_root() is not None:
             result = self._calculate(parser_tree.get_root(), variables)
-            # print('{:<14}'.format('Result:'), result, sep='')
-            # print()
             return result
         else:
-            # print('Error')
-            # print()
             return False
 
     def _simplify(self, node):
@@ -111,11 +77,11 @@ class Calculator(object):
                     value = operation(*operands)                    # Calculate the value of this node
                     node.set_value(value, is_number=True)           # Set the value of this node
 
-                elif node.get_value() in self.__supported_functions:    # If this Node is a function
+                else:                                                   # If the Node is a function
                     arguments = []
                     for child in node.get_child_list():                 # Get the value  of each child
                         arguments.append(child.get_value())
-                    function = getattr(math, node.get_value())
+                    function = getattr(Math, node.get_value())
                     value = function(*arguments)                        # Calculate the value of this Node
                     node.set_value(value, is_number=True)               # Set the value of this Node
 
@@ -125,7 +91,7 @@ class Calculator(object):
                 return True             # Do nothing and return
 
             elif node.is_constant():                    # If the Node is a constant
-                value = vars(math)[node.get_value()]    # Get the value of the constant
+                value = vars(Math)[node.get_value()]    # Get the value of the constant
                 node.set_value(value, is_number=True)   # Set the value of this Node
                 return True
 
@@ -151,8 +117,8 @@ class Calculator(object):
                 value = operation(*operands)                    # Calculate the value of this Node
                 return value
 
-            elif node.get_value() in self.__supported_functions:        # If the Node is a function
-                function = getattr(math, node.get_value())              # Get the function
+            else:                                                       # If the Node is a function
+                function = getattr(Math, node.get_value())              # Get the function
                 arguments = []
                 for child in node.get_child_list():                     # Calculate the value of each child
                     arguments.append(self._calculate(child, variables=variables))
