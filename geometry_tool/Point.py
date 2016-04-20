@@ -8,7 +8,7 @@ class Point(object):
     def __init__(self, coordinates, position, tkinter):
         self.__coordinates = coordinates
         self.__position = position
-        self.__tkinter_object = tkinter
+        self.__tkinter_objects = [tkinter]
 
     def get_coordinates(self):
         return self.__coordinates
@@ -16,5 +16,5 @@ class Point(object):
     def get_position(self):
         return self.__position
 
-    def get_tkinter_object(self):
-        return self.__tkinter_object
+    def get_tkinter_objects(self):
+        return self.__tkinter_objects

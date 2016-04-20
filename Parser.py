@@ -4,37 +4,17 @@
 # V 1.0
 
 import re
-import xml.etree.ElementTree as Et
+import inspect
+import Math
 from ParserTree import ParserTree
 
 
 class Parser(object):
-    def __init__(self, xml_file):
-        self.__operators = []               # List of available operators
-        self.__operator_precedence = {}     # List of available operators and their corresponding precedence
-        self.__operator_associativity = {}  # List of available operators and their corresponding associativity
-        self.__supported_functions = {}     # List of available functions
-        self.__supported_constants = []     # List of available constants
-        self.__supported_variables = []     # List of available variables
-        self.__operations_xml = Et.parse(xml_file)
-        self.__xml_root = self.__operations_xml.getroot()
-        for child in self.__xml_root[0]:    # Iterating over the operators, defined in the XML-File
-            attributes = child.attrib
-            self.__operators.append(attributes['name'])
-            self.__operator_precedence[attributes['name']] = attributes['precedence']
-            self.__operator_associativity[attributes['name']] = attributes['associativity']
-
-        for child in self.__xml_root[1]:    # Iterating over the functions, defined in the XML-File
-            attributes = child.attrib
-            self.__supported_functions[attributes['name']] = int(attributes['variables'])
-
-        for child in self.__xml_root[2]:    # Iterating over the constants, defined in the XML-File
-            attributes = child.attrib
-            self.__supported_constants.append(attributes['name'])
-
-        for child in self.__xml_root[3]:    # Iterating over the variables, defined in the XML-File
-            attributes = child.attrib
-            self.__supported_variables.append(attributes['name'])
+    def __init__(self):
+        self.__operators = ['^', '*', '/', '+', '-']    # List of available operators
+        self.__operator_precedence = {'^': 4, '*': 3, '/': 3, '+': 2, '-': 2}
+        self.__operator_associativity = {'^': 'r', '*': 'l', '/': 'l', '+': 'l', '-': 'l'}
+        self.__supported_constants = ['e', 'pi']        # List of available constants
 
     def parse_expression(self, expression):
         """
@@ -65,7 +45,7 @@ class Parser(object):
 
     def _make_postfix(self, expression):
         """
-        Uses the shunting-yard algorithm to convert from infix to postfix notation.
+        Uses the shunting-yard algorithm to convert an expression from infix to postfix notation.
 
         :arg expression: The expression to be converted into postfix notation.
         :type expression: list
@@ -80,10 +60,10 @@ class Parser(object):
             elif token in self.__supported_constants:   # If the token is a constant
                 output_queue.append(token)              # Add it to the output queue
 
-            elif token in self.__supported_variables:   # If the token is a variable
+            elif re.match('^[a-z]$', token):            # If the token is a variable (single lowercase)
                 output_queue.append(token)              # Add it to the output queue
 
-            elif token in self.__supported_functions:   # If the token is a function
+            elif re.match('^[a-zA-Z]{2,}$', token):     # If the token is a function name
                 operator_stack.append(token)            # Add it to the operator stack
 
             elif token == ',':                          # If the token is a argument separator
@@ -128,7 +108,7 @@ class Parser(object):
                 operator_stack.pop()                    # Pop the left parenthesis off the stack
 
                 if len(operator_stack) > 0:
-                    if operator_stack[-1] in self.__supported_functions:    # If the top of the operator stack is a
+                    if re.match('^[a-zA-Z]{2,}$', operator_stack[-1]):      # If the top of the operator stack is a
                                                                             # function
                         operator = operator_stack.pop()                     # Pop it off the operator stack
                         output_queue.append(operator)                       # Add it to the output queue
@@ -145,7 +125,7 @@ class Parser(object):
 
     def _parse(self, expression, current_token_index, parser_tree, parent=None):
         """
-        Parser an expression, given in postfix notation and writes it to a ParserTree.
+        Parses an expression, given in postfix notation and writes it to a ParserTree.
 
         :arg expression: The expression to parse.
         :type expression: list
@@ -164,22 +144,24 @@ class Parser(object):
             current_token_index = self._parse(expression, current_token_index, parser_tree, parent=parent)
             current_token_index = self._parse(expression, current_token_index, parser_tree, parent=parent)
 
-        elif token in self.__supported_functions:                           # If the token is a function
+        elif token in self.__supported_constants:           # If the token is a constant
+            parser_tree.add_constant(token, parent=parent)  # Add the token as Node
+            current_token_index -= 1
+
+        elif re.match('^[a-zA-Z][a-zA-z0-9]+$', token):                     # If the token is a function
             parent = parser_tree.add_operation(token, parent=parent)        # Add the token as Node
             current_token_index -= 1
-            for argument in range(0, self.__supported_functions[token]):    # Add each argument as child
+            function = getattr(Math, token)
+            argument_count = len(inspect.getfullargspec(function).args)
+            for argument in range(0, argument_count):                       # Add each argument as child
                 current_token_index = self._parse(expression, current_token_index, parser_tree, parent=parent)
 
-        elif token in self.__supported_constants:               # If the token is a constant
-            parser_tree.add_constant(token, parent=parent)      # Add the token as Node
-            current_token_index -= 1
-
-        elif token in self.__supported_variables:               # If the token is a variable
+        elif re.match('^[a-z]$', token):                        # If the token is a variable
             parser_tree.add_variable(token, parent=parent)      # Add the token as Node
             current_token_index -= 1
 
-        elif re.match('^-?\d+(\.\d+)?$', token):                # If the token is a number
-            parser_tree.add_number(float(token), parent=parent)        # Add the token as Node
+        elif re.match('^-?\d+(\.\d+)?$', token):                        # If the token is a number
+            parser_tree.add_number(float(token), parent=parent)         # Add the token as Node
             current_token_index -= 1
 
         return current_token_index          # Return the current token index
@@ -198,9 +180,21 @@ class Parser(object):
         expression = expression.replace(',', ' , ')
         expression = re.sub('\s+', ' ', expression)
         expression = expression.split(' ')
+
         if len(expression) > 0:
             while expression[-1] == '':
                 expression.pop()
                 if len(expression) == 0:
                     break
+
+        for index in range(0, len(expression)):
+            token = expression[index]
+
+            if re.match('^\.\d+$', token):
+                token = '0' + token             # Adding left out leading zeros in positive decimal digits
+            if re.match('^-\.\d+$', token):
+                token.replace('-', '-0')        # Adding left out leading zeros in negative decimal digits
+
+            expression[index] = token
+
         return expression
