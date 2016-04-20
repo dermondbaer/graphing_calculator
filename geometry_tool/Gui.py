@@ -183,6 +183,7 @@ class Gui(object):
         """
         print('Creating Function Graph')
         print('Function Term:', function_term)
+        print()
         tkinter_objects = self.__coordinate_system.create_function_graph(function_term)
         function = Function(function_term, tkinter_objects)
         self.__figures.append(function)
