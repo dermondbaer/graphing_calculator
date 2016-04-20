@@ -13,7 +13,7 @@ class CoordinateSystem(object):
     def __init__(self, gui, master, axis_size):
         self.__gui = gui
         self.__master = master
-        self.__calculator = Calculator('../supported.xml')
+        self.__calculator = Calculator()
 
         size_x, size_y = axis_size
         neg_size_x, pos_size_x = size_x
@@ -244,8 +244,8 @@ class CoordinateSystem(object):
 
         else:
             for unit in range(int(neg_units_x), int(pos_units_x)+1):
-                for fraction in range(0, int(scale_x / 10)):
-                    x = unit + (fraction / (int(scale_x / 10)))
+                for fraction in range(0, int(scale_x)):
+                    x = unit + (fraction / int(scale_x))
                     try:
                         y = self.__calculator.calculate_function_value(parsed_function, x=x)
                         position_x, position_y = self.get_absolute_position((x, y))
