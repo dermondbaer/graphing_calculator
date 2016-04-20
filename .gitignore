@@ -9,3 +9,5 @@ graphing_calculator/.idea/workspace.xml
 __pycache__/Expression.cpython-35.pyc
 *.pyc
 .idea/dictionaries/Pascal.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
