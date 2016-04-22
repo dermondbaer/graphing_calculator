@@ -1,13 +1,94 @@
+from math import *
+
 # Max Trinter, Pascal Mehnert
-# 23.03.2016
+# 22.04.2016
 # Collection of mathematical functions
-# V 1.0
-
-import math
-
+# V 1.1
 
 pi = math.pi
 e = math.e
+
+
+def fac(zahl):
+
+    zahl = int(zahl)
+    
+    for i in range(1,(zahl)):
+        zahl *= i
+
+    return zahl
+
+def nueberk(n,k):
+
+    n = int(n)
+    k = int(k)
+
+    zaehler = fac(n)
+
+    nenner = fac(k)
+    nenner = nenner * fac(n-k)
+        
+    return(zaehler/nenner)
+
+def binompdf(n,p,k):
+    n = int(n)
+    k = int(k)
+
+    if(k > n):
+        print("Error. N <= k!")
+        return 0
+
+    if (p > 1):
+        print("Error. p <= 1!")
+
+    return (nueberk(n,k)*pow(p,k)*pow((1-p),(n-k)))
+
+def binomcdf(n,p,k):
+
+    n = int(n)
+    k = int(k)
+
+    if(k > n):
+        print("Error. N <= k!")
+        return 0
+
+    if (p > 1):
+        print("Error. p <= 1!")
+
+
+    ergebnis = 0
+    for i in range(1,(k+1)):
+        ergebnis += binompdf(n,p,i)
+
+    return (ergebnis)
+
+def dec(zaehler,nenner):
+    return zaehler/nenner
+
+def frac(zahl):
+ 
+    zaehler = 1
+    
+    nachkommastellen = len(str(zahl % 1).split(".")[1])
+
+    zaehler = zahl * pow(10,nachkommastellen)
+
+    nenner = pow(10,nachkommastellen)
+
+    rest = 1
+    b = zaehler
+    a = nenner
+    
+    while rest != 0:
+        rest = b % a
+        b = a
+        a = rest
+
+    zaehler = int(zaehler/b)
+    nenner = int(nenner/b)
+
+    #Hier die Return-Anweisung
+    print(zaehler,"/",nenner)
 
 
 def cos(x):
@@ -51,11 +132,11 @@ def atanh(x):
 
 
 def radians(x):
-    return math.radians(x)
+    return (winkel / 360) * (2*pi)
 
 
 def degrees(x):
-    return math.degrees(x)
+    return (winkel * 360) / (2*pi)
 
 
 def sqrt(x):
@@ -87,4 +168,7 @@ def max(a, b):
 
 
 def abs(x):
-    return abs(x)
+    if(x >= 0):
+        return x
+    else:
+        return -x
