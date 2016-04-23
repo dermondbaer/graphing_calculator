@@ -4,7 +4,7 @@
 #   V 0.1
 
 from tkinter import *
-from Calculator import Calculator
+from math_calculator import Calculator
 # from math import *
 # import parser
 
@@ -242,6 +242,11 @@ class CoordinateSystem(object):
                         full_graph.append(current_graph_section)
                         current_graph_section = []
 
+                except ValueError:
+                    if current_graph_section:
+                        full_graph.append(current_graph_section)
+                        current_graph_section = []
+
         else:
             for unit in range(int(neg_units_x), int(pos_units_x)+1):
                 for fraction in range(0, int(scale_x)):
@@ -263,6 +268,11 @@ class CoordinateSystem(object):
                             current_graph_section.append((position_x, position_y))
 
                     except ZeroDivisionError:
+                        if current_graph_section:
+                            full_graph.append(current_graph_section)
+                            current_graph_section = []
+
+                    except ValueError:
                         if current_graph_section:
                             full_graph.append(current_graph_section)
                             current_graph_section = []
