@@ -5,8 +5,8 @@
 
 import re
 import inspect
-import Math
-from ParserTree import ParserTree
+import math_library
+from parser_tree import ParserTree
 
 
 class Parser(object):
@@ -151,7 +151,7 @@ class Parser(object):
         elif re.match('^[a-zA-Z][a-zA-z0-9]+$', token):                     # If the token is a function
             parent = parser_tree.add_operation(token, parent=parent)        # Add the token as Node
             current_token_index -= 1
-            function = getattr(Math, token)
+            function = getattr(math_library, token)
             argument_count = len(inspect.getfullargspec(function).args)
             for argument in range(0, argument_count):                       # Add each argument as child
                 current_token_index = self._parse(expression, current_token_index, parser_tree, parent=parent)

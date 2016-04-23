@@ -3,10 +3,10 @@
 # Calculator for mathematical expressions
 # V 0.1
 
-import Math
+import math_library
 from operator import *
 from Parser import Parser
-from ParserTree import ParserTree
+from parser_tree import ParserTree
 
 
 class Calculator(object):
@@ -81,7 +81,7 @@ class Calculator(object):
                     arguments = []
                     for child in node.get_child_list():                 # Get the value  of each child
                         arguments.append(child.get_value())
-                    function = getattr(Math, node.get_value())
+                    function = getattr(math_library, node.get_value())
                     value = function(*arguments)                        # Calculate the value of this Node
                     node.set_value(value, is_number=True)               # Set the value of this Node
 
@@ -91,7 +91,7 @@ class Calculator(object):
                 return True             # Do nothing and return
 
             elif node.is_constant():                    # If the Node is a constant
-                value = vars(Math)[node.get_value()]    # Get the value of the constant
+                value = vars(math_library)[node.get_value()]    # Get the value of the constant
                 node.set_value(value, is_number=True)   # Set the value of this Node
                 return True
 
@@ -118,7 +118,7 @@ class Calculator(object):
                 return value
 
             else:                                                       # If the Node is a function
-                function = getattr(Math, node.get_value())              # Get the function
+                function = getattr(math_library, node.get_value())              # Get the function
                 arguments = []
                 for child in node.get_child_list():                     # Calculate the value of each child
                     arguments.append(self._calculate(child, variables=variables))
