@@ -5,7 +5,7 @@
 
 import math_library
 from operator import *
-from Parser import Parser
+from math_parser import Parser
 from parser_tree import ParserTree
 
 
