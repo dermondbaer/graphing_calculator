@@ -4,7 +4,7 @@
 #   V 0.1
 
 from geometry_tool.gui import *
-from Calculator import *
+from math_calculator import *
 
 
 class Application(object):

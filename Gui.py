@@ -4,7 +4,7 @@
 
 from functools import partial
 from tkinter import *
-from Parser import *
+from math_parser import *
 import re
 
 
