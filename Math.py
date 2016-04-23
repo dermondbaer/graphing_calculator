@@ -15,7 +15,7 @@ def cos(x):
 
 
 def cosh(x):
-    """Returns the hyperbolic cosine of x (measured in radians)."""
+    """Returns the hyperbolic cosine of x."""
     return math.cosh(x)
 
 
@@ -25,7 +25,7 @@ def acos(x):
 
 
 def acosh(x):
-    """Returns the reverse hyperbolic cosine of x (measured in radians)."""
+    """Returns the reverse hyperbolic cosine of x."""
     return math.acosh(x)
 
 
@@ -35,7 +35,7 @@ def sin(x):
 
 
 def sinh(x):
-    """Returns the hyperbolic sine of x (measured in radians)."""
+    """Returns the hyperbolic sine of x."""
     return math.sinh(x)
 
 
@@ -45,7 +45,7 @@ def asin(x):
 
 
 def asinh(x):
-    """Returns the reverse hyperbolic sine of x (measured in radians)."""
+    """Returns the reverse hyperbolic sine of x."""
     return math.asinh(x)
 
 
@@ -55,7 +55,7 @@ def tan(x):
 
 
 def tanh(x):
-    """Returns the hyperbolic tangent of x (measured in radians)."""
+    """Returns the hyperbolic tangent of x."""
     return math.tanh(x)
 
 
@@ -70,7 +70,7 @@ def atan2(y, x):
 
 
 def atanh(x):
-    """Returns the reverse hyperbolic tangent of x (measured in radians)."""
+    """Returns the reverse hyperbolic tangent of x."""
     return math.atanh(x)
 
 
