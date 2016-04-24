@@ -197,4 +197,14 @@ class Parser(object):
 
             expression[index] = token
 
+        stack = []
+        for token in expression:
+            if token == '(':
+                stack.append(token)
+            elif token == ')':
+                stack.pop()
+        if len(stack) > 0:
+            for bracket in range(0, len(stack)):
+                expression.append(')')              # Adding left out closing brackets at the end of the expression
+
         return expression
