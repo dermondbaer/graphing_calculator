@@ -134,11 +134,11 @@ def binompdf(n, p, k):
     :return: The probability for k successes.
     """
     if k > n:
-        print("Error. N <= k!")
-        return 0
-
+        raise ValueError('K must not be greater than N.')
+    if n < 1:
+        raise ValueError('N must not be smaller than 1.')
     if p > 1:
-        print("Error. p <= 1!")
+        raise ValueError('Probability must not be greater than one.')
 
     return ncr(n, k) * pow(p, k) * pow((1 - p), (n - k))
 
