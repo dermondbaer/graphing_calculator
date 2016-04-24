@@ -5,15 +5,9 @@
 
 
 class Expression(object):
-    def __init__(self, expression, parsed_expression, variables=False):
-        """
-        :type expression: str
-        :type parsed_expression: ParserTree()
-        :type variables: list
-        """
+    def __init__(self, expression, parsed_expression):
         self.__expression = expression
         self.__parsed_expression = parsed_expression
-        self.__variables = variables
 
     def get_expression(self):
         return self.__expression
@@ -21,5 +15,19 @@ class Expression(object):
     def get_parsed_expression(self):
         return self.__parsed_expression
 
-    def get_variable_list(self):
-        return self.__variables
+    @staticmethod
+    def is_function():
+        return False
+
+
+class Function(Expression):
+    def __init__(self, expression, parsed_expression, simplified_parsed_expression):
+        Expression.__init__(self, expression, parsed_expression)
+        self.__simplified_parsed_expression = simplified_parsed_expression
+
+    def get_simplified_parsed_expression(self):
+        return self.__simplified_parsed_expression
+
+    @staticmethod
+    def is_function():
+        return True

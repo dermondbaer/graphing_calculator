@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--This file is obsolete-->
 <data>
     <operators>
         <operator name="^" precedence="4" associativity="r"/>
