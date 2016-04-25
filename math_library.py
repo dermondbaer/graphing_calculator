@@ -1,4 +1,4 @@
-# Max Trinter, Pascal Mehnert
+# Max T., Pascal Mehnert
 # 23.04.2016
 # Collection of mathematical functions
 # V 1.0

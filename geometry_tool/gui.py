@@ -6,12 +6,8 @@
 from tkinter import *
 
 from geometry_tool.coordinate_system import CoordinateSystem
-# from geometry_tool.gui_output import GuiOutput
 from geometry_tool.user_input import UserInput
-from geometry_tool.function import Function
-from geometry_tool.point import Point
-from geometry_tool.distance import Distance
-from geometry_tool.line import Line
+from geometry_tool.figures import Point, Distance, Line, Function
 
 
 class Gui(object):
