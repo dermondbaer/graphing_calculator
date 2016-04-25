@@ -94,8 +94,7 @@ class Gui(object):
         self.__figures = []
 
     def get_units(self):
-        """Returns the amount of units on the negative and positive parts of the x- and y-axis as
-        ((negative_units_x, positive_units_x), (negative_units_y, positive_units_x))"""
+        """Returns the amount of units on the negative and positive parts of the x- and y-axis as"""
         return self.__units
 
     def get_scale(self):
@@ -110,24 +109,27 @@ class Gui(object):
         """Returns the tkinter root of the GUI."""
         return self.__master
 
-    def create_point(self, coordinates):
+    def create_point(self, coordinates, debug_output=False):
         """
         Creates a point in the coordinate system at the given coordinates.
 
         :arg coordinates: The coordinates of the Point.
         :type coordinates: tuple
+        :arg debug_output: Whether to display debug output.
+        :type debug_output: bool
         :rtype: Point
         """
         position, tkinter_object = self.__coordinate_system.create_point(coordinates)
-        print('Creating Point')
-        print('Coordinates:', coordinates)
-        print('Position:', position)
-        print()
+        if debug_output:
+            print('Creating Point')
+            print('Coordinates:', coordinates)
+            print('Position:', position)
+            print()
         point = Point(coordinates, position, tkinter_object)
         self.__figures.append(point)
         return point
 
-    def create_distance(self, coord_a, coord_b):
+    def create_distance(self, coord_a, coord_b, debug_output=False):
         """
         Creates a distance in the coordinate system from point a to point b.
 
@@ -135,20 +137,23 @@ class Gui(object):
         :type coord_a: tuple
         :arg coord_b: The coordinates for the ending of the distance.
         :type coord_b: tuple
+        :arg debug_output: Whether to display debug output.
+        :type debug_output: bool
         :rtype: Distance
         """
         pos_a, pos_b, tkinter_objects = self.__coordinate_system.create_distance(coord_a, coord_b)
-        print('Creating Distance')
-        print('Coordinates Point A:', coord_a)
-        print('Coordinates Point B:', coord_b)
-        print('Position Point A:', pos_a)
-        print('Position Point B:', pos_b)
-        print()
+        if debug_output:
+            print('Creating Distance')
+            print('Coordinates Point A:', coord_a)
+            print('Coordinates Point B:', coord_b)
+            print('Position Point A:', pos_a)
+            print('Position Point B:', pos_b)
+            print()
         distance = Distance(coord_a, coord_b, pos_a, pos_b, tkinter_objects)
         self.__figures.append(distance)
         return distance
 
-    def create_line(self, support_vector, direction_vector):
+    def create_line(self, support_vector, direction_vector, debug_output=False):
         """
         Creates a line in the coordinate system with a support and a direction vector.
 
@@ -156,30 +161,36 @@ class Gui(object):
         :type support_vector: tuple
         :arg direction_vector: The direction vector of the line.
         :type direction_vector: tuple
+        :arg debug_output: Whether to display debug output.
+        :type debug_output: bool
         :rtype: Line
         """
         pos_sup, pos_dir, tkinter = self.__coordinate_system.create_line(support_vector, direction_vector)
         line = Line(support_vector, direction_vector, pos_sup, pos_dir, tkinter)
-        print('Creating Line')
-        print('Coordinates Support Vector:', support_vector)
-        print('Coordinates Direction Vector:', direction_vector)
-        print('Position Support Vector:', pos_sup)
-        print('Position Direction Vector:', pos_dir)
-        print()
+        if debug_output:
+            print('Creating Line')
+            print('Coordinates Support Vector:', support_vector)
+            print('Coordinates Direction Vector:', direction_vector)
+            print('Position Support Vector:', pos_sup)
+            print('Position Direction Vector:', pos_dir)
+            print()
         self.__figures.append(line)
         return line
 
-    def create_function_graph(self, function_term):
+    def create_function_graph(self, function_term, debug_output=False):
         """
         Creates a function graph in the coordinate system.
 
         :arg function_term: The corresponding term to the function graph.
         :type function_term: str
+        :arg debug_output: Whether to display debug output.
+        :type debug_output: bool
         :rtype: Function
         """
-        print('Creating Function Graph')
-        print('Function Term:', function_term)
-        print()
+        if debug_output:
+            print('Creating Function Graph')
+            print('Function Term:', function_term)
+            print()
         tkinter_objects = self.__coordinate_system.create_function_graph(function_term)
         function = Function(function_term, tkinter_objects)
         self.__figures.append(function)
