@@ -1,0 +1,6 @@
+x ^ 2
+sin(x)
+sin(2 * x)
+sinh(x)
+degrees(asin(x))
+binompdf(10, x, 5)
