@@ -139,6 +139,8 @@ def binompdf(n, p, k):
         raise ValueError('N must not be smaller than 1.')
     if p > 1:
         raise ValueError('Probability must not be greater than one.')
+    if p < 0:
+        raise ValueError('Probability must not be smaller than one.')
 
     return ncr(n, k) * pow(p, k) * pow((1 - p), (n - k))
 
@@ -160,6 +162,8 @@ def binomcdf(n, p, k):
         raise ValueError('N must not be smaller than 1.')
     if p > 1:
         raise ValueError('Probability must not be greater than one.')
+    if p < 0:
+        raise ValueError('Probability must not be smaller than one.')
 
     result = 0
     for i in range(0, (k + 1)):

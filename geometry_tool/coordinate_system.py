@@ -5,12 +5,15 @@
 
 from tkinter import *
 from math_calculator import Calculator
-# from math import *
-# import parser
 
 
 class CoordinateSystem(object):
     def __init__(self, gui, master, axis_size):
+        """
+        :arg gui: The Gui, the CoordinateSystem belongs to.
+        :arg master: The Tkinter master widget.
+        :arg axis_size: The absolute axis size of the CoordinateSystem.
+        """
         self.__gui = gui
         self.__master = master
         self.__calculator = Calculator()
