@@ -12,4 +12,3 @@ binomcdf(5, 0.2, 2);0.94208
 binompdf(5, 0.3, 1);0.36015
 cos(radians(5));0.9961946981
 degrees(acos(0.5));60
-ncr(10, -5);n.a.
