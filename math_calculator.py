@@ -10,11 +10,11 @@ from parser_tree import ParserTree
 
 
 class Calculator(object):
-    def __init__(self):
-        self.__parser = Parser()
-        self.__operators = {'+': add, '-': sub, '*': mul, '/': truediv, '^': pow}
+    parser = Parser()
+    operators = {'+': add, '-': sub, '*': mul, '/': truediv, '^': pow}
 
-    def calculate_expression(self, expression):
+    @staticmethod
+    def calculate_expression(expression):
         """
         Calculates the solution of a mathematical expression.
         If there are variables in the expression, it is being simplified as far as possible.
@@ -24,17 +24,18 @@ class Calculator(object):
         :rtype: ParserTree
         """
         print('{:<14}'.format('Calculating:'), expression, sep='')
-        parser_tree = self.__parser.parse_expression(expression)        # Parsing the given expression
+        parser_tree = Calculator.parser.parse_expression(expression)        # Parsing the given expression
         print('{:<14}'.format('Postfix:'), end='')
         parser_tree.print()
         if parser_tree.get_root() is not None:
-            self._simplify(parser_tree.get_root())          # Calling the _simplify function
+            Calculator._simplify(parser_tree.get_root())          # Calling the _simplify function
         print('{:<14}'.format('Result:'), end='')
         parser_tree.print()
         print()
         return parser_tree
 
-    def calculate_function_value(self, parser_tree, **variables):
+    @staticmethod
+    def calculate_function_value(parser_tree, **variables):
         """
         Calculates the solution of an already expression, that has already been parsed.
         All variables used in the expression have to be declared in the function call as variable=value.
@@ -46,12 +47,13 @@ class Calculator(object):
         :rtype: float
         """
         if parser_tree.get_root() is not None:
-            result = self._calculate(parser_tree.get_root(), variables)
+            result = Calculator._calculate(parser_tree.get_root(), variables)
             return result
         else:
             return False
 
-    def _simplify(self, node):
+    @staticmethod
+    def _simplify(node):
         """
         Simplifies a Node and its children by calculating their actual value.
 
@@ -61,7 +63,7 @@ class Calculator(object):
         """
         can_be_simplified = True
         for child in node.get_child_list():     # Try to simplify each child
-            if not self._simplify(child):       # If one child can't be simplified
+            if not Calculator._simplify(child):       # If one child can't be simplified
                 can_be_simplified = False       # Then this Node can also be not simplified
 
         if node.is_variable():      # If this Node is a variable
@@ -69,8 +71,8 @@ class Calculator(object):
 
         if can_be_simplified:
             if node.is_operation():
-                if node.get_value() in self.__operators:            # If this Node is an operator
-                    operation = self.__operators[node.get_value()]  # Get the operator
+                if node.get_value() in Calculator.operators:            # If this Node is an operator
+                    operation = Calculator.operators[node.get_value()]  # Get the operator
                     operand_0 = node.get_child(0).get_value()       # Get the values of the children
                     operand_1 = node.get_child(1).get_value()
                     operands = (operand_0, operand_1)
@@ -98,7 +100,8 @@ class Calculator(object):
         else:
             return False
 
-    def _calculate(self, node, variables=None):
+    @staticmethod
+    def _calculate(node, variables=None):
         """
         Calculates the value of a Node and returns it.
 
@@ -109,10 +112,10 @@ class Calculator(object):
         :rtype: float
         """
         if node.is_operation():
-            if node.get_value() in self.__operators:            # If the Node is an operator
-                operation = self.__operators[node.get_value()]  # Get the operator
-                operand_1 = self._calculate(node.get_child(0), variables=variables)
-                operand_2 = self._calculate(node.get_child(1), variables=variables)
+            if node.get_value() in Calculator.operators:            # If the Node is an operator
+                operation = Calculator.operators[node.get_value()]  # Get the operator
+                operand_1 = Calculator._calculate(node.get_child(0), variables=variables)
+                operand_2 = Calculator._calculate(node.get_child(1), variables=variables)
                 operands = (operand_1, operand_2)               # Calculate the values of both children
                 value = operation(*operands)                    # Calculate the value of this Node
                 return value
@@ -121,7 +124,7 @@ class Calculator(object):
                 function = getattr(math_library, node.get_value())              # Get the function
                 arguments = []
                 for child in node.get_child_list():                     # Calculate the value of each child
-                    arguments.append(self._calculate(child, variables=variables))
+                    arguments.append(Calculator._calculate(child, variables=variables))
                 value = function(*arguments)                            # Calculate the value of this Node
                 return value
 
