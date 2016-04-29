@@ -9,7 +9,7 @@ import math_library
 from parser_tree import ParserTree
 
 
-class Parser(object):
+class Parser:
     operators = ['^', '*', '/', '+', '-']       # List of available operators
     operator_precedence = {'^': 4, '*': 3, '/': 3, '+': 2, '-': 2}
     operator_associativity = {'^': 'r', '*': 'l', '/': 'l', '+': 'l', '-': 'l'}
@@ -26,9 +26,13 @@ class Parser(object):
         """
         postfix = Parser._make_postfix(Parser.partition(expression))    # Converts the expression to postfix notation
         parser_tree = ParserTree(expression)
-        if len(postfix) > 0:
-            Parser._parse(postfix, current_token_index=len(postfix) - 1, parser_tree=parser_tree)
-        return parser_tree
+        if postfix:
+            if Parser._parse(postfix, current_token_index=len(postfix) - 1, parser_tree=parser_tree) == -1:
+                return parser_tree
+            else:
+                raise ValueError('Error while Parsing the Expression.')
+        else:
+            return parser_tree
 
     @staticmethod
     def make_expression_postfix(expression):
@@ -39,9 +43,9 @@ class Parser(object):
         :type expression: str
         :rtype: str
         """
-        infix = Parser.partition(expression)      # Sequences the given expression
-        postfix = Parser._make_postfix(infix)    # Invokes the actual conversion of the expression
-        postfix = ' '.join(postfix)             # Joins the sequenced expression back together
+        infix = Parser.partition(expression)        # Sequences the given expression
+        postfix = Parser._make_postfix(infix)       # Invokes the actual conversion of the expression
+        postfix = ' '.join(postfix)                 # Joins the sequenced expression back together
         return postfix
 
     @staticmethod
@@ -184,7 +188,7 @@ class Parser(object):
         expression = re.sub('\s+', ' ', expression)
         expression = expression.split(' ')
 
-        if len(expression) > 0:
+        if expression:
             while expression[-1] == '':
                 expression.pop()
                 if len(expression) == 0:
@@ -206,7 +210,7 @@ class Parser(object):
                 stack.append(token)
             elif token == ')':
                 stack.pop()
-        if len(stack) > 0:
+        if stack:
             for bracket in range(0, len(stack)):
                 expression.append(')')              # Adding left out closing brackets at the end of the expression
 

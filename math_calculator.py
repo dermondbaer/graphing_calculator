@@ -9,7 +9,7 @@ from math_parser import Parser
 from parser_tree import ParserTree
 
 
-class Calculator(object):
+class Calculator:
     parser = Parser()
     operators = {'+': add, '-': sub, '*': mul, '/': truediv, '^': pow}
 
@@ -35,7 +35,7 @@ class Calculator(object):
         return parser_tree
 
     @staticmethod
-    def calculate_function_value(parser_tree, **variables):
+    def calculate_function_value(parser_tree, variables):
         """
         Calculates the solution of an already expression, that has already been parsed.
         All variables used in the expression have to be declared in the function call as variable=value.
