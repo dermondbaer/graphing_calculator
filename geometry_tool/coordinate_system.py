@@ -225,7 +225,7 @@ class CoordinateSystem(object):
         if scale_x <= 1:
             for x in range(int(neg_units_x), int(pos_units_x+1)):
                 try:
-                    y = self.__calculator.calculate_function_value(parsed_function, x=x)
+                    y = self.__calculator.calculate_function_value(parsed_function, {'x': x})
                     position_x, position_y = self.get_absolute_position((x, y))
                     if position_y < -overhang:
                         if current_graph_section:
@@ -255,7 +255,7 @@ class CoordinateSystem(object):
                 for fraction in range(0, int(scale_x)):
                     x = unit + (fraction / int(scale_x))
                     try:
-                        y = self.__calculator.calculate_function_value(parsed_function, x=x)
+                        y = self.__calculator.calculate_function_value(parsed_function, {'x': x})
                         position_x, position_y = self.get_absolute_position((x, y))
                         if position_y < -overhang:
                             if current_graph_section:
