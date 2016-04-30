@@ -4,6 +4,7 @@
 # V 1.0
 
 import math
+import builtins
 
 pi = math.pi
 e = math.e
@@ -115,13 +116,18 @@ def factorial(x):
 
 
 def max(a, b):
-    """Returns the absolute of a and b."""
-    return max(a, b)
+    """Returns the maximum of a and b."""
+    return builtins.max(a, b)
+
+
+def min(a, b):
+    """Returns the minimum of a and b."""
+    return builtins.min(a, b)
 
 
 def abs(x):
     """Returns the absolute of x."""
-    return abs(x)
+    return builtins.abs(x)
 
 
 def binompdf(n, p, k):
