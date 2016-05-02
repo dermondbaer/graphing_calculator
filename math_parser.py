@@ -209,14 +209,19 @@ class Parser:
             if token == '(':
                 stack.append(token)
             elif token == ')':
-                stack.pop()
+                if len(stack) > 0:
+                    stack.pop()
+                else:
+                    raise ValueError('Error while parsing the expression, check parenthesis.')
         if stack:
             for bracket in range(0, len(stack)):
                 expression.append(')')              # Adding left out closing brackets at the end of the expression
 
         for index, token in enumerate(expression):                      # Adding left out multiplication signs
-            next_token = expression[index + 1]
             next_index = index + 1
+            if next_index == len(expression):
+                break
+            next_token = expression[index + 1]
             if re.match('^-?[0-9]+(\.[0-9]+)?', token):                 # Between numbers and ...
                 if next_token == '(':                                   # ... opening brackets
                     expression.insert(next_index, '*')
