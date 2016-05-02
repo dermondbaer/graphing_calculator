@@ -145,14 +145,14 @@ class Parser:
         :rtype: int
         """
         token = expression[current_token_index]
-        if token in Parser.operators:       # If the token is an operator
+        if token in Parser.operators:                                       # If the token is an operator
             parent = parser_tree.add_operation(token, parent=parent)
             current_token_index -= 1
             current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
             current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
 
-        elif token in Parser.supported_constants:           # If the token is a constant
-            parser_tree.add_constant(token, parent=parent)  # Add the token as Node
+        elif token in Parser.supported_constants:                           # If the token is a constant
+            parser_tree.add_constant(token, parent=parent)                  # Add the token as Node
             current_token_index -= 1
 
         elif re.match('^[a-zA-Z][a-zA-z0-9]+$', token):                     # If the token is a function
@@ -163,15 +163,15 @@ class Parser:
             for argument in range(0, argument_count):                       # Add each argument as child
                 current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
 
-        elif re.match('^[a-z]$', token):                        # If the token is a variable
-            parser_tree.add_variable(token, parent=parent)      # Add the token as Node
+        elif re.match('^[a-z]$', token):                                    # If the token is a variable
+            parser_tree.add_variable(token, parent=parent)                  # Add the token as Node
             current_token_index -= 1
 
-        elif re.match('^-?\d+(\.\d+)?$', token):                        # If the token is a number
-            parser_tree.add_number(float(token), parent=parent)         # Add the token as Node
+        elif re.match('^-?\d+(\.\d+)?$', token):                            # If the token is a number
+            parser_tree.add_number(float(token), parent=parent)             # Add the token as Node
             current_token_index -= 1
 
-        return current_token_index          # Return the current token index
+        return current_token_index
 
     @staticmethod
     def partition(expression):
