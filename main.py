@@ -2,7 +2,7 @@
 # 11.03.2016
 #
 
-from Gui import *
+from gui import *
 
 
 class Application(object):
