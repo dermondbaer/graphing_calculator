@@ -214,4 +214,53 @@ class Parser:
             for bracket in range(0, len(stack)):
                 expression.append(')')              # Adding left out closing brackets at the end of the expression
 
+        for index, token in enumerate(expression):                      # Adding left out multiplication signs
+            next_token = expression[index + 1]
+            next_index = index + 1
+            if re.match('^-?[0-9]+(\.[0-9]+)?', token):                 # Between numbers and ...
+                if next_token == '(':                                   # ... opening brackets
+                    expression.insert(next_index, '*')
+                elif next_token in Parser.supported_constants:          # ... constants
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-z]$', next_token):                   # ... variables
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-zA-Z][a-zA-z0-9]+$', next_token):    # ... functions
+                    expression.insert(next_index, '*')
+
+            elif token == ')':                                          # Between closing brackets and ...
+                if next_token == '(':                                   # ... opening brackets
+                    expression.insert(next_index, '*')
+                elif re.match('^-?[0-9]+(\.[0-9]+)?', next_token):      # ... numbers
+                    expression.insert(next_index, '*')
+                elif next_token in Parser.supported_constants:          # ... constants
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-z]$', next_token):                   # ... variables
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-zA-Z][a-zA-z0-9]+$', next_token):    # ... functions
+                    expression.insert(next_index, '*')
+
+            elif token in Parser.supported_constants:                   # Between constants and ...
+                if next_token == '(':                                   # ... opening brackets
+                    expression.insert(next_index, '*')
+                elif re.match('^-?[0-9]+(\.[0-9]+)?', next_token):      # ... numbers
+                    expression.insert(next_index, '*')
+                elif next_token in Parser.supported_constants:          # ... constants
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-z]$', next_token):                   # ... variables
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-zA-Z][a-zA-z0-9]+$', next_token):    # ... functions
+                    expression.insert(next_index, '*')
+
+            elif re.match('^[a-z]$', token):                            # Between variables and ...
+                if next_token == '(':                                   # ... opening brackets
+                    expression.insert(next_index, '*')
+                elif re.match('^-?[0-9]+(\.[0-9]+)?', next_token):      # ... numbers
+                    expression.insert(next_index, '*')
+                elif next_token in Parser.supported_constants:          # ... constants
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-z]$', next_token):                   # ... variables
+                    expression.insert(next_index, '*')
+                elif re.match('^[a-zA-Z][a-zA-z0-9]+$', next_token):    # ... functions
+                    expression.insert(next_index, '*')
+
         return expression
