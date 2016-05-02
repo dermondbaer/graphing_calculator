@@ -139,6 +139,9 @@ class CoordinateSystem(object):
     def get_canvas(self):
         return self.__canvas
 
+    def get_frame(self):
+        return self.__frame
+
     def get_absolute_position(self, coordinates):
         x, y = coordinates
         origin_x, origin_y = self.__origin

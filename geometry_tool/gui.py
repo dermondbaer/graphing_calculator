@@ -52,6 +52,8 @@ class Gui(object):
         print('Y-scale:', scale_y)
         print()
 
+        self.__default_size = (default_units_x, default_units_y)
+        self.__target_size = (target_size_x, target_size_y)
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
         self.__figures = []
@@ -62,6 +64,7 @@ class Gui(object):
         self.__menu = Menu(master=self.__master)
         self.__menu.add_command(label='Quit', command=self.stop)
         self.__menu.add_command(label='Clear', command=self.clear_figures)
+        self.__menu.add_command(label='Restart', command=self.restart)
         self.__master.config(menu=self.__menu)
 
         self.__in_out_container = Frame(self.__master)
@@ -80,6 +83,44 @@ class Gui(object):
     def start(self):
         """Calls the mainloop for the Gui."""
         self.__master.mainloop()
+
+    def restart(self):
+        """Destroys the Coordinate System and asks the user to input the size of the Coordinate System,
+        that is then being recreated. Previously added figures are being redrawn."""
+        dialog = InputDialog()
+        units_x, units_y = dialog.get_gui_size()
+
+        default_units_x, default_units_y = self.__default_size
+        target_size_x, target_size_y = self.__target_size
+        if not units_x:
+            units_x = (-default_units_x, default_units_x)
+        if not units_y:
+            units_y = (-default_units_y, default_units_y)
+
+        neg_units_x, pos_units_x = units_x
+        neg_units_y, pos_units_y = units_y
+        scale_x = target_size_x / (abs(neg_units_x) + abs(pos_units_x))
+        scale_y = target_size_y / (abs(neg_units_y) + abs(pos_units_y))
+        absolute_size_x = (scale_x * neg_units_x, scale_x * pos_units_x)
+        absolute_size_y = (scale_y * neg_units_y, scale_y * pos_units_y)
+        absolute_size = (absolute_size_x, absolute_size_y)
+
+        self.__scale = (scale_x, scale_y)
+        self.__units = (units_x, units_y)
+        self.__coordinate_system.get_frame().destroy()
+        self.__coordinate_system = CoordinateSystem(self, self.__master, absolute_size)
+
+        figures = self.__figures
+        self.__figures = []
+        for figure in figures:
+            if figure.is_point():
+                self.create_point(figure.get_coordinates())
+            elif figure.is_distance():
+                self.create_line(figure.get_coordinates_a(), figure.get_coordinates_b)
+            elif figure.is_line():
+                self.create_line(figure.get_coordinates_support_vector(), figure.get_coordinates_direction_vector())
+            elif figure.is_function():
+                self.create_function_graph(figure.get_function_term())
 
     def stop(self):
         """Destroys the Gui."""
