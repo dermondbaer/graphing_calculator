@@ -9,7 +9,8 @@ from math_calculator import *
 
 class Application(object):
     def __init__(self):
-        self.__gui = Gui('Coordinate System', target_size_x=950, target_size_y=950)
+        self.__master = Tk()
+        self.__gui = Gui(self.__master, target_size_x=950, target_size_y=950)
         self.__calculator = Calculator()
 
     def start(self):
