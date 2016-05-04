@@ -1,13 +1,3 @@
-.idea/workspace.xml
-.idea/encodings.xml
-.idea/graphing_calculator.iml
-.idea/modules.xml
-.idea/misc.xml
-.idea/vcs.xml
-__pycache__/ParserTree.cpython-35.pyc
-graphing_calculator/.idea/workspace.xml
-__pycache__/Expression.cpython-35.pyc
+.idea/
+geometry_tool/.idea/
 *.pyc
-.idea/dictionaries/Pascal.xml
-.idea/inspectionProfiles/profiles_settings.xml
-.idea/inspectionProfiles/Project_Default.xml

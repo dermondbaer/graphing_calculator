@@ -11,6 +11,22 @@ class Figure(object):
     def get_tkinter_objects(self):
         return self.__tkinter_objects
 
+    @staticmethod
+    def is_point():
+        return False
+
+    @staticmethod
+    def is_distance():
+        return False
+
+    @staticmethod
+    def is_line():
+        return False
+
+    @staticmethod
+    def is_function():
+        return False
+
 
 class Point(Figure):
     def __init__(self, coordinates, position, tkinter_objects):
@@ -25,6 +41,10 @@ class Point(Figure):
     def get_position(self):
         return self.__position
 
+    @staticmethod
+    def is_point():
+        return True
+
 
 class Distance(Figure):
     def __init__(self, coord_a, coord_b, pos_a, pos_b, tkinter_objects):
@@ -33,6 +53,7 @@ class Distance(Figure):
         self.__coordinates_b = coord_b
         self.__position_a = pos_a
         self.__position_b = pos_b
+        self.__is_distance = True
 
     def get_coordinates_a(self):
         return self.__coordinates_a
@@ -46,6 +67,10 @@ class Distance(Figure):
     def get_position_b(self):
         return self.__position_b
 
+    @staticmethod
+    def is_distance():
+        return True
+
 
 class Line(Figure):
     def __init__(self, coord_sup, coord_dir, pos_sup, pos_dir, tkinter_objects):
@@ -55,6 +80,7 @@ class Line(Figure):
         self.__coordinates_direction_vector = coord_dir
         self.__position_support_vector = pos_sup
         self.__position_direction_vector = pos_dir
+        self.__is_line = True
 
     def get_coordinates_support_vector(self):
         return self.__coordinates_support_vector
@@ -68,11 +94,20 @@ class Line(Figure):
     def get_position_direction_vector(self):
         return self.__position_direction_vector
 
+    @staticmethod
+    def is_line():
+        return True
+
 
 class Function(Figure):
     def __init__(self, function_term, tkinter_objects):
         Figure.__init__(self, tkinter_objects)
         self.__function_term = function_term
+        self.__is_function = True
 
     def get_function_term(self):
         return self.__function_term
+
+    @staticmethod
+    def is_function():
+        return True
