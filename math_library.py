@@ -92,7 +92,7 @@ def sqrt(x):
 
 def log(x, n):
     """Returns the logarithm of x to the base of n."""
-    return math.log(x, base=n)
+    return math.log(x, n)
 
 
 def log2(x):
