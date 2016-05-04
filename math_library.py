@@ -107,7 +107,7 @@ def log10(x):
 
 def ln(x):
     """Returns the natural logarithm of x."""
-    return math.log(x, base=math.e)
+    return math.log(x, math.e)
 
 
 def factorial(x):
