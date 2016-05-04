@@ -4,7 +4,7 @@
 # V 1.0
 
 
-class Node:
+class Node(object):
     """Represents either an operation, a number, a constant or a variable in a Parser Tree."""
     def __init__(self, value, is_operation=False, is_number=False, is_constant=False, is_variable=False):
         self.__child_list = []
@@ -76,7 +76,7 @@ class Node:
         return child
 
 
-class ParserTree:
+class ParserTree(object):
     def __init__(self, expression=False):
         """
         Used to save a mathematical Expression as a Tree.

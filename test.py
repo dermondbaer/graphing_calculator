@@ -27,6 +27,7 @@ class Application(object):
             self.__calculator.calculate_expression(expression)
             print('{:<14}'.format('Expected:'), expected_result, sep='')
             print()
+            print()
 
     def test_parser(self):
         pass
@@ -35,6 +36,7 @@ class Application(object):
         test_file = open('test_files/test_geometry_tool')
         for function in test_file.read().splitlines():
             self.__gui.create_function_graph(function)
+
 
 app = Application()
 app.test_geometry_tool()

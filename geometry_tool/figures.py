@@ -4,11 +4,36 @@
 # V 1.0
 
 
-class Point(object):
+class Figure(object):
+    def __init__(self, tkinter_objects):
+        self.__tkinter_objects = list(tkinter_objects)
+
+    def get_tkinter_objects(self):
+        return self.__tkinter_objects
+
+    @staticmethod
+    def is_point():
+        return False
+
+    @staticmethod
+    def is_distance():
+        return False
+
+    @staticmethod
+    def is_line():
+        return False
+
+    @staticmethod
+    def is_function():
+        return False
+
+
+class Point(Figure):
     def __init__(self, coordinates, position, tkinter_objects):
+        tkinter_objects = [tkinter_objects]
+        Figure.__init__(self, tkinter_objects)
         self.__coordinates = coordinates
         self.__position = position
-        self.__tkinter_objects = [tkinter_objects]
 
     def get_coordinates(self):
         return self.__coordinates
@@ -16,17 +41,19 @@ class Point(object):
     def get_position(self):
         return self.__position
 
-    def get_tkinter_objects(self):
-        return self.__tkinter_objects
+    @staticmethod
+    def is_point():
+        return True
 
 
-class Distance(object):
+class Distance(Figure):
     def __init__(self, coord_a, coord_b, pos_a, pos_b, tkinter_objects):
+        Figure.__init__(self, tkinter_objects)
         self.__coordinates_a = coord_a
         self.__coordinates_b = coord_b
         self.__position_a = pos_a
         self.__position_b = pos_b
-        self.__tkinter_objects = tkinter_objects
+        self.__is_distance = True
 
     def get_coordinates_a(self):
         return self.__coordinates_a
@@ -40,17 +67,20 @@ class Distance(object):
     def get_position_b(self):
         return self.__position_b
 
-    def get_tkinter_objects(self):
-        return self.__tkinter_objects
+    @staticmethod
+    def is_distance():
+        return True
 
 
-class Line(object):
+class Line(Figure):
     def __init__(self, coord_sup, coord_dir, pos_sup, pos_dir, tkinter_objects):
+        tkinter_objects = [tkinter_objects]
+        Figure.__init__(self, tkinter_objects)
         self.__coordinates_support_vector = coord_sup
         self.__coordinates_direction_vector = coord_dir
         self.__position_support_vector = pos_sup
         self.__position_direction_vector = pos_dir
-        self.__tkinter_objects = [tkinter_objects]
+        self.__is_line = True
 
     def get_coordinates_support_vector(self):
         return self.__coordinates_support_vector
@@ -64,17 +94,20 @@ class Line(object):
     def get_position_direction_vector(self):
         return self.__position_direction_vector
 
-    def get_tkinter_objects(self):
-        return self.__tkinter_objects
+    @staticmethod
+    def is_line():
+        return True
 
 
-class Function(object):
+class Function(Figure):
     def __init__(self, function_term, tkinter_objects):
+        Figure.__init__(self, tkinter_objects)
         self.__function_term = function_term
-        self.__tkinter_objects = tkinter_objects
+        self.__is_function = True
 
     def get_function_term(self):
         return self.__function_term
 
-    def get_tkinter_objects(self):
-        return self.__tkinter_objects
+    @staticmethod
+    def is_function():
+        return True

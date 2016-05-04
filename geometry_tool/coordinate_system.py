@@ -31,10 +31,10 @@ class CoordinateSystem(object):
         canvas_height = pos_size_y + abs(neg_size_y)
         self.__canvas_size = (canvas_width, canvas_height)
 
-        self.__frame = Frame(self.__master, borderwidth=1, background='black')
+        self.__frame = Frame(self.__master, borderwidth=1, bg='black')
         self.__frame.pack(side=RIGHT)
 
-        self.__canvas = Canvas(self.__frame, width=canvas_width, height=canvas_height, highlightthickness=0)
+        self.__canvas = Canvas(self.__frame, width=canvas_width, height=canvas_height, highlightthickness=0, bg='white')
         self.__canvas.pack()
         self.__canvas.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
         self.__canvas.create_line((0, pos_size_y), (canvas_width, pos_size_y))
@@ -139,6 +139,9 @@ class CoordinateSystem(object):
     def get_canvas(self):
         return self.__canvas
 
+    def get_frame(self):
+        return self.__frame
+
     def get_absolute_position(self, coordinates):
         x, y = coordinates
         origin_x, origin_y = self.__origin
@@ -225,7 +228,7 @@ class CoordinateSystem(object):
         if scale_x <= 1:
             for x in range(int(neg_units_x), int(pos_units_x+1)):
                 try:
-                    y = self.__calculator.calculate_function_value(parsed_function, x=x)
+                    y = self.__calculator.calculate_function_value(parsed_function, {'x': x})
                     position_x, position_y = self.get_absolute_position((x, y))
                     if position_y < -overhang:
                         if current_graph_section:
@@ -255,7 +258,7 @@ class CoordinateSystem(object):
                 for fraction in range(0, int(scale_x)):
                     x = unit + (fraction / int(scale_x))
                     try:
-                        y = self.__calculator.calculate_function_value(parsed_function, x=x)
+                        y = self.__calculator.calculate_function_value(parsed_function, {'x': x})
                         position_x, position_y = self.get_absolute_position((x, y))
                         if position_y < -overhang:
                             if current_graph_section:
@@ -285,7 +288,7 @@ class CoordinateSystem(object):
 
         tkinter_objects = []
         for a in full_graph:
-            tkinter_objects.append(self.__canvas.create_line(a))
+            tkinter_objects.append(self.__canvas.create_line(a, fill='black'))
 
         return tkinter_objects
 
