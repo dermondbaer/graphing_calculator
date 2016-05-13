@@ -5,8 +5,9 @@
 
 import math_library
 from operator import *
-from math_parser import Parser
-from parser_tree import ParserTree
+from decimal import *
+from math_parser import *
+from parser_tree import *
 
 
 class Calculator:
@@ -28,7 +29,7 @@ class Calculator:
         print('{:<14}'.format('Postfix:'), end='')
         parser_tree.print()
         if parser_tree.get_root() is not None:
-            Calculator._simplify(parser_tree.get_root())                    # Calling the _simplify function
+            Calculator._simplify(parser_tree, parser_tree.get_root())       # Calling the _simplify function
         print('{:<14}'.format('Result:'), end='')
         parser_tree.print()
         print()
@@ -53,52 +54,48 @@ class Calculator:
             return False
 
     @staticmethod
-    def _simplify(node):
+    def _simplify(parser_tree, node):
         """
         Simplifies a Node and its children by calculating their actual value.
 
         :arg node: The Node to simplify.
-        :type node: Node
         :rtype: bool
         """
-        can_be_simplified = True
-        for child in node.get_child_list():             # Try to simplify each child
-            if not Calculator._simplify(child):         # If one child can't be simplified
-                can_be_simplified = False               # Then this Node can also be not simplified
+        if node.is_variable():                              # If this Node is a variable
+            return False                                    # Then this Nodes parent can't be simplified
 
-        if node.is_variable():      # If this Node is a variable
-            return False            # Then this Node and its parents can't be simplified
-
-        if can_be_simplified:
-            if node.is_operation():
-                if node.get_value() in Calculator.operators:            # If this Node is an operator
-                    operation = Calculator.operators[node.get_value()]  # Get the operator
-                    operand_0 = node.get_child(0).get_value()           # Get the values of the children
-                    operand_1 = node.get_child(1).get_value()
-                    operands = (operand_0, operand_1)
-                    value = operation(*operands)                        # Calculate the value of this node
-                    node.set_value(value, is_number=True)               # Set the value of this node
-
-                else:                                                   # If the Node is a function
-                    arguments = []
-                    for child in node.get_child_list():                 # Get the value  of each child
-                        arguments.append(child.get_value())
-                    function = getattr(math_library, node.get_value())
-                    value = function(*arguments)                        # Calculate the value of this Node
-                    node.set_value(value, is_number=True)               # Set the value of this Node
-
-                return True
-
-            elif node.is_number():      # If this Node is a number
-                return True             # Do nothing and return
-
-            elif node.is_constant():                                # If the Node is a constant
-                value = vars(math_library)[node.get_value()]        # Get the value of the constant
-                node.set_value(value, is_number=True)               # Set the value of this Node
-                return True
+        elif node.is_number() or node.is_constant():        # If this Node is Number or a Constant
+            return True                                     # Then this Nodes parent can be simplified
 
         else:
-            return False
+            for child in node.get_child_list():             # Try to simplify each child
+                if not Calculator._simplify(parser_tree, child):         # If one child can't be simplified
+                    return False                            # Then this Node can also be not simplified
+
+            parent = node.get_parent()
+            if node.is_operator():
+                operation = node.get_value()
+                operand_0 = node.get_child(0).get_value()               # Get the values of the children
+                operand_1 = node.get_child(1).get_value()
+                operands = (operand_0, operand_1)
+                value = operation(*operands)                            # Calculate the value of this node
+                if parent is not None:
+                    parent.replace_child(node, Number(str(value), value, parent))
+                else:
+                    parser_tree.set_root(Number(str(value), value, parent))
+
+            elif node.is_function():
+                function = node.get_value()
+                arguments = []
+                for child in node.get_child_list():                     # Get the value  of each child
+                    arguments.append(child.get_value())
+                value = function(*arguments)                            # Calculate the value of this Node
+                if parent is not None:
+                    parent.replace_child(node, Number(str(value), value, parent))
+                else:
+                    parser_tree.set_root(Number(str(value), value, parent))
+
+            return True
 
     @staticmethod
     def _calculate(node, variables=None):
@@ -111,26 +108,23 @@ class Calculator:
         :type variables: dict
         :rtype: float
         """
-        if node.is_operation():
-            if node.get_value() in Calculator.operators:                # If the Node is an operator
-                operation = Calculator.operators[node.get_value()]      # Get the operator
-                operand_1 = Calculator._calculate(node.get_child(0), variables=variables)
-                operand_2 = Calculator._calculate(node.get_child(1), variables=variables)
-                operands = (operand_1, operand_2)                       # Calculate the values of both children
-                value = operation(*operands)                            # Calculate the value of this Node
-                return value
+        if node.is_operator():
+            operation = node.get_value()
+            operand_1 = Calculator._calculate(node.get_child(0), variables=variables)
+            operand_2 = Calculator._calculate(node.get_child(1), variables=variables)
+            value = operation(operand_1, operand_2)
 
-            else:                                                       # If the Node is a function
-                function = getattr(math_library, node.get_value())              # Get the function
-                arguments = []
-                for child in node.get_child_list():                     # Calculate the value of each child
-                    arguments.append(Calculator._calculate(child, variables=variables))
-                value = function(*arguments)                            # Calculate the value of this Node
-                return value
+        elif node.is_function():
+            function = node.get_value()
+            arguments = []
+            for child in node.get_child_list():
+                arguments.append(Calculator._calculate(child, variables=variables))
+            value = function(*arguments)
 
-        elif node.is_number():          # If the Node is a number
-            return node.get_value()     # Return the value of the Node
+        elif node.is_number() or node.is_constant():
+            value = node.get_value()
 
-        elif node.is_variable():                    # If the Node is a variable
-            value = variables[node.get_value()]     # Get the value of the Node from the dictionary
-            return value                            # Return the value
+        elif node.is_variable():
+            value = Decimal(variables[node.get_key()])
+
+        return value
