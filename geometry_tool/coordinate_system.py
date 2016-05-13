@@ -144,9 +144,9 @@ class CoordinateSystem(object):
 
     def get_absolute_position(self, coordinates):
         x, y = coordinates
+        y = float(y)
         origin_x, origin_y = self.__origin
         scale_x, scale_y = self.__gui.get_scale()
-
         abs_pos_x = origin_x + (x * scale_x)
         abs_pos_y = origin_y - (y * scale_y)
 
