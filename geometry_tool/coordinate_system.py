@@ -31,10 +31,8 @@ class CoordinateSystem(object):
         canvas_height = pos_size_y + abs(neg_size_y)
         self.__canvas_size = (canvas_width, canvas_height)
 
-        self.__frame = Frame(self.__master, borderwidth=1, bg='black')
-        self.__frame.pack(side=RIGHT)
-
-        self.__canvas = Canvas(self.__frame, width=canvas_width, height=canvas_height, highlightthickness=0, bg='white')
+        self.__canvas = Canvas(self.__master, width=canvas_width, height=canvas_height, highlightthickness=0,
+                               bg='white')
         self.__canvas.pack()
         self.__canvas.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
         self.__canvas.create_line((0, pos_size_y), (canvas_width, pos_size_y))
@@ -138,9 +136,6 @@ class CoordinateSystem(object):
 
     def get_canvas(self):
         return self.__canvas
-
-    def get_frame(self):
-        return self.__frame
 
     def get_absolute_position(self, coordinates):
         x, y = coordinates

@@ -6,16 +6,14 @@
 from tkinter import *
 
 from geometry_tool.coordinate_system import CoordinateSystem
-from geometry_tool.user_input import UserInput
 from geometry_tool.figures import Point, Distance, Line, Function
 
 
 class Gui(object):
-    """Graphical User Interface for a CoordinateSystem."""
-    def __init__(self, window_title, target_size_x=1000, target_size_y=1000, default_units_x=10, default_units_y=10):
+    """Graphical User Interface for a CoordinateSystem. Interface between user and the Coordinate System."""
+    def __init__(self, master, target_size_x=1000, target_size_y=1000, default_units_x=10, default_units_y=10):
         """
-        :arg window_title: The title to display for the coordinate system.
-        :type window_title: str
+        :arg master: The parent tkinter element of the Gui.
         :arg target_size_x: The width of the coordinate system in Pixels.
         :type target_size_x: int
         :arg target_size_y: The height of the coordinate system in Pixels.
@@ -25,7 +23,12 @@ class Gui(object):
         :arg default_units_y: The default amount of units on the y-axis.
         :type default_units_y: int
         """
-        dialog = InputDialog()
+        self.__default_size = (default_units_x, default_units_y)
+        self.__target_size = (target_size_x, target_size_y)
+        self.__master = master
+        self.__figures = []
+
+        dialog = InputDialog(self)
         units_x, units_y = dialog.get_gui_size()
 
         if not units_x:
@@ -52,33 +55,35 @@ class Gui(object):
         print('Y-scale:', scale_y)
         print()
 
-        self.__default_size = (default_units_x, default_units_y)
-        self.__target_size = (target_size_x, target_size_y)
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
-        self.__figures = []
-        self.__master = Tk()
-        self.__master.wm_title(window_title)
-        self.__master.resizable(0, 0)
+        self.__frame = Frame(self.__master)
+        self.__frame.pack()
+        self.__master.lift()
+        self.__master.attributes("-topmost", True)
 
-        self.__menu = Menu(master=self.__master)
+        # self.__master = Tk()
+        # self.__master.wm_title(window_title)
+        # self.__master.resizable(0, 0)
+
+        self.__menu = Menu(master=self.__frame, bg='red')
         self.__menu.add_command(label='Quit', command=self.stop)
         self.__menu.add_command(label='Clear', command=self.clear_figures)
         self.__menu.add_command(label='Restart', command=self.restart)
         self.__master.config(menu=self.__menu)
 
-        self.__in_out_container = Frame(self.__master)
-        self.__in_out_container.pack(side=LEFT)
+        # self.__in_out_container = Frame(self.__master)
+        # self.__in_out_container.pack(side=LEFT)
 
-        self.__user_input = UserInput(self, self.__in_out_container)
-        self.__user_input.create_point_input(0, 0)
-        self.__user_input.create_function_input(0, 1)
-        self.__user_input.create_distance_input(1, 0)
-        self.__user_input.create_line_input(1, 1)
+        # self.__user_input = UserInput(self, self.__in_out_container)
+        # self.__user_input.create_point_input(0, 0)
+        # self.__user_input.create_function_input(0, 1)
+        # self.__user_input.create_distance_input(1, 0)
+        # self.__user_input.create_line_input(1, 1)
 
         # self.__gui_output = GuiOutput(self, self.__in_out_container)
 
-        self.__coordinate_system = CoordinateSystem(self, self.__master, absolute_size)
+        self.__coordinate_system = CoordinateSystem(self, self.__frame, absolute_size)
 
     def start(self):
         """Calls the mainloop for the Gui."""
@@ -107,8 +112,8 @@ class Gui(object):
 
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
-        self.__coordinate_system.get_frame().destroy()
-        self.__coordinate_system = CoordinateSystem(self, self.__master, absolute_size)
+        self.__coordinate_system.get_canvas().destroy()
+        self.__coordinate_system = CoordinateSystem(self, self.__frame, absolute_size)
 
         figures = self.__figures
         self.__figures = []
@@ -134,6 +139,9 @@ class Gui(object):
                 self.__coordinate_system.del_tkinter_object(tkinter_object)
         self.__figures = []
 
+    def get_default_size(self):
+        return self.__default_size
+
     def get_units(self):
         """Returns the amount of units on the negative and positive parts of the x- and y-axis as"""
         return self.__units
@@ -147,8 +155,12 @@ class Gui(object):
         return self.__figures
 
     def get_master(self):
-        """Returns the tkinter root of the GUI."""
+        """Returns the parent tkinter element of the GUI."""
         return self.__master
+
+    def get_frame(self):
+        """Returns the main frame of the Gui"""
+        return self.__frame
 
     def create_point(self, coordinates, debug_output=False):
         """
@@ -281,7 +293,10 @@ class Gui(object):
 
 
 class InputDialog(object):
-    def __init__(self):
+    def __init__(self, gui):
+        self.__gui = gui
+        default_size_x, default_size_y = self.__gui.get_default_size()
+
         def get_size():
             is_float = re.compile(r'^-?\d+(\.\d+)?$')
 
@@ -322,6 +337,8 @@ class InputDialog(object):
 
         self.__size_x = self.__size_y = False
         master = Tk()
+        master.lift()
+        master.attributes("-topmost", True)
         dialog = Frame(master)
         dialog.grid(pady=2)
         dialog.focus_set()
@@ -333,9 +350,14 @@ class InputDialog(object):
         input_neg_x = Entry(dialog, width=10)
         input_neg_x.bind('<Return>', call_get_size)
         input_neg_x.grid(row=1, column=1)
+        input_neg_x.insert(0, default_size_x)
+        input_neg_x.focus()
+        input_neg_x.selection_range(0, END)
+
         input_pos_x = Entry(dialog, width=10)
         input_pos_x.bind('<Return>', call_get_size)
         input_pos_x.grid(row=1, column=3)
+        input_pos_x.insert(0, default_size_x)
 
         Label(dialog, text='Y: [ -').grid(row=2, column=0, pady=2)
         Label(dialog, text=';  ').grid(row=2, column=2, pady=2)
@@ -344,10 +366,14 @@ class InputDialog(object):
         input_neg_y = Entry(dialog, width=10)
         input_neg_y.bind('<Return>', call_get_size)
         input_neg_y.grid(row=2, column=1, pady=2)
+        input_neg_y.insert(0, default_size_y)
+
         input_pos_y = Entry(dialog, width=10)
         input_pos_y.grid(row=2, column=3, pady=2)
         input_pos_y.bind('<Return>', call_get_size)
-        button = Button(dialog, text='Create', command=get_size)
+        input_pos_y.insert(0, default_size_y)
+
+        button = Button(dialog, text='Create', command=get_size, relief='groove')
         button.bind('<Return>', call_get_size)
         button.grid(columnspan=5, pady=5)
 
