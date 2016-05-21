@@ -11,26 +11,6 @@ class Node(object):
         self.__value = value
         self.__parent = parent
 
-    @staticmethod
-    def is_operator():
-        return False
-
-    @staticmethod
-    def is_function():
-        return False
-
-    @staticmethod
-    def is_number():
-        return False
-
-    @staticmethod
-    def is_constant():
-        return False
-
-    @staticmethod
-    def is_variable():
-        return False
-
     def get_key(self):
         """Returns the key of this Node"""
         return self.__key
@@ -56,27 +36,20 @@ class Constant(Node):
     def __init__(self, key, value, parent):
         Node.__init__(self, key, value, parent)
 
-    @staticmethod
-    def is_constant():
-        return True
-
 
 class Variable(Node):
     def __init__(self, key, parent):
         Node.__init__(self, key, key, parent)
-
-    @staticmethod
-    def is_variable():
-        return True
 
 
 class Number(Node):
     def __init__(self, key, value, parent):
         Node.__init__(self, key, value, parent)
 
-    @staticmethod
-    def is_number():
-        return True
+
+class ParsedFunction(Node):
+    def __init__(self, key, value, parent):
+        Node.__init__(self, key, value, parent)
 
 
 class Operation(Node):
@@ -90,7 +63,7 @@ class Operation(Node):
     def get_child(self, index):
         return self.__child_list[index]
 
-    def add_child(self, child, reverse=False):
+    def add_child(self, child, reverse=True):
         if reverse is False:
             self.__child_list.append(child)         # adding as most right child
         else:
@@ -107,18 +80,10 @@ class Operator(Operation):
     def __int__(self, key, value, parent):
         Operation.__init__(self, key, value, parent)
 
-    @staticmethod
-    def is_operator():
-        return True
-
 
 class Function(Operation):
     def __init__(self, key, value, parent):
         Operation.__init__(self, key, value, parent)
-
-    @staticmethod
-    def is_function():
-        return True
 
 
 class ParserTree(object):
@@ -149,7 +114,7 @@ class ParserTree(object):
             self.__root = Operator(key, value, parent)
             return self.__root
 
-        elif parent.is_operator() or parent.is_function():
+        elif isinstance(parent, Operation):
             child = Operator(key, value, parent)
             parent.add_child(child, reverse=reverse)
             return child
@@ -163,7 +128,7 @@ class ParserTree(object):
             self.__root = Function(key, value, parent)
             return self.__root
 
-        elif parent.is_operator() or parent.is_function():
+        elif isinstance(parent, Operation):
             child = Function(key, value, parent)
             parent.add_child(child, reverse=reverse)
             return child
@@ -177,7 +142,7 @@ class ParserTree(object):
             self.__root = Number(key, value, parent)
             return self.__root
 
-        elif parent.is_operator() or parent.is_function():
+        elif isinstance(parent, Operation):
             child = Number(key, value, parent)
             parent.add_child(child, reverse=reverse)
             return child
@@ -191,7 +156,7 @@ class ParserTree(object):
             self.__root = Constant(key, value, parent)
             return self.__root
 
-        elif parent.is_operator() or parent.is_function():
+        elif isinstance(parent, Operation):
             child = Constant(key, value, parent)
             parent.add_child(child, reverse=reverse)
             return child
@@ -205,9 +170,23 @@ class ParserTree(object):
             self.__root = Variable(key, parent)
             return self.__root
 
-        elif parent.is_operator() or parent.is_function():
+        elif isinstance(parent, Operation):
             child = Variable(key, parent)
             parent.add_child(child, reverse=reverse)
+            return child
+
+        else:
+            raise ValueError('Error while parsing the expression.')
+
+    def add_parsed_function(self, key, value, reverse=True, parent=None):
+        if parent is None:
+            self.__root = ParsedFunction(key, value, parent)
+            return self.__root
+
+        elif isinstance(parent, Operation):
+            child = ParsedFunction(key, value, parent)
+            parent.add_child(child, reverse=reverse)
+            return child
 
         else:
             raise ValueError('Error while parsing the expression.')
@@ -224,29 +203,32 @@ class ParserTree(object):
 
     def _is_variable(self, node, variable_list):
         """Checks if a Node is a variable and calls itself for every child of the Node."""
-        if node.is_variable():
-            variable_list.append(node.get_value())
-        elif node.is_operator():
+        if type(node) == Variable:
+            variable_list.append(node.get_key())
+        elif isinstance(node, Operation):
             for child in node.get_child_list():
                 self._is_variable(child, variable_list)
 
     def print(self, precision=12):
         """Initializes the print for this Parser Tree."""
         if self.__root is not None:
-            self._print(self.__root, precision)             # Calls the _print() function for the root of this Parser Tree
+            self._print(self.__root, precision)
         print()
 
     def _print(self, node, precision):
         """Prints the given Node and initializes the print for every child element."""
         if node is not None:
-            if node.is_number() or node.is_constant():
+            key = ''
+            if type(node)in (Number, Constant):
                 key = round(node.get_value(), precision)
-            elif node.is_variable():
+            elif type(node) == Variable:
                 key = node.get_key()
-            elif node.is_operator() or node.is_function():
+            elif type(node) == ParsedFunction:
+                key = node.get_key()
+            elif isinstance(node, Operation):
                 key = node.get_key()
                 for child in node.get_child_list():
-                    self._print(child, precision)              # Calls the _print() function for every child element of this Node
+                    self._print(child, precision)
             key = str(key)
             key = key.rstrip('0').rstrip('.') if '.' in key else key
             print(key, end=' ')
