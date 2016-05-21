@@ -1,18 +1,19 @@
 # Pascal Mehnert
-# 09.03.2016
+# 19.05.2016
 # Multiple algorithms, used to restructure and parse mathematical expression.
-# V 1.0
+# V 2.0
 
 import re
 import inspect
-import operator
+import operator as op
 import math_library
+import analysis_library
 from decimal import *
 from parser_tree import ParserTree
 
 
-class Parser:
-    operators = {'+': operator.add, '-': operator.sub, '*': operator.mul, '/': operator.truediv, '^': pow}
+class Parser(object):
+    operators = {'+': op.add, '-': op.sub, '*': op.mul, '/': op.truediv, '^': pow}
     operator_precedence = {'^': 4, '*': 3, '/': 3, '+': 2, '-': 2}
     operator_associativity = {'^': 'r', '*': 'l', '/': 'l', '+': 'l', '-': 'l'}
     supported_constants = ['e', 'pi']
@@ -146,7 +147,11 @@ class Parser:
         :type parent: Node
         :rtype: int
         """
-        token = expression[current_token_index]
+        if current_token_index >= 0:
+            token = expression[current_token_index]
+        else:
+            return current_token_index
+
         if token in Parser.operators:
             value = Parser.operators[token]
             parent = parser_tree.add_operator(token, value, parent=parent)
@@ -160,12 +165,29 @@ class Parser:
             current_token_index -= 1
 
         elif re.match('^[a-zA-Z][a-zA-z0-9]+$', token):                         # If the token is a function
-            function = getattr(math_library, token)
-            parent = parser_tree.add_function(token, function, parent=parent)   # Add the token as Node
-            current_token_index -= 1
-            argument_count = len(inspect.getfullargspec(function).args)
-            for argument in range(0, argument_count):                           # Add each argument as child
-                current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
+            try:
+                function = getattr(math_library, token)
+                parent = parser_tree.add_function(token, function, parent=parent)
+                current_token_index -= 1
+                argument_count = len(inspect.getfullargspec(function).args)
+                for argument in range(0, argument_count):
+                    current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
+
+            except AttributeError:
+                function = getattr(analysis_library, token)
+                parent = parser_tree.add_function(token, function, parent=parent)
+                current_token_index -= 1
+                argument_count = len(inspect.getfullargspec(function).args)
+
+                for argument in range(0, argument_count - 1):
+                    current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
+
+                temp_parser_tree = ParserTree()
+                new_current_token_index = Parser._parse(expression, current_token_index, temp_parser_tree, parent=None)
+                function_term = expression[new_current_token_index + 1:current_token_index + 1]
+                function_term = ' '.join(function_term)
+                parser_tree.add_parsed_function(function_term, temp_parser_tree, parent=parent)
+                current_token_index = new_current_token_index
 
         elif re.match('^[a-z]$', token):                                        # If the token is a variable
             parser_tree.add_variable(token, parent=parent)               # Add the token as Node
