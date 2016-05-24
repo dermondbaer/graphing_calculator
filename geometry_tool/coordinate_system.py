@@ -112,7 +112,8 @@ class CoordinateSystem(object):
             margin = origin_y + (unit * unit_size_y)
             self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
             if unit > 0:
-                self.__canvas.create_text((origin_x-10, margin), text=(-unit*multiplicand_y), font="arial 7", anchor='e')
+                self.__canvas.create_text((origin_x-10, margin), text=(-unit*multiplicand_y), font="arial 7",
+                                          anchor='e')
             margin = origin_y + ((unit + Decimal('0.5')) * unit_size_y)
             self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
 
@@ -144,6 +145,7 @@ class CoordinateSystem(object):
         return self.__canvas
 
     def get_absolute_position(self, coordinates):
+        """Calculates the exact position for a point given in coordinates."""
         x, y = coordinates
         origin_x, origin_y = self.__origin
         scale_x, scale_y = self.__unit_size
@@ -153,6 +155,7 @@ class CoordinateSystem(object):
         return abs_pos_x, abs_pos_y
 
     def get_coordinates(self, position):
+        """Calculates the coordinates for a point given in pixels."""
         position_x, position_y = position
         origin_x, origin_y = self.__origin
         unit_size_x, unit_size_y = self.__unit_size
@@ -166,11 +169,13 @@ class CoordinateSystem(object):
         return coordinate_x, coordinate_y
 
     def create_point(self, coordinates):
+        """Creates a point in this CoordinateSystem."""
         x, y = self.get_absolute_position(coordinates)
         tkinter = self.__canvas.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
         return (x, y), tkinter
 
     def create_distance(self, coord_a, coord_b):
+        """Creates a distance in this CoordinateSystem."""
         tkinter_objects = []
 
         pos_a = self.get_absolute_position(coord_a)
@@ -190,6 +195,7 @@ class CoordinateSystem(object):
         return pos_a, pos_b, tkinter_objects
 
     def create_line(self, coord_sup, coord_dir):
+        """Creates a line in this CoordinateSystem."""
         pos_sup_vec = self.get_absolute_position(coord_sup)
         pos_dir_vec = self.get_absolute_position(coord_dir)
         coord_sup_x, coord_sup_y = coord_sup
@@ -227,10 +233,11 @@ class CoordinateSystem(object):
         return pos_sup_vec, pos_dir_vec, tkinter_object
 
     def create_function_graph(self, function_term):
+        """Creates a function graph in this CoordinateSystem."""
         parsed_function = self.__calculator.calculate_expression(function_term)
 
         canvas_size_x, canvas_size_y = self.__canvas_size
-        overhang = canvas_size_y * 2
+        overhang = canvas_size_y
 
         units_x, units_y = self.__gui.get_units()
         neg_units_x, pos_units_x = units_x
@@ -263,12 +270,10 @@ class CoordinateSystem(object):
                         current_graph_section = []
 
         else:
-            for unit in range(int(neg_units_x), int(pos_units_x)+1):
+            for unit in range(int(neg_units_x) - 2, int(pos_units_x) + 1):
                 dec_unit = Decimal(unit)
                 for fraction in range(0, int(scale_x)):
-                    dec_fraction = Decimal(fraction)
-                    x = unit + (fraction / int(scale_x))
-                    dec_x = dec_unit + (dec_fraction / int(scale_x))
+                    dec_x = dec_unit + (Decimal(fraction) / int(scale_x))
                     try:
                         y = self.__calculator.calculate_function_value(parsed_function, {'x': dec_x})
                         position_x, position_y = self.get_absolute_position((dec_x, y))
@@ -300,4 +305,5 @@ class CoordinateSystem(object):
         return tkinter_objects
 
     def del_tkinter_object(self, tkinter_object):
+        """Deletes a tkinter object from the canvas."""
         self.__canvas.delete(tkinter_object)

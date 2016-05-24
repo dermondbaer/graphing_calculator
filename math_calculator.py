@@ -12,9 +12,7 @@ from parser_tree import *
 decimal.getcontext().prec = 64
 
 
-class Calculator(object):
-    parser = Parser()
-
+class Calculator(Parser):
     @staticmethod
     def calculate_expression(expression):
         """
@@ -26,7 +24,7 @@ class Calculator(object):
         :rtype: ParserTree
         """
         print('{:<14}'.format('Calculating:'), expression, sep='')
-        parser_tree = Calculator.parser.parse_expression(expression)        # Parsing the given expression
+        parser_tree = Calculator.parse_expression(expression)               # Parsing the given expression
         print('{:<14}'.format('Postfix:'), end='')
         parser_tree.print()
         if parser_tree.get_root() is not None:
