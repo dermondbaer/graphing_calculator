@@ -41,7 +41,6 @@ class Variable(Node):
     def __init__(self, key, parent):
         Node.__init__(self, key, key, parent)
 
-
 class Number(Node):
     def __init__(self, key, value, parent):
         Node.__init__(self, key, value, parent)
@@ -63,11 +62,8 @@ class Operation(Node):
     def get_child(self, index):
         return self.__child_list[index]
 
-    def add_child(self, child, reverse=True):
-        if reverse is False:
-            self.__child_list.append(child)         # adding as most right child
-        else:
-            self.__child_list.insert(0, child)      # adding as most left child
+    def add_child(self, child):
+        self.__child_list.insert(0, child)
 
     def replace_child(self, old, new):
         for index, child in enumerate(self.__child_list):
@@ -108,7 +104,7 @@ class ParserTree(object):
         """Returns the expression saved in this ParserTree"""
         return self.__expression
 
-    def add_operator(self, key, value, reverse=True, parent=None):
+    def add_operator(self, key, value, parent=None):
         """Adds an operation as child of a Node."""
         if parent is None:
             self.__root = Operator(key, value, parent)
@@ -116,13 +112,13 @@ class ParserTree(object):
 
         elif isinstance(parent, Operation):
             child = Operator(key, value, parent)
-            parent.add_child(child, reverse=reverse)
+            parent.add_child(child)
             return child
 
         else:
             raise ValueError('Error while parsing the expression.')
 
-    def add_function(self, key, value, reverse=True, parent=None):
+    def add_function(self, key, value, parent=None):
         """Adds an operation as child of a Node."""
         if parent is None:
             self.__root = Function(key, value, parent)
@@ -130,13 +126,13 @@ class ParserTree(object):
 
         elif isinstance(parent, Operation):
             child = Function(key, value, parent)
-            parent.add_child(child, reverse=reverse)
+            parent.add_child(child)
             return child
 
         else:
             raise ValueError('Error while parsing the expression.')
 
-    def add_number(self, key, value, reverse=True, parent=None):
+    def add_number(self, key, value, parent=None):
         """Adds a value as child of a Node."""
         if parent is None:
             self.__root = Number(key, value, parent)
@@ -144,13 +140,13 @@ class ParserTree(object):
 
         elif isinstance(parent, Operation):
             child = Number(key, value, parent)
-            parent.add_child(child, reverse=reverse)
+            parent.add_child(child)
             return child
 
         else:
             raise ValueError('Error while parsing the expression.')
 
-    def add_constant(self, key, value, reverse=True, parent=None):
+    def add_constant(self, key, value, parent=None):
         """Adds a constant as child of a Node."""
         if parent is None:
             self.__root = Constant(key, value, parent)
@@ -158,13 +154,13 @@ class ParserTree(object):
 
         elif isinstance(parent, Operation):
             child = Constant(key, value, parent)
-            parent.add_child(child, reverse=reverse)
+            parent.add_child(child)
             return child
 
         else:
             raise ValueError('Error while parsing the expression.')
 
-    def add_variable(self, key, reverse=True, parent=None):
+    def add_variable(self, key, parent=None):
         """Adds a variable as child of a Node."""
         if parent is None:
             self.__root = Variable(key, parent)
@@ -172,20 +168,20 @@ class ParserTree(object):
 
         elif isinstance(parent, Operation):
             child = Variable(key, parent)
-            parent.add_child(child, reverse=reverse)
+            parent.add_child(child)
             return child
 
         else:
             raise ValueError('Error while parsing the expression.')
 
-    def add_parsed_function(self, key, value, reverse=True, parent=None):
+    def add_parsed_function(self, key, value, parent=None):
         if parent is None:
             self.__root = ParsedFunction(key, value, parent)
             return self.__root
 
         elif isinstance(parent, Operation):
             child = ParsedFunction(key, value, parent)
-            parent.add_child(child, reverse=reverse)
+            parent.add_child(child)
             return child
 
         else:

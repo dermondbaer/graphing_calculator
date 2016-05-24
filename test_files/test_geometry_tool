@@ -1,9 +1,16 @@
-x
-x ^ 2
-sin(x)
-sin(2 * x)
-sinh(x)
-degrees(asin(x))
-binompdf(10, x, 5)
+# -x
+# x ^ 2
+# sin(x)
+# sin(2 * x)
+# sinh(x)
+# degrees(asin(x))
+# binompdf(10, x, 5)
 # fnint(x ^ 2, -1 * x, x)
 # nderiv(x ^ 2, x)
+# ln(x)
+# sin(-x)
+# -sin(-x)
+# -(-cos(-5))
+# log2(x)
+# tan(x)
+# 1 / (x - 6)

@@ -21,20 +21,32 @@ class Gui(object):
         def call_restart(event):
             self.restart()
 
+        def call_clear(event):
+            self.clear_figures()
+
+        def call_stop(event):
+            self.stop()
+
         self.__default_unit_count = (Decimal(default_units_x), Decimal(default_units_y))
-        self.__target_size = (Decimal(target_size_x), Decimal(target_size_y))
+        target_size_x, target_size_y = Decimal(target_size_x), Decimal(target_size_y)
+        self.__target_size = (target_size_x, target_size_y)
         self.__master = master
         self.__master.bind('<F5>', call_restart)
+        self.__master.bind('<Delete>', call_clear)
+        self.__master.bind('<Escape>', call_stop)
         self.__figures = []
 
         # Creating the InputDialog and waiting for it to be closed.
-        dialog = InputDialog(((default_units_x, default_units_x), (default_units_y, default_units_y)))
-        units_x, units_y = dialog.get_gui_size()
+        # dialog = InputDialog(((default_units_x, default_units_x), (default_units_y, default_units_y)))
+        # units_x, units_y = dialog.get_gui_size()
 
-        if not units_x:
-            units_x = (-default_units_x, default_units_x)
-        if not units_y:
-            units_y = (-default_units_y, default_units_y)
+        # if not units_x:
+        #    units_x = (-default_units_x, default_units_x)
+        # if not units_y:
+        #    units_y = (-default_units_y, default_units_y)
+
+        units_x = (-default_units_x, default_units_x)
+        units_y = (-default_units_y, default_units_y)
 
         # Calculating the scale of the Gui.
         neg_units_x, pos_units_x = units_x
@@ -43,9 +55,9 @@ class Gui(object):
         scale_y = target_size_y / (abs(neg_units_y) + abs(pos_units_y))
 
         if scale_x > 1:
-            scale_x = round(scale_x)
+            scale_x = round(scale_x, 3)
         if scale_y > 1:
-            scale_y = round(scale_y)
+            scale_y = round(scale_y, 3)
 
         # Calculating the absolute of the CoordinateSystem im pixels.
         absolute_size_x = (scale_x * neg_units_x, scale_x * pos_units_x)
@@ -68,16 +80,13 @@ class Gui(object):
         self.__frame = Frame(self.__master)
         self.__frame.pack()
         self.__master.lift()
-
-        # self.__master = Tk()
-        # self.__master.wm_title(window_title)
-        # self.__master.resizable(0, 0)
+        self.__master.focus_force()
 
         # Creating the menu bar.
         self.__menu = Menu(master=self.__frame, bg='red')
-        self.__menu.add_command(label='Quit', command=self.stop)
-        self.__menu.add_command(label='Clear', command=self.clear_figures)
-        self.__menu.add_command(label='Restart', command=self.restart)
+        self.__menu.add_command(label='Quit (ESC)', command=self.stop)
+        self.__menu.add_command(label='Clear (DEL)', command=self.clear_figures)
+        self.__menu.add_command(label='Restart (F5)', command=self.restart)
         self.__master.config(menu=self.__menu)
 
         self.__coordinate_system = CoordinateSystem(self, self.__frame, absolute_size)
@@ -110,6 +119,15 @@ class Gui(object):
         absolute_size_y = (scale_y * neg_units_y, scale_y * pos_units_y)
         absolute_size = (absolute_size_x, absolute_size_y)
 
+        if scale_x > 1:
+            scale_x = round(scale_x, 3)
+        if scale_y > 1:
+            scale_y = round(scale_y, 3)
+
+        absolute_size_x = (scale_x * neg_units_x, scale_x * pos_units_x)
+        absolute_size_y = (scale_y * neg_units_y, scale_y * pos_units_y)
+        absolute_size = (absolute_size_x, absolute_size_y)
+
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
         self.__coordinate_system.get_canvas().destroy()
@@ -133,7 +151,7 @@ class Gui(object):
             if type(figure) == Point:
                 self.create_point(figure.get_coordinates())
             elif type(figure) == Distance:
-                self.create_line(figure.get_coordinates_a(), figure.get_coordinates_b)
+                self.create_distance(figure.get_coordinates_a(), figure.get_coordinates_b())
             elif type(figure) == Line:
                 self.create_line(figure.get_coordinates_support_vector(), figure.get_coordinates_direction_vector())
             elif type(figure) == Function:
@@ -168,7 +186,7 @@ class Gui(object):
         return self.__scale
 
     def get_figures(self):
-        """Returns a list of all figures in the GUI."""
+        """Returns a list of all figures in the Gui."""
         return self.__figures
 
     def get_master(self):
@@ -180,14 +198,7 @@ class Gui(object):
         return self.__frame
 
     def create_point(self, coordinates, debug_output=False):
-        """
-        Creates a point in the coordinate system at the given coordinates.
-
-        :arg coordinates: The coordinates of the Point.
-        :type coordinates: tuple
-        :arg debug_output: Whether to display debug output.
-        :rtype: Point
-        """
+        """Creates a point in the coordinate system at the given coordinates."""
         position, tkinter_object = self.__coordinate_system.create_point(coordinates)
         if debug_output:
             print('Creating Point')
@@ -200,16 +211,7 @@ class Gui(object):
         return point
 
     def create_distance(self, coord_a, coord_b, debug_output=False):
-        """
-        Creates a distance in the coordinate system from point a to point b.
-
-        :arg coord_a: The coordinates for the beginning of the distance.
-        :type coord_a: tuple
-        :arg coord_b: The coordinates for the ending of the distance.
-        :type coord_b: tuple
-        :arg debug_output: Whether to display debug output.
-        :rtype: Distance
-        """
+        """Creates a distance in the coordinate system from point a to point b."""
         pos_a, pos_b, tkinter_objects = self.__coordinate_system.create_distance(coord_a, coord_b)
         if debug_output:
             print('Creating Distance')
@@ -224,16 +226,7 @@ class Gui(object):
         return distance
 
     def create_line(self, support_vector, direction_vector, debug_output=False):
-        """
-        Creates a line in the coordinate system with a support and a direction vector.
-
-        :arg support_vector: The support vector of the line.
-        :type support_vector: tuple
-        :arg direction_vector: The direction vector of the line.
-        :type direction_vector: tuple
-        :arg debug_output: Whether to display debug output.
-        :rtype: Line
-        """
+        """Creates a line in the coordinate system with a support and a direction vector."""
         pos_sup, pos_dir, tkinter = self.__coordinate_system.create_line(support_vector, direction_vector)
         line = Line(support_vector, direction_vector, pos_sup, pos_dir, tkinter)
         if debug_output:
@@ -248,14 +241,7 @@ class Gui(object):
         return line
 
     def create_function_graph(self, function_term, debug_output=False):
-        """
-        Creates a function graph in the coordinate system.
-
-        :arg function_term: The corresponding term to the function graph.
-        :type function_term: str
-        :arg debug_output: Whether to display debug output.
-        :rtype: Function
-        """
+        """Creates a function graph in the coordinate system."""
         if debug_output:
             print('Creating Function Graph')
             print('Function Term:', function_term)
@@ -287,12 +273,12 @@ class InputDialog(object):
 
         # Grabs the entries, entered into the input fields and validates whether they are correct.
         def get_size(event=None):
-            is_float = re.compile(r'^-?\d+(\.\d+)?$')
+            is_decimal = re.compile(r'^-?\d+(\.\d+)?$')
 
             # Validate the values, entered into the input fields.
             x = y = False
-            neg = self.validate_axis_size(is_float, input_neg_x)
-            pos = self.validate_axis_size(is_float, input_pos_x)
+            neg = self.validate_axis_size(is_decimal, input_neg_x)
+            pos = self.validate_axis_size(is_decimal, input_pos_x)
             if neg and pos:
                 x = True
             if not neg:
@@ -301,8 +287,8 @@ class InputDialog(object):
             if not pos:
                 input_pos_x.delete(0, END)
 
-            neg = self.validate_axis_size(is_float, input_neg_y)
-            pos = self.validate_axis_size(is_float, input_pos_y)
+            neg = self.validate_axis_size(is_decimal, input_neg_y)
+            pos = self.validate_axis_size(is_decimal, input_pos_y)
             if neg and pos:
                 y = True
             if not neg:
@@ -329,6 +315,7 @@ class InputDialog(object):
         master = Tk()
         master.lift()
         master.attributes("-topmost", True)
+        master.focus_force()
         dialog = Frame(master)
         dialog.grid(pady=2)
         dialog.focus_set()
