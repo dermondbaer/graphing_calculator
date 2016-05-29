@@ -1,7 +1,7 @@
 # Pascal Mehnert
 # 25.04.2016
-# Multiple classes representing figures in the coordinate system.
-# V 1.0
+# Multiple classes representing figures in the CoordinateSystem.
+# V 2.0
 
 
 class Figure(object):
