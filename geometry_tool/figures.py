@@ -1,7 +1,7 @@
 # Pascal Mehnert
 # 25.04.2016
-# Multiple classes representing figures in the coordinate system.
-# V 1.0
+# Multiple classes representing figures in the CoordinateSystem.
+# V 2.0
 
 
 class Figure(object):
@@ -10,22 +10,6 @@ class Figure(object):
 
     def get_tkinter_objects(self):
         return self.__tkinter_objects
-
-    @staticmethod
-    def is_point():
-        return False
-
-    @staticmethod
-    def is_distance():
-        return False
-
-    @staticmethod
-    def is_line():
-        return False
-
-    @staticmethod
-    def is_function():
-        return False
 
 
 class Point(Figure):
@@ -40,10 +24,6 @@ class Point(Figure):
 
     def get_position(self):
         return self.__position
-
-    @staticmethod
-    def is_point():
-        return True
 
 
 class Distance(Figure):
@@ -67,10 +47,6 @@ class Distance(Figure):
     def get_position_b(self):
         return self.__position_b
 
-    @staticmethod
-    def is_distance():
-        return True
-
 
 class Line(Figure):
     def __init__(self, coord_sup, coord_dir, pos_sup, pos_dir, tkinter_objects):
@@ -88,15 +64,11 @@ class Line(Figure):
     def get_coordinates_direction_vector(self):
         return self.__coordinates_direction_vector
 
-    def get__position_support_vector(self):
+    def get_position_support_vector(self):
         return self.__position_support_vector
 
     def get_position_direction_vector(self):
         return self.__position_direction_vector
-
-    @staticmethod
-    def is_line():
-        return True
 
 
 class Function(Figure):
@@ -107,7 +79,3 @@ class Function(Figure):
 
     def get_function_term(self):
         return self.__function_term
-
-    @staticmethod
-    def is_function():
-        return True

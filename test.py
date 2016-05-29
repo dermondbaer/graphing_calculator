@@ -1,45 +1,39 @@
 #   Pascal Mehnert
 #   29.01.2016
 #
-#   V 0.1
+#   V 1.0
 
 from geometry_tool.gui import *
 from math_calculator import *
 
 
-class Application(object):
+class TestApplication(Calculator, Gui):
     def __init__(self):
+        Calculator.__init__(self)
         self.__master = Tk()
-        self.__gui = Gui(self.__master, target_size_x=950, target_size_y=950)
-        self.__calculator = Calculator()
-
-    def start(self):
-        self.__gui.start()
-
-    def stop(self):
-        self.__gui.stop()
+        self.__master.resizable(0, 0)
+        Gui.__init__(self, self.__master, target_size_x=900, target_size_y=900)
 
     def test_calculator(self):
         test_file = open('test_files/test_calculator', mode='r')
         for line in test_file.read().splitlines():
-            temp = line.split(';')
-            expression = temp[0]
-            expected_result = temp[1]
-            self.__calculator.calculate_expression(expression)
-            print('{:<14}'.format('Expected:'), expected_result, sep='')
-            print()
-            print()
-
-    def test_parser(self):
-        pass
+            if line[0:2] != '# ':
+                temp = line.split(';')
+                expression = temp[0]
+                expected_result = temp[1]
+                self.calculate_expression(expression)
+                print('{:<14}'.format('Expected:'), expected_result, sep='')
+                print()
+                print()
 
     def test_geometry_tool(self):
         test_file = open('test_files/test_geometry_tool')
         for function in test_file.read().splitlines():
-            self.__gui.create_function_graph(function)
+            if function[0:2] != '# ':
+                self.create_function_graph(function)
 
 
-app = Application()
+app = TestApplication()
 app.test_geometry_tool()
 app.test_calculator()
 app.start()
