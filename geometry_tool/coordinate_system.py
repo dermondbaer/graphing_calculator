@@ -33,8 +33,6 @@ class CoordinateSystem(Canvas):
         canvas_height = pos_size_y + abs(neg_size_y) + 1
         self.__canvas_size = (canvas_width, canvas_height)
 
-        # self.__canvas = Canvas(self.__master, width=canvas_width, height=canvas_height, highlightthickness=0,
-        #                        bg='white')
         Canvas.__init__(self, self.__master, width=canvas_width, height=canvas_height, highlightthickness=0)
         self.__mouse_position = self.create_text(canvas_width-3, canvas_height-1, text='0; 0', anchor='se')
 
@@ -140,10 +138,6 @@ class CoordinateSystem(Canvas):
         """Returns the tkinter master element of this CoordinateSystem."""
         return self.__master
 
-    # def get_canvas(self):
-    #     """Returns the Canvas of this CoordinateSystem."""
-    #     return self.__canvas
-
     def get_absolute_position(self, coordinates):
         """Calculates the exact position of a point given in coordinates."""
         x, y = coordinates
@@ -188,15 +182,15 @@ class CoordinateSystem(Canvas):
         pos_a = self.get_absolute_position(coord_a)
         pos_b = self.get_absolute_position(coord_b)
 
-        tkinter = self.__canvas.create_line(pos_a, pos_b)
+        tkinter = self.create_line(pos_a, pos_b)
         tkinter_objects.append(tkinter)
 
         x, y = pos_a
-        tkinter = self.__canvas.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
+        tkinter = self.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
         tkinter_objects.append(tkinter)
 
         x, y = pos_b
-        tkinter = self.__canvas.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
+        tkinter = self.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
         tkinter_objects.append(tkinter)
 
         return pos_a, pos_b, tkinter_objects
@@ -235,7 +229,7 @@ class CoordinateSystem(Canvas):
         pos_a = self.get_absolute_position(point_a)
         pos_b = self.get_absolute_position(point_b)
 
-        tkinter_object = self.__canvas.create_line(pos_a, pos_b)
+        tkinter_object = self.create_line(pos_a, pos_b)
 
         return pos_sup_vec, pos_dir_vec, tkinter_object
 
@@ -324,4 +318,4 @@ class CoordinateSystem(Canvas):
 
     def del_tkinter_object(self, tkinter_object):
         """Deletes a tkinter object from the canvas."""
-        self.__canvas.delete(tkinter_object)
+        self.delete(tkinter_object)
