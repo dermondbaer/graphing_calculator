@@ -113,7 +113,7 @@ class Gui(object):
 
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
-        self.__coordinate_system.get_canvas().destroy()
+        self.__coordinate_system.destroy()
         self.__coordinate_system = CoordinateSystem(self, self.__frame, absolute_size)
 
         print('Recreating Coordinate System')
@@ -210,7 +210,7 @@ class Gui(object):
 
     def create_line(self, support_vector, direction_vector, debug_output=False):
         """Creates a line in the CoordinateSystem with a support vector and a direction vector."""
-        pos_sup, pos_dir, tkinter = self.__coordinate_system.create_line(support_vector, direction_vector)
+        pos_sup, pos_dir, tkinter = self.__coordinate_system.create_vector_line(support_vector, direction_vector)
         line = Line(support_vector, direction_vector, pos_sup, pos_dir, tkinter)
         if debug_output:
             print('Creating Line')

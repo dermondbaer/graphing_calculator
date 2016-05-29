@@ -7,7 +7,7 @@ from decimal import *
 from math_calculator import Calculator
 
 
-class CoordinateSystem(object):
+class CoordinateSystem(Canvas):
     def __init__(self, gui, master, axis_size):
         """
         :arg gui: The Gui, the CoordinateSystem belongs to.
@@ -33,23 +33,24 @@ class CoordinateSystem(object):
         canvas_height = pos_size_y + abs(neg_size_y) + 1
         self.__canvas_size = (canvas_width, canvas_height)
 
-        self.__canvas = Canvas(self.__master, width=canvas_width, height=canvas_height, highlightthickness=0,
-                               bg='white')
-        self.__mouse_position = self.__canvas.create_text(canvas_width-3, canvas_height-1, text='0; 0', anchor='se')
+        # self.__canvas = Canvas(self.__master, width=canvas_width, height=canvas_height, highlightthickness=0,
+        #                        bg='white')
+        Canvas.__init__(self, self.__master, width=canvas_width, height=canvas_height, highlightthickness=0)
+        self.__mouse_position = self.create_text(canvas_width-3, canvas_height-1, text='0; 0', anchor='se')
 
         def set_mouse_position(event):
             """Displays the current mouse position in the bottom right of the Canvas"""
             coordinate_x, coordinate_y = self.get_coordinates((event.x, event.y))
             coordinate_x, coordinate_y = round(coordinate_x, 3), round(coordinate_y, 3)
-            self.__canvas.itemconfig(self.__mouse_position, text='{0}; {1}'.format(coordinate_x, coordinate_y))
+            self.itemconfig(self.__mouse_position, text='{0}; {1}'.format(coordinate_x, coordinate_y))
 
         # When the mouse is moved, the set_mouse_position function is being executed.
-        self.__canvas.bind('<Motion>', set_mouse_position)
-        self.__canvas.pack()
+        self.bind('<Motion>', set_mouse_position)
+        self.pack()
 
         # Draw the lines, representing the x-and y-axis.
-        self.__canvas.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
-        self.__canvas.create_line((0, pos_size_y), (canvas_width, pos_size_y))
+        self.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
+        self.create_line((0, pos_size_y), (canvas_width, pos_size_y))
 
         self.__unit_size = self.__gui.get_scale()
         unit_size_x, unit_size_y = self.__unit_size
@@ -86,42 +87,38 @@ class CoordinateSystem(object):
         # Draw the scaling on the negative x-axis.
         for unit in range(0, neg_units_x + 1):
             margin = origin_x - (unit * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 6), (margin, origin_y - 7))
+            self.create_line((margin, origin_y + 6), (margin, origin_y - 7))
             if unit > 0:
-                self.__canvas.create_text((margin, origin_y - 7), text=(-unit * multiplicand_x), font="arial 7",
-                                          anchor='s')
+                self.create_text((margin, origin_y - 7), text=(-unit * multiplicand_x), font="arial 7", anchor='s')
             margin = origin_x - ((unit + Decimal('0.5')) * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 4), (margin, origin_y - 5))
+            self.create_line((margin, origin_y + 4), (margin, origin_y - 5))
 
         # Draw the scaling on the positive x-axis.
         for unit in range(0, pos_units_x + 1):
             margin = origin_x + (unit * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 6), (margin, origin_y - 7))
+            self.create_line((margin, origin_y + 6), (margin, origin_y - 7))
             if unit > 0:
-                self.__canvas.create_text((margin, origin_y - 7), text=(unit * multiplicand_x), font="arial 7",
-                                          anchor='s')
+                self.create_text((margin, origin_y - 7), text=(unit * multiplicand_x), font="arial 7", anchor='s')
             margin = origin_x + ((unit + Decimal('0.5')) * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 4), (margin, origin_y - 5))
+            self.create_line((margin, origin_y + 4), (margin, origin_y - 5))
 
         # Draw the scaling on the negative y-axis.
         for unit in range(0, neg_units_y + 1):
             margin = origin_y + (unit * unit_size_y)
-            self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
+            self.create_line((origin_x + 6, margin), (origin_x - 7, margin))
             if unit > 0:
-                self.__canvas.create_text((origin_x + 10, margin), text=(-unit*multiplicand_y), font="arial 7",
-                                          anchor='w')
+                self.create_text((origin_x + 10, margin), text=(-unit*multiplicand_y), font="arial 7", anchor='w')
             margin = origin_y + ((unit + Decimal('0.5')) * unit_size_y)
-            self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
+            self.create_line((origin_x + 4, margin), (origin_x - 5, margin))
 
         # Draw the scaling on the positive y-axis.
         for unit in range(0, pos_units_y + 1):
             margin = origin_y - (unit * unit_size_y)
-            self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
+            self.create_line((origin_x + 6, margin), (origin_x - 7, margin))
             if unit > 0:
-                self.__canvas.create_text((origin_x + 10, margin), text=(unit*multiplicand_y), font="arial 7",
-                                          anchor='w')
+                self.create_text((origin_x + 10, margin), text=(unit*multiplicand_y), font="arial 7", anchor='w')
             margin = origin_y - ((unit + Decimal('0.5')) * unit_size_y)
-            self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
+            self.create_line((origin_x + 4, margin), (origin_x - 5, margin))
 
     def get_gui(self):
         """Returns the Gui of this CoordinateSystem."""
@@ -143,9 +140,9 @@ class CoordinateSystem(object):
         """Returns the tkinter master element of this CoordinateSystem."""
         return self.__master
 
-    def get_canvas(self):
-        """Returns the Canvas of this CoordinateSystem."""
-        return self.__canvas
+    # def get_canvas(self):
+    #     """Returns the Canvas of this CoordinateSystem."""
+    #     return self.__canvas
 
     def get_absolute_position(self, coordinates):
         """Calculates the exact position of a point given in coordinates."""
@@ -181,7 +178,7 @@ class CoordinateSystem(object):
     def create_point(self, coordinates):
         """Creates a point in this CoordinateSystem."""
         x, y = self.get_absolute_position(coordinates)
-        tkinter = self.__canvas.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
+        tkinter = self.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
         return (x, y), tkinter
 
     def create_distance(self, coord_a, coord_b):
@@ -204,7 +201,7 @@ class CoordinateSystem(object):
 
         return pos_a, pos_b, tkinter_objects
 
-    def create_line(self, coord_sup, coord_dir):
+    def create_vector_line(self, coord_sup, coord_dir):
         """Creates a line in this CoordinateSystem."""
         pos_sup_vec = self.get_absolute_position(coord_sup)
         pos_dir_vec = self.get_absolute_position(coord_dir)
@@ -321,7 +318,7 @@ class CoordinateSystem(object):
         for section in full_graph:
             if len(section) > 1:
                 section = [section[i] for i in range(0, len(section), 4)]
-                tkinter_objects.append(self.__canvas.create_line(section, fill='black'))
+                tkinter_objects.append(self.create_line(section, fill='black'))
 
         return tkinter_objects
 
