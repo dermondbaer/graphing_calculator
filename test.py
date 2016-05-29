@@ -13,11 +13,6 @@ class TestApplication(Calculator, Gui):
         self.__master = Tk()
         self.__master.resizable(0, 0)
         Gui.__init__(self, self.__master, target_size_x=900, target_size_y=900)
-        # self.create_distance((1, 2), (3, 4))
-        # self.create_point((5, 5))
-        # self.create_line((-1, 4), (1, 0))
-        # self.__gui = Gui(self.__master, target_size_x=900, target_size_y=900)
-        # self.__calculator = Calculator
 
     def test_calculator(self):
         test_file = open('test_files/test_calculator', mode='r')

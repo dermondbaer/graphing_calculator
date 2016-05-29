@@ -7,86 +7,73 @@ import math
 import builtins
 from decimal import *
 
-pi = Decimal('3.1415926535897932384626433832')
-e = Decimal('2.7182818284590452353602874713')
+pi = Decimal('3.1415926535897932384626433832795028841971693993751058209749445923')
+e = Decimal('2.7182818284590452353602874713526624977572470936999595749669676277')
 
 
 def cos(x):
     """Returns the cosine of x (measured in radians)."""
     return Decimal(math.cos(x))
-    # return round(Decimal(math.cos(x)), 15)
 
 
 def cosh(x):
     """Returns the hyperbolic cosine of x."""
     return Decimal(math.cosh(x))
-    # return round(Decimal(math.cosh(x)), 15)
 
 
 def acos(x):
     """Returns the arc sine of x (measured in radians)."""
     return Decimal(math.acos(x))
-    # return round(Decimal(math.acos(x)), 15)
 
 
 def acosh(x):
     """Returns the reverse hyperbolic cosine of x."""
     return Decimal(math.acosh(x))
-    # return round(Decimal(math.acosh(x)), 15)
 
 
 def sin(x):
     """Returns the sine of x (measured in radians)."""
     return Decimal(math.sin(x))
-    # return round(Decimal(math.sin(x)), 15)
 
 
 def sinh(x):
     """Returns the hyperbolic sine of x."""
     return Decimal(math.sinh(x))
-    # return round(Decimal(math.sinh(x)), 15)
 
 
 def asin(x):
     """Returns the arc sine of x (measured in radians)."""
     return Decimal(math.asin(x))
-    # return round(Decimal(math.asin(x)), 15)
 
 
 def asinh(x):
     """Returns the reverse hyperbolic sine of x."""
     return Decimal(math.asinh(x))
-    # return round(Decimal(math.asinh(x)), 15)
 
 
 def tan(x):
     """Returns the tangent of x (measured in radians)."""
     return Decimal(math.tan(x))
-    # return round(Decimal(math.tan(x)), 15)
 
 
 def tanh(x):
     """Returns the hyperbolic tangent of x."""
     return Decimal(math.tanh(x))
-    # return round(Decimal(math.tanh(x)), 15)
 
 
 def atan(x):
     """Returns the arc tangent of x (measured in radians)."""
     return Decimal(math.atan(x))
-    # return round(Decimal(math.atan(x)), 15)
 
 
 def atan2(y, x):
     """Returns the arc tangent of x/y (measured in radians)."""
     return Decimal(math.atan2(y, x))
-    # return round(Decimal(math.atan2(y, x)), 15)
 
 
 def atanh(x):
     """Returns the reverse hyperbolic tangent of x."""
     return Decimal(math.atanh(x))
-    # return round(Decimal(math.atanh(x)), 15)
 
 
 def radians(x):

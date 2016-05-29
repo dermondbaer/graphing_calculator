@@ -29,13 +29,13 @@ class Parser(object):
     @staticmethod
     def parse_expression(expression):
         """
-        Parses a mathematical expression and returns it as a ParserTree.  Its purpose is NOT graphic display.
+        Parses a mathematical expression and returns it as ParserTree.
 
-        :arg expression: A mathematical expression, given in infix notation.
+        :param expression: A mathematical expression, given in infix notation.
         :type expression: str
         :rtype: ParserTree
         """
-        postfix = Parser._make_postfix(Parser.partition(expression))  # Converts the expression to postfix notation
+        postfix = Parser._make_postfix(Parser.partition(expression))
         parser_tree = ParserTree(expression)
         if postfix:
             if Parser._parse(postfix, current_token_index=len(postfix) - 1, parser_tree=parser_tree) == -1:
@@ -48,15 +48,15 @@ class Parser(object):
     @staticmethod
     def make_expression_postfix(expression):
         """
-        Initializes the conversion of a mathematical from infix to postfix notation.
+        Converts a mathematical expression from infix to postfix notation.
 
-        :arg expression: The expression to be converted into postfix notation.
+        :param expression: The expression to be converted to postfix notation.
         :type expression: str
         :rtype: str
         """
-        infix = Parser.partition(expression)  # Sequences the given expression
-        postfix = Parser._make_postfix(infix)  # Invokes the actual conversion of the expression
-        postfix = ' '.join(postfix)  # Joins the sequenced expression back together
+        infix = Parser.partition(expression)
+        postfix = Parser._make_postfix(infix)
+        postfix = ' '.join(postfix)
         return postfix
 
     @staticmethod
@@ -64,7 +64,7 @@ class Parser(object):
         """
         Uses the shunting-yard algorithm to convert an expression from infix to postfix notation.
 
-        :arg expression: The expression to be converted into postfix notation.
+        :param expression: The expression to be converted into postfix notation.
         :type expression: list
         :rtype: list
         """
@@ -146,15 +146,15 @@ class Parser(object):
     @staticmethod
     def _parse(expression, current_token_index, parser_tree, parent=None):
         """
-        Parses an expression, given in postfix notation and writes it to a ParserTree.
+        Parses an expression, given in postfix notation and saves it to a ParserTree.
 
-        :arg expression: The expression to parse.
+        :param expression: The expression to parse.
         :type expression: list
-        :arg current_token_index: The index of the current token.
+        :parm current_token_index: The index of the current token.
         :type current_token_index: int
-        :arg parser_tree: The ParserTree, the expression is written to.
+        :param parser_tree: The ParserTree, the expression is being written to.
         :type parser_tree: ParserTree
-        :arg parent: The Node that is parent to the current token.
+        :param parent: The Node that is parent to the current token.
         :type parent: Node
         :rtype: int
         """
@@ -174,12 +174,12 @@ class Parser(object):
             current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
             current_token_index = Parser._parse(expression, current_token_index, parser_tree, parent=parent)
 
-        elif token in Parser.supported_constants:                   # If the token is a constant
+        elif token in Parser.supported_constants:
             value = vars(math_library)[token]
-            parser_tree.add_constant(token, value, parent=parent)   # Add the token as Node
+            parser_tree.add_constant(token, value, parent=parent)
             current_token_index -= 1
 
-        elif re.match(is_function_name, token):                     # If the token is a function
+        elif re.match(is_function_name, token):
             try:
                 function = getattr(math_library, token)
                 parent = parser_tree.add_function(token, function, parent=parent)
@@ -204,12 +204,12 @@ class Parser(object):
                 parser_tree.add_parsed_function(function_term, temp_parser_tree, parent=parent)
                 current_token_index = new_current_token_index
 
-        elif re.match(is_variable, token):                                      # If the token is a variable
+        elif re.match(is_variable, token):
             parser_tree.add_variable(token, parent)
             current_token_index -= 1
 
-        elif re.match(is_number, token):                                        # If the token is a number
-            parser_tree.add_number(token, Decimal(token), parent=parent)        # Add the token as Node
+        elif re.match(is_number, token):
+            parser_tree.add_number(token, Decimal(token), parent=parent)
             current_token_index -= 1
 
         return current_token_index
@@ -242,6 +242,7 @@ class Parser(object):
                 expression.pop()
                 if len(expression) == 0:
                     break
+        if expression:
             while expression[0] == '':
                 expression.pop(0)
                 if len(expression) == 0:
@@ -253,7 +254,6 @@ class Parser(object):
                 token = '0' + token             # Adding left out leading zeros in positive decimal digits
             if re.match('^-\.\d+$', token):
                 token.replace('-', '-0')        # Adding left out leading zeros in negative decimal digits
-
             expression[index] = token
 
         stack = []
