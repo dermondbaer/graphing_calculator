@@ -36,7 +36,7 @@ class Parser(object):
         :rtype: ParserTree
         """
         postfix = Parser._make_postfix(Parser.partition(expression))
-        parser_tree = ParserTree(expression)
+        parser_tree = ParserTree()
         if postfix:
             if Parser._parse(postfix, current_token_index=len(postfix) - 1, parser_tree=parser_tree) == -1:
                 return parser_tree

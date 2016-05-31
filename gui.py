@@ -105,7 +105,7 @@ class Gui(object):
         self.__btn_equals = Button(master=self.__basemathbtn, text="=", command=self.equals) \
             .grid(row=2, column=1, ipadx=self.__grid_keypad_ipadx, ipady=self.__grid_keypad_ipady, sticky="NESW",
                   rowspan=2)
-        #self.__btn_exp = Button(master=self.__basemathbtn, text="^", command=partial(self.press, " ^ ")) \
+        # self.__btn_exp = Button(master=self.__basemathbtn, text="^", command=partial(self.press, " ^ ")) \
         #    .grid(row=1, column=1, ipadx=self.__grid_keypad_ipadx, ipady=self.__grid_keypad_ipady, sticky="NESW")
         self.__btn_clr = Button(master=self.__basemathbtn, text="C", command=self.clear, bg="orange") \
             .grid(row=0, column=1, ipadx=self.__grid_keypad_ipadx, ipady=self.__grid_keypad_ipady, sticky="NESW")
@@ -169,7 +169,7 @@ class Gui(object):
                              self.__parsegeometry(self.__tk.winfo_geometry())[1])
 
         # parser setup
-        self.__parser = Parser()
+        # self.__parser = Parser()
 
         # calculator setup
         self.__calc = Calculator()
@@ -192,7 +192,7 @@ class Gui(object):
 
     def stop(self):
         self.__tk.destroy()
-        self.__main.stop()
+        self.__main.stop_application()
 
     def press(self, value):
         self.__expr.append(value)
@@ -219,7 +219,7 @@ class Gui(object):
     def equals(self):
         try:
             expr = self.convert_list_to_string(self.__expr)
-            tmp = self.__parser.make_expression_postfix(expr)
+            tmp = self.__calc.make_expression_postfix(expr)
             self.__lbl_postf_expr.configure(text=tmp)
             result = self.__calc.calculate_expression(expr)
             if result.get_root() is not None:

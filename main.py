@@ -5,16 +5,12 @@
 from gui import *
 
 
-class Application(object):
+class Application(Gui):
     def __init__(self, title):
-        self.__title = title
-        self.__gui = Gui(self, title)
-  
-    def start(self):
-        self.__gui.start()
+        Gui.__init__(self, self, title)
 
     @staticmethod
-    def stop():
+    def stop_application():
         raise SystemExit
 
 # config
