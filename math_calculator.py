@@ -23,18 +23,16 @@ class Calculator(math_parser.Parser):
         :type expression: str
         :rtype: ParserTree
         """
-        print('{:<14}'.format('Calculating:'), expression, sep='')
+        print('{:<14}'.format('Calculating:'), '"', expression, '"', sep='')
 
         parser_tree = Calculator.parse_expression(expression)
 
-        print('{:<14}'.format('Postfix:'), end='')
-        parser_tree.print()
+        print('{:<14}'.format('Postfix:'), '"', parser_tree.to_string(), '"', sep='')
 
         if parser_tree.get_root() is not None:
             Calculator._simplify(parser_tree, parser_tree.get_root())
 
-        print('{:<14}'.format('Result:'), end='')
-        parser_tree.print()
+        print('{:<14}'.format('Result:'), '"', parser_tree.to_string(), '"', sep='')
         print()
 
         return parser_tree

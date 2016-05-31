@@ -235,18 +235,8 @@ class Parser(object):
         expression = expression.replace(')', ' ) ')
         expression = expression.replace(',', ' , ')
         expression = re.sub('\s+', ' ', expression)
+        expression = expression.rstrip(' ').lstrip(' ')
         expression = expression.split(' ')
-
-        if expression:
-            while expression[-1] == '':
-                expression.pop()
-                if len(expression) == 0:
-                    break
-        if expression:
-            while expression[0] == '':
-                expression.pop(0)
-                if len(expression) == 0:
-                    break
 
         for index in range(0, len(expression)):
             token = expression[index]
