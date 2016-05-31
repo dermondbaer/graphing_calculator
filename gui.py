@@ -4,8 +4,8 @@
 
 from functools import partial
 from tkinter import *
-from value_table import *
 from math_calculator import *
+from value_table import *
 import re
 
 
@@ -153,6 +153,7 @@ class Gui(object):
         self.__value_table.configure_size(10,2)
 
         # hide the value table
+        self.__value_table_master.grid_remove()
         # define a minimum width
         # self.__tk.grid_columnconfigure(2, minsize=300)
 
