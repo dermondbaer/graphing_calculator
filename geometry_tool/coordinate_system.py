@@ -75,7 +75,7 @@ class CoordinateSystem(object):
         self.__master.config(menu=self.__menu)
 
         # Creating the CoordinateSystemCanvas.
-        self.__coordinate_system = CoordinateSystemCanvas(self, absolute_size)
+        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
 
     def start(self):
         """Calls the mainloop for this CoordinateSystem."""
@@ -113,8 +113,8 @@ class CoordinateSystem(object):
 
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
-        self.__coordinate_system.destroy()
-        self.__coordinate_system = CoordinateSystemCanvas(self, absolute_size)
+        self.__coordinate_system_canvas.destroy()
+        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
 
         print('Recreating Coordinate System')
         print('X-target_size:', target_size_x)
@@ -149,7 +149,7 @@ class CoordinateSystem(object):
         """Removes all figures from the CoordinateSystem."""
         for figure in self.__figures:
             for tkinter_object in figure.get_tkinter_objects():
-                self.__coordinate_system.del_tkinter_object(tkinter_object)
+                self.__coordinate_system_canvas.del_tkinter_object(tkinter_object)
         self.__figures = []
 
     def get_default_unit_count(self):
@@ -182,7 +182,7 @@ class CoordinateSystem(object):
 
     def create_point(self, coordinates, debug_output=False):
         """Creates a point in this CoordinateSystem at the given coordinates."""
-        position, tkinter_object = self.__coordinate_system.create_point(coordinates)
+        position, tkinter_object = self.__coordinate_system_canvas.create_point(coordinates)
         if debug_output:
             print('Creating Point')
             print('Coordinates:', coordinates)
@@ -195,7 +195,7 @@ class CoordinateSystem(object):
 
     def create_distance(self, coord_a, coord_b, debug_output=False):
         """Creates a distance in this CoordinateSystem from point a to point b."""
-        pos_a, pos_b, tkinter_objects = self.__coordinate_system.create_distance(coord_a, coord_b)
+        pos_a, pos_b, tkinter_objects = self.__coordinate_system_canvas.create_distance(coord_a, coord_b)
         if debug_output:
             print('Creating Distance')
             print('Coordinates Point A:', coord_a)
@@ -210,7 +210,7 @@ class CoordinateSystem(object):
 
     def create_line(self, support_vector, direction_vector, debug_output=False):
         """Creates a line in this CoordinateSystem with a support vector and a direction vector."""
-        pos_sup, pos_dir, tkinter = self.__coordinate_system.create_vector_line(support_vector, direction_vector)
+        pos_sup, pos_dir, tkinter = self.__coordinate_system_canvas.create_vector_line(support_vector, direction_vector)
         line = Line(support_vector, direction_vector, pos_sup, pos_dir, tkinter)
         if debug_output:
             print('Creating Line')
@@ -230,7 +230,7 @@ class CoordinateSystem(object):
             print('Function Term:', function_term)
             print()
 
-        tkinter_objects = self.__coordinate_system.create_function_graph(function_term)
+        tkinter_objects = self.__coordinate_system_canvas.create_function_graph(function_term)
         function = Function(function_term, tkinter_objects)
         self.__figures.append(function)
         return function
@@ -239,7 +239,7 @@ class CoordinateSystem(object):
         """Deletes a figure from this CoordinateSystem."""
         self.__figures.remove(figure)
         for tkinter_object in figure.get_tkinter_objects():
-            self.__coordinate_system.del_tkinter_object(tkinter_object)
+            self.__coordinate_system_canvas.del_tkinter_object(tkinter_object)
 
 
 class InputDialog(object):

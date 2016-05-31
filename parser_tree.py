@@ -3,6 +3,8 @@
 # Collections of classes, that are used to save a mathematical expression as a Tree.
 # V 2.0
 
+import re
+
 
 class Node(object):
     """Represents any type of Node in a ParserTree"""
@@ -128,6 +130,9 @@ class ParserTree(object):
     def __init__(self):
         self.__root = None
 
+    def __str__(self):
+        return self.to_string()
+
     def get_root(self):
         """Returns the root of this Parser Tree."""
         return self.__root
@@ -244,18 +249,40 @@ class ParserTree(object):
 
     def _print_node(self, node, precision):
         """Prints the Node to the given precision. Then it calls itself for every child of the Node."""
-        if node is not None:
-            key = ''
-            if type(node)in (Number, Constant):
-                key = round(node.get_value(), precision)
-            elif type(node) == Variable:
-                key = node.get_key()
-            elif type(node) == ParsedFunction:
-                key = node.get_key()
-            elif isinstance(node, Operation):
-                key = node.get_key()
-                for child in node.get_child_list():
-                    self._print_node(child, precision)
-            key = str(key)
-            key = key.rstrip('0').rstrip('.') if '.' in key else key
-            print(key, end=' ')
+        key = str()
+        if type(node) in (Number, Constant):
+            key = round(node.get_value(), precision)
+        elif type(node) in (Variable, ParsedFunction):
+            key = node.get_key()
+        elif isinstance(node, Operation):
+            key = node.get_key()
+            for child in node.get_child_list():
+                self._print_node(child, precision)
+        key = str(key)
+        key = key.rstrip('0').rstrip('.') if '.' in key else key
+        print(key, end=' ')
+
+    def to_string(self, precision=12):
+        string = str()
+        if self.__root is not None:
+            string = self._node_to_string(self.__root, precision)
+            string = string.lstrip(' ').rstrip('')
+            return string
+        else:
+            return string
+
+    def _node_to_string(self, node, precision, string=''):
+        key = str()
+        if type(node) in (Number, Constant):
+            key = round(node.get_value(), precision)
+        elif type(node) in (Variable, ParsedFunction):
+            key = node.get_key()
+        elif isinstance(node, Operation):
+            for child in node.get_child_list():
+                key += ' ' + self._node_to_string(child, precision, string)
+            key += ' ' + node.get_key()
+        key = str(key)
+        key = key.rstrip('0').rstrip('.') if '.' in key else key
+        key = re.sub('\s+', ' ', key)
+
+        return key
