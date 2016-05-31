@@ -33,6 +33,7 @@ class Distance(Figure):
         self.__coordinates_b = coord_b
         self.__position_a = pos_a
         self.__position_b = pos_b
+        self.__is_distance = True
 
     def get_coordinates_a(self):
         return self.__coordinates_a
@@ -55,6 +56,7 @@ class Line(Figure):
         self.__coordinates_direction_vector = coord_dir
         self.__position_support_vector = pos_sup
         self.__position_direction_vector = pos_dir
+        self.__is_line = True
 
     def get_coordinates_support_vector(self):
         return self.__coordinates_support_vector
@@ -62,7 +64,7 @@ class Line(Figure):
     def get_coordinates_direction_vector(self):
         return self.__coordinates_direction_vector
 
-    def get__position_support_vector(self):
+    def get_position_support_vector(self):
         return self.__position_support_vector
 
     def get_position_direction_vector(self):
@@ -73,6 +75,7 @@ class Function(Figure):
     def __init__(self, function_term, tkinter_objects):
         Figure.__init__(self, tkinter_objects)
         self.__function_term = function_term
+        self.__is_function = True
 
     def get_function_term(self):
         return self.__function_term

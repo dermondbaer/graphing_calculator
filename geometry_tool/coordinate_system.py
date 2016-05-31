@@ -1,9 +1,9 @@
 #   Pascal Mehnert
 #   29.01.2016
-#
-#   V 0.1
+#   V 2.0
 
 from tkinter import *
+from decimal import *
 from math_calculator import Calculator
 
 
@@ -24,57 +24,56 @@ class CoordinateSystem(object):
         self.__axis_size = axis_size
 
         origin_x = abs(neg_size_x)
-        origin_y = abs(pos_size_x)
+        origin_y = abs(pos_size_y)
         self.__origin = (origin_x, origin_y)
 
-        canvas_width = pos_size_x + abs(neg_size_x)
-        canvas_height = pos_size_y + abs(neg_size_y)
+        canvas_width = pos_size_x + abs(neg_size_x) + 1
+        canvas_height = pos_size_y + abs(neg_size_y) + 1
         self.__canvas_size = (canvas_width, canvas_height)
 
-        self.__frame = Frame(self.__master, borderwidth=1, bg='black')
-        self.__frame.pack(side=RIGHT)
+        self.__canvas = Canvas(self.__master, width=canvas_width, height=canvas_height, highlightthickness=0,
+                               bg='white')
+        self.__mouse_position = self.__canvas.create_text(canvas_width-3, canvas_height-1, text='0; 0', anchor='se')
 
-        self.__canvas = Canvas(self.__frame, width=canvas_width, height=canvas_height, highlightthickness=0, bg='white')
+        def set_mouse_position(event):
+            coordinate_x, coordinate_y = self.get_coordinates((event.x, event.y))
+            coordinate_x, coordinate_y = round(coordinate_x, 3), round(coordinate_y, 3)
+            self.__canvas.itemconfig(self.__mouse_position, text='{0}; {1}'.format(coordinate_x, coordinate_y))
+
+        # When the mouse is moved, the set_mouse_position function is being executed.
+        self.__canvas.bind('<Motion>', set_mouse_position)
         self.__canvas.pack()
+
+        # Draw the lines, representing the x-and y-axis.
         self.__canvas.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
         self.__canvas.create_line((0, pos_size_y), (canvas_width, pos_size_y))
 
-        unit_size_x, unit_size_y = self.__gui.get_scale()
+        self.__unit_size = self.__gui.get_scale()
+        unit_size_x, unit_size_y = self.__unit_size
 
-        if unit_size_x < 25:
-            multiplicand_x = 0
-            temp = unit_size_x
-            while temp < 25:
-                temp = unit_size_x
-                multiplicand_x += 5
-                temp *= multiplicand_x
+        # Calculate an appropriate scaling for the x-and y-axis, based on the unit size of the respective axis.
+        if unit_size_x < 20:
+            multiplicand_x = 10
+            while unit_size_x * multiplicand_x < 20:
+                multiplicand_x *= 10
             unit_size_x *= multiplicand_x
-        elif unit_size_x >= 100:
-            multiplicand_x = 1
-            temp = unit_size_x
-            while temp >= 100:
-                temp = unit_size_x
-                multiplicand_x /= 2
-                temp *= multiplicand_x
+        elif unit_size_x > 100:
+            multiplicand_x = Decimal('0.1')
+            while unit_size_x * multiplicand_x > 100:
+                multiplicand_x /= 10
             unit_size_x *= multiplicand_x
         else:
             multiplicand_x = 1
 
-        if unit_size_y < 25:
-            multiplicand_y = 0
-            temp = unit_size_y
-            while temp < 25:
-                temp = unit_size_y
-                multiplicand_y += 5
-                temp *= multiplicand_y
+        if unit_size_y < 20:
+            multiplicand_y = 10
+            while unit_size_y * multiplicand_y < 20:
+                multiplicand_y *= 10
             unit_size_y *= multiplicand_y
-        elif unit_size_y >= 100:
-            multiplicand_y = 1
-            temp = unit_size_y
-            while temp >= 100:
-                temp = unit_size_y
-                multiplicand_y /= 2
-                temp *= multiplicand_y
+        elif unit_size_y > 100:
+            multiplicand_y = Decimal('0.1')
+            while unit_size_y * multiplicand_y > 100:
+                multiplicand_y /= 10
             unit_size_y *= multiplicand_y
         else:
             multiplicand_y = 1
@@ -84,41 +83,46 @@ class CoordinateSystem(object):
         neg_units_x, pos_units_x = units_x
         neg_units_y, pos_units_y = units_y
 
+        # Calculate the number of units displayed on the x-and y-axis, based on the scaling previously computed.
         neg_units_x = abs(int(neg_units_x / multiplicand_x))
         pos_units_x = abs(int(pos_units_x / multiplicand_x))
         neg_units_y = abs(int(neg_units_y / multiplicand_y))
         pos_units_y = abs(int(pos_units_y / multiplicand_y))
 
-        for i in range(0, neg_units_x):
-            margin = origin_x - (i * unit_size_x)
+        # Draw the scaling on the negative x-axis.
+        for unit in range(0, neg_units_x + 1):
+            margin = origin_x - (unit * unit_size_x)
             self.__canvas.create_line((margin, origin_y + 6), (margin, origin_y - 7))
-            if i > 0:
-                self.__canvas.create_text((margin, origin_y - 15), text=(-i * multiplicand_x), font="arial 7")
-            margin = origin_x - ((i + 0.5) * unit_size_x)
+            if unit > 0:
+                self.__canvas.create_text((margin, origin_y - 15), text=(-unit * multiplicand_x), font="arial 7")
+            margin = origin_x - ((unit + Decimal('0.5')) * unit_size_x)
             self.__canvas.create_line((margin, origin_y + 4), (margin, origin_y - 5))
 
-        for i in range(0, pos_units_x):
-            margin = origin_x + (i * unit_size_x)
+        # Draw the scaling on the positive x-axis.
+        for unit in range(0, pos_units_x + 1):
+            margin = origin_x + (unit * unit_size_x)
             self.__canvas.create_line((margin, origin_y + 6), (margin, origin_y - 7))
-            if i > 0:
-                self.__canvas.create_text((margin, origin_y + 15), text=(i * multiplicand_x), font="arial 7")
-            margin = origin_x + ((i + 0.5) * unit_size_x)
+            if unit > 0:
+                self.__canvas.create_text((margin, origin_y + 15), text=(unit * multiplicand_x), font="arial 7")
+            margin = origin_x + ((unit + Decimal('0.5')) * unit_size_x)
             self.__canvas.create_line((margin, origin_y + 4), (margin, origin_y - 5))
 
-        for i in range(0, neg_units_y):
-            margin = origin_y + (i * unit_size_y)
+        # Draw the scaling on the negative y-axis.
+        for unit in range(0, neg_units_y + 1):
+            margin = origin_y + (unit * unit_size_y)
             self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
-            if i > 0:
-                self.__canvas.create_text((origin_x-10, margin), text=(-i*multiplicand_y), font="arial 7", anchor='e')
-            margin = origin_y + ((i + 0.5) * unit_size_y)
+            if unit > 0:
+                self.__canvas.create_text((origin_x-10, margin), text=(-unit*multiplicand_y), font="arial 7", anchor='e')
+            margin = origin_y + ((unit + Decimal('0.5')) * unit_size_y)
             self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
 
-        for i in range(0, pos_units_y):
-            margin = origin_y - (i * unit_size_y)
+        # Draw the scaling on the positive y-axis.
+        for unit in range(0, pos_units_y + 1):
+            margin = origin_y - (unit * unit_size_y)
             self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
-            if i > 0:
-                self.__canvas.create_text((origin_x+10, margin), text=(i*multiplicand_y), font="arial 7", anchor='w')
-            margin = origin_y - ((i + 0.5) * unit_size_y)
+            if unit > 0:
+                self.__canvas.create_text((origin_x+10, margin), text=(unit*multiplicand_y), font="arial 7", anchor='w')
+            margin = origin_y - ((unit + Decimal('0.5')) * unit_size_y)
             self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
 
     def get_gui(self):
@@ -142,12 +146,24 @@ class CoordinateSystem(object):
     def get_absolute_position(self, coordinates):
         x, y = coordinates
         origin_x, origin_y = self.__origin
-        scale_x, scale_y = self.__gui.get_scale()
-
+        scale_x, scale_y = self.__unit_size
         abs_pos_x = origin_x + (x * scale_x)
         abs_pos_y = origin_y - (y * scale_y)
 
         return abs_pos_x, abs_pos_y
+
+    def get_coordinates(self, position):
+        position_x, position_y = position
+        origin_x, origin_y = self.__origin
+        unit_size_x, unit_size_y = self.__unit_size
+
+        delta_x = position_x - origin_x
+        coordinate_x = delta_x / unit_size_x
+
+        delta_y = origin_y - position_y
+        coordinate_y = delta_y / unit_size_y
+
+        return coordinate_x, coordinate_y
 
     def create_point(self, coordinates):
         x, y = self.get_absolute_position(coordinates)
@@ -224,9 +240,10 @@ class CoordinateSystem(object):
 
         if scale_x <= 1:
             for x in range(int(neg_units_x), int(pos_units_x+1)):
+                dec_x = Decimal(x)
                 try:
-                    y = self.__calculator.calculate_function_value(parsed_function, {'x': x})
-                    position_x, position_y = self.get_absolute_position((x, y))
+                    y = self.__calculator.calculate_function_value(parsed_function, {'x': dec_x})
+                    position_x, position_y = self.get_absolute_position((dec_x, y))
                     if position_y < -overhang:
                         if current_graph_section:
                             current_graph_section.append((position_x, -overhang))
@@ -240,23 +257,21 @@ class CoordinateSystem(object):
                     else:
                         current_graph_section.append((position_x, position_y))
 
-                except ZeroDivisionError:
-                    if current_graph_section:
-                        full_graph.append(current_graph_section)
-                        current_graph_section = []
-
-                except ValueError:
+                except (ZeroDivisionError, ValueError, OverflowError, InvalidOperation):
                     if current_graph_section:
                         full_graph.append(current_graph_section)
                         current_graph_section = []
 
         else:
             for unit in range(int(neg_units_x), int(pos_units_x)+1):
+                dec_unit = Decimal(unit)
                 for fraction in range(0, int(scale_x)):
+                    dec_fraction = Decimal(fraction)
                     x = unit + (fraction / int(scale_x))
+                    dec_x = dec_unit + (dec_fraction / int(scale_x))
                     try:
-                        y = self.__calculator.calculate_function_value(parsed_function, {'x': x})
-                        position_x, position_y = self.get_absolute_position((x, y))
+                        y = self.__calculator.calculate_function_value(parsed_function, {'x': dec_x})
+                        position_x, position_y = self.get_absolute_position((dec_x, y))
                         if position_y < -overhang:
                             if current_graph_section:
                                 current_graph_section.append((position_x, -overhang))
@@ -270,12 +285,7 @@ class CoordinateSystem(object):
                         else:
                             current_graph_section.append((position_x, position_y))
 
-                    except ZeroDivisionError:
-                        if current_graph_section:
-                            full_graph.append(current_graph_section)
-                            current_graph_section = []
-
-                    except ValueError:
+                    except (ZeroDivisionError, ValueError, OverflowError, InvalidOperation):
                         if current_graph_section:
                             full_graph.append(current_graph_section)
                             current_graph_section = []

@@ -1,118 +1,136 @@
 # Max T., Pascal Mehnert
 # 23.04.2016
-# Collection of mathematical functions
+# Collection of mathematical functions, using decimals instead of floats.
 # V 1.0
 
 import math
 import builtins
+from decimal import *
 
-pi = math.pi
-e = math.e
+pi = Decimal('3.1415926535897932384626433832')
+e = Decimal('2.7182818284590452353602874713')
 
 
 def cos(x):
     """Returns the cosine of x (measured in radians)."""
-    return math.cos(x)
+    return Decimal(math.cos(x))
+    # return round(Decimal(math.cos(x)), 15)
 
 
 def cosh(x):
     """Returns the hyperbolic cosine of x."""
-    return math.cosh(x)
+    return Decimal(math.cosh(x))
+    # return round(Decimal(math.cosh(x)), 15)
 
 
 def acos(x):
     """Returns the arc sine of x (measured in radians)."""
-    return math.acos(x)
+    return Decimal(math.acos(x))
+    # return round(Decimal(math.acos(x)), 15)
 
 
 def acosh(x):
     """Returns the reverse hyperbolic cosine of x."""
-    return math.acosh(x)
+    return Decimal(math.acosh(x))
+    # return round(Decimal(math.acosh(x)), 15)
 
 
 def sin(x):
     """Returns the sine of x (measured in radians)."""
-    return math.sin(x)
+    return Decimal(math.sin(x))
+    # return round(Decimal(math.sin(x)), 15)
 
 
 def sinh(x):
     """Returns the hyperbolic sine of x."""
-    return math.sinh(x)
+    return Decimal(math.sinh(x))
+    # return round(Decimal(math.sinh(x)), 15)
 
 
 def asin(x):
     """Returns the arc sine of x (measured in radians)."""
-    return math.asin(x)
+    return Decimal(math.asin(x))
+    # return round(Decimal(math.asin(x)), 15)
 
 
 def asinh(x):
     """Returns the reverse hyperbolic sine of x."""
-    return math.asinh(x)
+    return Decimal(math.asinh(x))
+    # return round(Decimal(math.asinh(x)), 15)
 
 
 def tan(x):
     """Returns the tangent of x (measured in radians)."""
-    return math.tan(x)
+    return Decimal(math.tan(x))
+    # return round(Decimal(math.tan(x)), 15)
 
 
 def tanh(x):
     """Returns the hyperbolic tangent of x."""
-    return math.tanh(x)
+    return Decimal(math.tanh(x))
+    # return round(Decimal(math.tanh(x)), 15)
 
 
 def atan(x):
     """Returns the arc tangent of x (measured in radians)."""
-    return math.atan(x)
+    return Decimal(math.atan(x))
+    # return round(Decimal(math.atan(x)), 15)
 
 
 def atan2(y, x):
     """Returns the arc tangent of x/y (measured in radians)."""
-    return math.atan2(y, x)
+    return Decimal(math.atan2(y, x))
+    # return round(Decimal(math.atan2(y, x)), 15)
 
 
 def atanh(x):
     """Returns the reverse hyperbolic tangent of x."""
-    return math.atanh(x)
+    return Decimal(math.atanh(x))
+    # return round(Decimal(math.atanh(x)), 15)
 
 
 def radians(x):
     """Converts the angle x from degrees to radians and returns it."""
-    return math.radians(x)
+    return (x / 360) * (2 * pi)
 
 
 def degrees(x):
     """Converts the angle x from radians to degrees and returns it."""
-    return math.degrees(x)
+    return (x * 360) / (2 * pi)
 
 
 def sqrt(x):
     """Returns the square root of x."""
-    return math.sqrt(x)
+    return x.sqrt()
 
 
 def log(x, n):
     """Returns the logarithm of x to the base of n."""
-    return math.log(x, base=n)
+    if n <= 0:
+        raise ValueError('Base must not be smaller than zero.')
+    if n == 1:
+        raise ValueError('Base must not be equal to one.')
+    return log10(x) / log10(n)
 
 
 def log2(x):
     """Returns the logarithm of x to the base of 2."""
-    return math.log2(x)
+    return log10(x) / log10(Decimal(2))
 
 
 def log10(x):
     """Returns the logarithm of x to the base of 10."""
-    return math.log10(x)
+    return x.log10()
 
 
 def ln(x):
     """Returns the natural logarithm of x."""
-    return math.log(x, base=math.e)
+    return x.ln()
 
 
 def factorial(x):
     """Returns the factorial of n."""
-    return math.factorial(x)
+    return Decimal(math.factorial(x))
 
 
 def max(a, b):
@@ -139,6 +157,8 @@ def binompdf(n, p, k):
     :param k: The number of successes.
     :return: The probability for k successes.
     """
+    k = int(k)
+    n = int(n)
     if k > n:
         raise ValueError('K must not be greater than N.')
     if n < 1:
