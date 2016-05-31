@@ -6,6 +6,7 @@ from functools import partial
 from tkinter import *
 from math_calculator import *
 from value_table import *
+from function_storage import *
 import re
 
 
@@ -32,12 +33,34 @@ class Gui(object):
         # menu
         self.__menu = Menu(master=self.__tk)
         self.__menu.add_command(label="Quit", command=self.stop)
+        self.__menu.add_command(label="Show Functions", command=self.expand_functions)
+        self.__show_hide_functions_index = 2
         self.__menu.add_command(label="Show Value Table", command=self.expand_table)
+        self.__show_hide_table_index = 3
         self.__tk.config(menu=self.__menu)
+
+        # main frames
+        self.__functions_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
+        self.__functions_master.grid(row=0, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
+                                       rowspan=3)
+        self.__output = Frame(master=self.__tk, bg=self.bg, relief=GROOVE)
+        self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NESW")
+
+        self.__keypad = Frame(master=self.__tk, bg="blue")
+        self.__keypad.grid(row=2, column=1, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
+
+        self.__basemathbtn = Frame(master=self.__tk, bg="red")
+        self.__basemathbtn.grid(row=2, column=2, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
+
+        self.__mathbtn = Frame(master=self.__tk)
+        self.__mathbtn.grid(row=1, column=1, columnspan=2, padx=self.pad_general, pady=self.pad_general,
+                            sticky="NESW")
+
+        self.__value_table_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
+        self.__value_table_master.grid(row=0, column=4, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
+                                       rowspan=3)
         
         # output
-        self.__output = Frame(master=self.__tk, bg=self.bg, relief=GROOVE)
-        self.__output.grid(row=0, column=0, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NESW")
         self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
         self.__lbl_parse_expr_info = Label(master=self.__output, text="Current expression: ", bg=self.bg)
         self.__lbl_postf_expr = Label(master=self.__output, text="", bg=self.bg)
@@ -47,7 +70,7 @@ class Gui(object):
         self.__lbl_err = Label(master=self.__output, text="", bg=self.bg)
         self.__lbl_err_info = Label(master=self.__output, text="Errors: ", bg=self.bg)
         self.__output_expr = Frame(master=self.__output, bg="white", relief=GROOVE)
-        self.__output_expr.grid(row=0, column=0, columnspan=2, sticky="NESW")
+        self.__output_expr.grid(row=0, column=1, columnspan=2, sticky="NESW")
         
         # layout
         self.__lbl_parse_expr.grid(row=1, column=1, sticky="NES")
@@ -65,8 +88,6 @@ class Gui(object):
         self.__output.grid_rowconfigure(index=0, minsize=200)
 
         # keypad
-        self.__keypad = Frame(master=self.__tk, bg="blue")
-        self.__keypad.grid(row=2, column=0, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
         self.__btn_9 = Button(master=self.__keypad, text="9", command=partial(self.press, "9")) \
             .grid(row=0, column=2, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_8 = Button(master=self.__keypad, text="8", command=partial(self.press, "8")) \
@@ -93,8 +114,6 @@ class Gui(object):
             .grid(row=3, column=2, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         
         # base math buttons
-        self.__basemathbtn = Frame(master=self.__tk, bg="red")
-        self.__basemathbtn.grid(row=2, column=1, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
         self.__btn_divide = Button(self.__basemathbtn, text="/", command=partial(self.press, " / ")) \
             .grid(row=0, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_multiply = Button(self.__basemathbtn, text="*", command=partial(self.press, " * ")) \
@@ -115,9 +134,6 @@ class Gui(object):
         
         # additional math buttons
         # first row
-        self.__mathbtn = Frame(master=self.__tk)
-        self.__mathbtn.grid(row=1, column=0, columnspan=2, padx=self.pad_general, pady=self.pad_general,
-                            sticky="NESW")
         self.__btn_pi = Button(master=self.__mathbtn, text="PI", command=partial(self.press, "pi")) \
             .grid(row=0, column=0, sticky="NESW")
         self.__btn_e = Button(master=self.__mathbtn, text="e", command=partial(self.press, "e")) \
@@ -145,17 +161,14 @@ class Gui(object):
             .grid(row=1, column=5, sticky="NESW")
 
         # value table
-        self.__value_table_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
-        self.__value_table_master.grid(row=0, column=2, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
-                                       rowspan=3)
-        # self.__value_table.grid_columnconfigure(1, minsize=100)
-        self.__value_table = Valuetable(self, self.__value_table_master, 20, 2, 0, 1)
-        self.__value_table.configure_size(10,2)
-
+        self.__value_table = Valuetable(self, self.__value_table_master, 25, 1, 0, 1)
         # hide the value table
         self.__value_table_master.grid_remove()
-        # define a minimum width
-        # self.__tk.grid_columnconfigure(2, minsize=300)
+
+        # saved functions
+        self.__functions = Function_storage(self, self.__functions_master, self.__value_table)
+        # hide saved functions frame
+        self.__functions_master.grid_remove()
 
         # fill up space
         for i in range(self.__mathbtn.grid_size()[0]):
@@ -189,12 +202,20 @@ class Gui(object):
         self.__calc = Calculator()
 
     def expand_table(self):
-        self.__menu.entryconfigure(index=2, label="Hide Value Table", command=self.collapse_table)
+        self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Hide Value Table", command=self.collapse_table)
         self.__value_table_master.grid()
 
     def collapse_table(self):
-        self.__menu.entryconfigure(index=2, label="Show Value Table", command=self.expand_table)
+        self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Show Value Table", command=self.expand_table)
         self.__value_table_master.grid_remove()
+
+    def expand_functions(self):
+        self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Hide Functions", command=self.collapse_functions)
+        self.__functions_master.grid()
+
+    def collapse_functions(self):
+        self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Show Functions", command=self.expand_functions)
+        self.__functions_master.grid_remove()
 
     @staticmethod
     def __parsegeometry(geometry):

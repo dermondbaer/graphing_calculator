@@ -1,6 +1,6 @@
 # Paul Birke
-# 08.05.2016
-# Wrapper for the value table
+# 31.05.2016
+# value table
 
 from tkinter import *
 
@@ -9,21 +9,21 @@ class Valuetable(object):
         self.__master = master_frame
         self.__gui = gui
 
-        self.__columns = 0
-        self.__rows = 0
+        self.__columns = columns
+        self.__rows = rows
         # table delta info label
         self.__lbl_value_table_delta_info = Label(master=self.__master, text="delta:", bg=self.__gui.bg)
-        self.__lbl_value_table_delta_info.grid(row=1, column=0, sticky="NESW", padx=self.__gui.pad_general,
+        self.__lbl_value_table_delta_info.grid(row=1, column=0, sticky="NES", padx=self.__gui.pad_general,
                                                pady=self.__gui.pad_general)
         # table start info label
         self.__lbl_value_table_start_info = Label(master=self.__master, text="start:", bg=self.__gui.bg)
-        self.__lbl_value_table_start_info.grid(row=0, column=0, sticky="NESW", padx=self.__gui.pad_general,
+        self.__lbl_value_table_start_info.grid(row=0, column=0, sticky="NES", padx=self.__gui.pad_general,
                                                pady=self.__gui.pad_general)
         # register validate_command callback function
         # table delta entry
         self.__entry_value_table_delta = Spinbox(master=self.__master, bg=self.__gui.bg, from_=0, to=1000000,
                                                  width=10, justify=RIGHT, cursor="XTERM", insertontime=0,
-                                                 validate="key", invcmd="bell")
+                                                 validate="key", invcmd="bell", command=self.recalculate)
         vcmd_delta = (self.__master.register(self.on_validate), '%P', 0, 1000000, "delta")
         self.__entry_value_table_delta['validatecommand'] = vcmd_delta
         self.__entry_value_table_delta.delete(0, END)
@@ -33,7 +33,7 @@ class Valuetable(object):
         # table start entry
         self.__entry_value_table_start = Spinbox(master=self.__master, bg=self.__gui.bg, from_=-1000000000000000,
                                                  to=1000000000000000, width=20, justify=RIGHT, cursor="XTERM",
-                                                 insertontime=0, validate="all", invcmd="bell")
+                                                 insertontime=0, validate="all", invcmd="bell", command=self.recalculate)
         vcmd_start = (self.__master.register(self.on_validate), '%P', -1000000000000000, 1000000000000000, "start")
         self.__entry_value_table_start['validatecommand'] = vcmd_start
         self.__entry_value_table_start.delete(0, END)
@@ -44,29 +44,57 @@ class Valuetable(object):
         self.__value_table_frame = Frame(master=self.__master, bg=self.__gui.bg, relief=RIDGE, borderwidth=2)
         self.__value_table_frame.grid(row=2, column=0, padx=self.__gui.pad_general, pady=self.__gui.pad_general, sticky="NESW",
                                 columnspan=2)
+        self.__column_list = ["x"]
+        self.configure_size(rows, columns, ["" for i in range(columns)])
+        self.recalculate()
+
+
+    def configure_size(self, rows, columns, header_list):
+        self.__rows = rows
+        self.__columns = columns
+        self.__value_table_frame.destroy()
+        self.__value_table_frame = Frame(master=self.__master, bg=self.__gui.bg, relief=RIDGE, borderwidth=2)
+        self.__value_table_frame.grid(row=2, column=0, padx=self.__gui.pad_general, pady=self.__gui.pad_general, sticky="NESW",
+                                columnspan=2)
+        header_list[0] = "x"
         # table header
-        self.__value_table_header = [Label(master=self.__value_table_frame, text="", bg=self.__gui.bg) for i in range(columns)]
+        self.__value_table_header = [Label(master=self.__value_table_frame, text=header_list[i], bg=self.__gui.bg) for i in range(columns)]
         for column in range(len(self.__value_table_header)):
             self.__value_table_header[column].grid(row=0, column=column, sticky="NESW", padx=self.__gui.pad_general,
                                                            pady=self.__gui.pad_general)
-        self.__value_table_header[0].configure(text="x")
+        #self.__value_table_header[0].configure(text="x")
+
         # table entry frame
         self.__value_table_entry_frame = Frame(master=self.__value_table_frame, bg=self.__gui.bg)
         self.__value_table_entry_frame.grid(row=2, column=0, padx=0, pady=0, sticky="NESW",
                                 columnspan=columns)
         # table entries
-        self.__value_table_entry = [[Label(master=self.__value_table_entry_frame, text="") for i in range(columns)] for i in range(rows)]
+        self.__value_table_entry = [[Label(master=self.__value_table_entry_frame, text="", bg="white") for i in range(columns)] for i in range(rows)]
         for row in range(len(self.__value_table_entry)):
             for column in range(len(self.__value_table_entry[row])):
-                self.__value_table_entry[row][column].grid(row=row, column=column, sticky="NESW", padx=self.__gui.pad_general,
-                                                           pady=self.__gui.pad_general)
+                self.__value_table_entry[row][column].grid(row=row, column=column, sticky="NESW", padx=1,
+                                                           pady=1)
         for row in range(len(self.__value_table_entry)):
             self.__value_table_entry_frame.grid_rowconfigure(index=row, minsize=20)
         for column in range(len(self.__value_table_entry[0])):
             self.__value_table_entry_frame.grid_columnconfigure(index=column, minsize=60)
+        self.__value_table_frame.grid()
 
-    def configure_size(self, rows, columns):
-        pass
+    def redraw(self, column_list):
+        column_list.insert(0, "x")
+        for index, item in enumerate(column_list):
+            column_list[index] = "f" + str(item)
+        self.__column_list = column_list
+        self.configure_size(self.__rows, len(column_list), column_list)
+        self.recalculate()
+
+    def recalculate(self):
+        for index, row in enumerate(self.__column_list):
+            for i in range(self.__rows):
+                if self.__column_list[index] == "x":
+                    self.__value_table_entry[i][index].configure(text=str(i))
+                else:
+                    self.__value_table_entry[i][index].configure(text="")
 
     @staticmethod
     def on_validate(p, min, max, item):
@@ -84,7 +112,7 @@ class Valuetable(object):
         except ValueError:
             return False
         else:
-            if tmp < int(min) or tmp > int(max):
+            if tmp < float(min) or tmp > float(max):
                 return False
             else:
                 return True
