@@ -125,13 +125,8 @@ class Function(Operation):
 
 class ParserTree(object):
     """A class that is used to save a mathematical expression as interpretable object."""
-    def __init__(self, expression=False):
-        """
-        :type expression: The expression saved in this ParserTree.
-        :type expression: str
-        """
+    def __init__(self):
         self.__root = None
-        self.__expression = expression
 
     def get_root(self):
         """Returns the root of this Parser Tree."""
@@ -140,10 +135,7 @@ class ParserTree(object):
     def set_root(self, node):
         """Sets the root of this ParserTree."""
         self.__root = node
-
-    def get_expression(self):
-        """Returns the expression saved in this ParserTree"""
-        return self.__expression
+        return node
 
     def add_operator(self, key, value, parent=None):
         """Adds an operator as child of a Node in this ParserTree."""
@@ -247,10 +239,10 @@ class ParserTree(object):
     def print(self, precision=12):
         """Prints every Node of this ParserTree to the given precision."""
         if self.__root is not None:
-            self._print(self.__root, precision)
+            self._print_node(self.__root, precision)
         print()
 
-    def _print(self, node, precision):
+    def _print_node(self, node, precision):
         """Prints the Node to the given precision. Then it calls itself for every child of the Node."""
         if node is not None:
             key = ''
@@ -263,7 +255,7 @@ class ParserTree(object):
             elif isinstance(node, Operation):
                 key = node.get_key()
                 for child in node.get_child_list():
-                    self._print(child, precision)
+                    self._print_node(child, precision)
             key = str(key)
             key = key.rstrip('0').rstrip('.') if '.' in key else key
             print(key, end=' ')

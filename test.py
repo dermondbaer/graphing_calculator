@@ -3,16 +3,16 @@
 #
 #   V 1.0
 
-from geometry_tool.gui import *
+from geometry_tool.coordinate_system import *
 from math_calculator import *
 
 
-class TestApplication(Calculator, Gui):
+class TestApplication(Calculator, CoordinateSystem):
     def __init__(self):
         Calculator.__init__(self)
         self.__master = Tk()
         self.__master.resizable(0, 0)
-        Gui.__init__(self, self.__master, target_size_x=900, target_size_y=900)
+        CoordinateSystem.__init__(self, self.__master, target_size_x=900, target_size_y=900)
 
     def test_calculator(self):
         test_file = open('test_files/test_calculator', mode='r')
