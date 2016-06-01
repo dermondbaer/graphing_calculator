@@ -14,7 +14,7 @@ class CoordinateSystemCanvas(Canvas):
         :arg axis_size: The absolute axis size of this CoordinateSystemCanvas.
         """
         self.__coordinate_system = coordinate_system
-        self.__master = coordinate_system.get_frame()
+        self.__master = coordinate_system
         self.__calculator = Calculator()
 
         self.__axis_size = axis_size

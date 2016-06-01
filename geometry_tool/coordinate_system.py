@@ -9,7 +9,7 @@ from geometry_tool.coordinate_system_canvas import CoordinateSystemCanvas
 from geometry_tool.figures import Point, Distance, Line, Function
 
 
-class CoordinateSystem(object):
+class CoordinateSystem(Frame):
     """Class that is used to interact between the underlying program and the CoordinateSystemCanvas."""
     def __init__(self, master, target_size_x=1000, target_size_y=1000, default_units_x=10, default_units_y=10):
         """
@@ -62,13 +62,13 @@ class CoordinateSystem(object):
 
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
-        self.__frame = Frame(self.__master)
-        self.__frame.pack()
+        Frame.__init__(self)
+        self.pack()
         self.__master.lift()
         self.__master.focus_force()
 
         # Creating a menu bar.
-        self.__menu = Menu(master=self.__frame, bg='red')
+        self.__menu = Menu(master=self, bg='red')
         self.__menu.add_command(label='Quit (ESC)', command=self.stop)
         self.__menu.add_command(label='Clear (DEL)', command=self.clear_figures)
         self.__menu.add_command(label='Restart (F5)', command=self.restart)
@@ -171,10 +171,6 @@ class CoordinateSystem(object):
     def get_figures(self):
         """Returns a list of all figures in this Gui."""
         return self.__figures
-
-    def get_frame(self):
-        """Returns the tkinter Frame of this CoordinateSystem"""
-        return self.__frame
 
     def get_master(self):
         """Returns the parent tkinter element of this CoordinateSystem."""

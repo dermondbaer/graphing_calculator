@@ -251,7 +251,9 @@ class ParserTree(object):
         """Prints the Node to the given precision. Then it calls itself for every child of the Node."""
         key = str()
         if type(node) in (Number, Constant):
-            key = round(node.get_value(), precision)
+            key = node.get_value()
+            if key != 0:
+                key = round(key, precision)
         elif type(node) in (Variable, ParsedFunction):
             key = node.get_key()
         elif isinstance(node, Operation):
@@ -263,6 +265,7 @@ class ParserTree(object):
         print(key, end=' ')
 
     def to_string(self, precision=12):
+        """Returns all Nodes of this ParserTree, to the given precision as String."""
         string = str()
         if self.__root is not None:
             string = self._node_to_string(self.__root, precision)
@@ -272,9 +275,12 @@ class ParserTree(object):
             return string
 
     def _node_to_string(self, node, precision, string=''):
+        """Returns the Node and its children as String. Decimals are rounded to the given precision."""
         key = str()
         if type(node) in (Number, Constant):
-            key = round(node.get_value(), precision)
+            key = node.get_value()
+            if key != 0:
+                key = round(key, precision)
         elif type(node) in (Variable, ParsedFunction):
             key = node.get_key()
         elif isinstance(node, Operation):

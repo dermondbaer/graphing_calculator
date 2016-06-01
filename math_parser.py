@@ -217,9 +217,9 @@ class Parser(object):
     @staticmethod
     def partition(expression):
         """
-        Sequences a mathematical expression into logically separable parts.
+        Sequences a mathematical expression into logically separable parts. The expression has to be in infix notation.
 
-        :arg expression: The expression to sequence.
+        :param expression: The expression to sequence.
         :type expression: str
         :rtype: list
         """
@@ -235,18 +235,8 @@ class Parser(object):
         expression = expression.replace(')', ' ) ')
         expression = expression.replace(',', ' , ')
         expression = re.sub('\s+', ' ', expression)
+        expression = expression.rstrip(' ').lstrip(' ')
         expression = expression.split(' ')
-
-        if expression:
-            while expression[-1] == '':
-                expression.pop()
-                if len(expression) == 0:
-                    break
-        if expression:
-            while expression[0] == '':
-                expression.pop(0)
-                if len(expression) == 0:
-                    break
 
         for index in range(0, len(expression)):
             token = expression[index]
