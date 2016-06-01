@@ -1,4 +1,4 @@
-# Max T., Pascal Mehnert
+# Max T.
 # 23.04.2016
 # Collection of mathematical functions, using decimals instead of floats.
 # V 1.0

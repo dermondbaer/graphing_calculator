@@ -68,7 +68,7 @@ class CoordinateSystem(Frame):
         self.__master.focus_force()
 
         # Creating a menu bar.
-        self.__menu = Menu(master=self, bg='red')
+        self.__menu = Menu(master=self)
         self.__menu.add_command(label='Quit (ESC)', command=self.stop)
         self.__menu.add_command(label='Clear (DEL)', command=self.clear_figures)
         self.__menu.add_command(label='Restart (F5)', command=self.restart)
