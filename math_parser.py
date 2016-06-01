@@ -217,9 +217,9 @@ class Parser(object):
     @staticmethod
     def partition(expression):
         """
-        Sequences a mathematical expression into logically separable parts.
+        Sequences a mathematical expression into logically separable parts. The expression has to be in infix notation.
 
-        :arg expression: The expression to sequence.
+        :param expression: The expression to sequence.
         :type expression: str
         :rtype: list
         """

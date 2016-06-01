@@ -38,7 +38,7 @@ class Calculator(math_parser.Parser):
         return parser_tree
 
     @staticmethod
-    def calculate_function_value(parser_tree, variables):
+    def calculate_function_value(parser_tree, variables, precision=12):
         """
         Calculates the solution of an expression, that has already been parsed.
         All variables used in the expression have to be declared in the function call as variable=value.
@@ -50,7 +50,12 @@ class Calculator(math_parser.Parser):
         :rtype: Decimal
         """
         if parser_tree.get_root() is not None:
-            return Calculator._calculate(parser_tree.get_root(), variables)
+            dec = Calculator._calculate(parser_tree.get_root(), variables)
+            if dec != 0:
+                dec = round(dec, precision)
+            string = str(dec)
+            string = string.rstrip('0').rstrip('.') if '.' in string else string
+            return decimal.Decimal(string)
 
         else:
             return False
