@@ -196,7 +196,7 @@ class Gui(object):
                              self.__parsegeometry(self.__tk.winfo_geometry())[1])
 
         # parser setup
-        self.__parser = Parser()
+        # self.__parser = Parser()
 
         # calculator setup
         self.__calc = Calculator()

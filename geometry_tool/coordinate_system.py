@@ -1,303 +1,359 @@
 #   Pascal Mehnert
-#   29.01.2016
-#   V 2.0
+#   19.05.2016
+#   V 1.0
 
 from tkinter import *
 from decimal import *
 from math_calculator import Calculator
+from geometry_tool.coordinate_system_canvas import CoordinateSystemCanvas
+from geometry_tool.figures import Point, Distance, Line, Function
 
 
-class CoordinateSystem(object):
-    def __init__(self, gui, master, axis_size):
+class CoordinateSystem(Frame):
+    """Class that is used to interact between the underlying program and the CoordinateSystemCanvas."""
+    def __init__(self, master, target_size_x=1000, target_size_y=1000, default_units_x=10, default_units_y=10):
         """
-        :arg gui: The Gui, the CoordinateSystem belongs to.
-        :arg master: The Tkinter master widget.
-        :arg axis_size: The absolute axis size of the CoordinateSystem.
+        :arg master: The parent tkinter element of this CoordinateSystem.
+        :arg target_size_x: The estimated width of the CoordinateSystem in Pixels.
+        :arg target_size_y: The estimated height of the CoordinateSystem in Pixels.
+        :arg default_units_x: The default amount of units on the x-axis.
+        :arg default_units_y: The default amount of units on the y-axis.
         """
-        self.__gui = gui
+        self.__default_unit_count = (Decimal(default_units_x), Decimal(default_units_y))
+        target_size_x, target_size_y = Decimal(target_size_x), Decimal(target_size_y)
+        self.__target_size = (target_size_x, target_size_y)
         self.__master = master
-        self.__calculator = Calculator()
+        self.__figures = []
 
-        size_x, size_y = axis_size
-        neg_size_x, pos_size_x = size_x
-        neg_size_y, pos_size_y = size_y
-        self.__axis_size = axis_size
+        # Binding keys to important functionalities of the CoordinateSystem.
+        self.__master.bind('<F5>', lambda event: self.restart())
+        self.__master.bind('<Delete>', lambda event: self.clear_figures())
+        self.__master.bind('<Escape>', lambda event: self.stop())
 
-        origin_x = abs(neg_size_x)
-        origin_y = abs(pos_size_y)
-        self.__origin = (origin_x, origin_y)
+        units_x = (-default_units_x, default_units_x)
+        units_y = (-default_units_y, default_units_y)
 
-        canvas_width = pos_size_x + abs(neg_size_x) + 1
-        canvas_height = pos_size_y + abs(neg_size_y) + 1
-        self.__canvas_size = (canvas_width, canvas_height)
-
-        self.__canvas = Canvas(self.__master, width=canvas_width, height=canvas_height, highlightthickness=0,
-                               bg='white')
-        self.__mouse_position = self.__canvas.create_text(canvas_width-3, canvas_height-1, text='0; 0', anchor='se')
-
-        def set_mouse_position(event):
-            coordinate_x, coordinate_y = self.get_coordinates((event.x, event.y))
-            coordinate_x, coordinate_y = round(coordinate_x, 3), round(coordinate_y, 3)
-            self.__canvas.itemconfig(self.__mouse_position, text='{0}; {1}'.format(coordinate_x, coordinate_y))
-
-        # When the mouse is moved, the set_mouse_position function is being executed.
-        self.__canvas.bind('<Motion>', set_mouse_position)
-        self.__canvas.pack()
-
-        # Draw the lines, representing the x-and y-axis.
-        self.__canvas.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
-        self.__canvas.create_line((0, pos_size_y), (canvas_width, pos_size_y))
-
-        self.__unit_size = self.__gui.get_scale()
-        unit_size_x, unit_size_y = self.__unit_size
-
-        # Calculate an appropriate scaling for the x-and y-axis, based on the unit size of the respective axis.
-        if unit_size_x < 20:
-            multiplicand_x = 10
-            while unit_size_x * multiplicand_x < 20:
-                multiplicand_x *= 10
-            unit_size_x *= multiplicand_x
-        elif unit_size_x > 100:
-            multiplicand_x = Decimal('0.1')
-            while unit_size_x * multiplicand_x > 100:
-                multiplicand_x /= 10
-            unit_size_x *= multiplicand_x
-        else:
-            multiplicand_x = 1
-
-        if unit_size_y < 20:
-            multiplicand_y = 10
-            while unit_size_y * multiplicand_y < 20:
-                multiplicand_y *= 10
-            unit_size_y *= multiplicand_y
-        elif unit_size_y > 100:
-            multiplicand_y = Decimal('0.1')
-            while unit_size_y * multiplicand_y > 100:
-                multiplicand_y /= 10
-            unit_size_y *= multiplicand_y
-        else:
-            multiplicand_y = 1
-
-        units = self.__gui.get_units()
-        units_x, units_y = units
+        # Calculating the scale of the CoordinateSystem.
         neg_units_x, pos_units_x = units_x
         neg_units_y, pos_units_y = units_y
+        scale_x = target_size_x / (abs(neg_units_x) + abs(pos_units_x))
+        scale_y = target_size_y / (abs(neg_units_y) + abs(pos_units_y))
 
-        # Calculate the number of units displayed on the x-and y-axis, based on the scaling previously computed.
-        neg_units_x = abs(int(neg_units_x / multiplicand_x))
-        pos_units_x = abs(int(pos_units_x / multiplicand_x))
-        neg_units_y = abs(int(neg_units_y / multiplicand_y))
-        pos_units_y = abs(int(pos_units_y / multiplicand_y))
+        if scale_x > 1:
+            scale_x = round(scale_x, 3)
+        if scale_y > 1:
+            scale_y = round(scale_y, 3)
 
-        # Draw the scaling on the negative x-axis.
-        for unit in range(0, neg_units_x + 1):
-            margin = origin_x - (unit * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 6), (margin, origin_y - 7))
-            if unit > 0:
-                self.__canvas.create_text((margin, origin_y - 15), text=(-unit * multiplicand_x), font="arial 7")
-            margin = origin_x - ((unit + Decimal('0.5')) * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 4), (margin, origin_y - 5))
+        # Calculating the absolute size of this CoordinateSystems Canvas in pixels.
+        absolute_size_x = (scale_x * neg_units_x, scale_x * pos_units_x)
+        absolute_size_y = (scale_y * neg_units_y, scale_y * pos_units_y)
+        absolute_size = (absolute_size_x, absolute_size_y)
 
-        # Draw the scaling on the positive x-axis.
-        for unit in range(0, pos_units_x + 1):
-            margin = origin_x + (unit * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 6), (margin, origin_y - 7))
-            if unit > 0:
-                self.__canvas.create_text((margin, origin_y + 15), text=(unit * multiplicand_x), font="arial 7")
-            margin = origin_x + ((unit + Decimal('0.5')) * unit_size_x)
-            self.__canvas.create_line((margin, origin_y + 4), (margin, origin_y - 5))
+        print('Creating Coordinate System')
+        print('X-target_size:', target_size_x)
+        print('Y-target_size:', target_size_y)
+        print('X-actual_size:', scale_x * (abs(neg_units_x) + pos_units_x))
+        print('Y-actual_size:', scale_y * (abs(neg_units_y) + pos_units_y))
+        print('X-range: ', neg_units_x, '; ', pos_units_x, sep='')
+        print('Y-range: ', neg_units_y, '; ', pos_units_y, sep='')
+        print('X-scale:', scale_x)
+        print('Y-scale:', scale_y)
+        print()
 
-        # Draw the scaling on the negative y-axis.
-        for unit in range(0, neg_units_y + 1):
-            margin = origin_y + (unit * unit_size_y)
-            self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
-            if unit > 0:
-                self.__canvas.create_text((origin_x-10, margin), text=(-unit*multiplicand_y), font="arial 7", anchor='e')
-            margin = origin_y + ((unit + Decimal('0.5')) * unit_size_y)
-            self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
+        self.__scale = (scale_x, scale_y)
+        self.__units = (units_x, units_y)
+        Frame.__init__(self)
+        self.pack()
+        self.__master.lift()
+        self.__master.focus_force()
 
-        # Draw the scaling on the positive y-axis.
-        for unit in range(0, pos_units_y + 1):
-            margin = origin_y - (unit * unit_size_y)
-            self.__canvas.create_line((origin_x + 6, margin), (origin_x - 7, margin))
-            if unit > 0:
-                self.__canvas.create_text((origin_x+10, margin), text=(unit*multiplicand_y), font="arial 7", anchor='w')
-            margin = origin_y - ((unit + Decimal('0.5')) * unit_size_y)
-            self.__canvas.create_line((origin_x + 4, margin), (origin_x - 5, margin))
+        # Creating a menu bar.
+        self.__menu = Menu(master=self, bg='red')
+        self.__menu.add_command(label='Quit (ESC)', command=self.stop)
+        self.__menu.add_command(label='Clear (DEL)', command=self.clear_figures)
+        self.__menu.add_command(label='Restart (F5)', command=self.restart)
+        self.__master.config(menu=self.__menu)
 
-    def get_gui(self):
-        return self.__gui
+        # Creating the CoordinateSystemCanvas.
+        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
 
-    def get_axis_size(self):
-        return self.__axis_size
+    def start(self):
+        """Calls the mainloop for this CoordinateSystem."""
+        self.__master.mainloop()
 
-    def get_canvas_size(self):
-        return self.__canvas_size
+    def restart(self, resize=True):
+        """Destroys the CoordinateSystemCanvas and asks the user to reenter the size of the CoordinateSystem.
+        The CoordinateSystemCanvas is then being recreated. Previously existent figures are being redrawn."""
+        units_x = units_y = False
+        if resize:
+            dialog = InputDialog(self.__units)
+            units_x, units_y = dialog.get_gui_size()
 
-    def get_origin(self):
-        return self.__origin
+        default_units_x, default_units_y = self.__default_unit_count
+        target_size_x, target_size_y = self.__target_size
+        if not units_x:
+            units_x = (-default_units_x, default_units_x)
+        if not units_y:
+            units_y = (-default_units_y, default_units_y)
+
+        # Recalculating the scale and the absolute size of this CoordinateSystem.
+        neg_units_x, pos_units_x = units_x
+        neg_units_y, pos_units_y = units_y
+        scale_x = target_size_x / (abs(neg_units_x) + abs(pos_units_x))
+        scale_y = target_size_y / (abs(neg_units_y) + abs(pos_units_y))
+
+        if scale_x > 1:
+            scale_x = round(scale_x, 3)
+        if scale_y > 1:
+            scale_y = round(scale_y, 3)
+
+        absolute_size_x = (scale_x * neg_units_x, scale_x * pos_units_x)
+        absolute_size_y = (scale_y * neg_units_y, scale_y * pos_units_y)
+        absolute_size = (absolute_size_x, absolute_size_y)
+
+        self.__scale = (scale_x, scale_y)
+        self.__units = (units_x, units_y)
+        self.__coordinate_system_canvas.destroy()
+        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
+
+        print('Recreating Coordinate System')
+        print('X-target_size:', target_size_x)
+        print('Y-target_size:', target_size_y)
+        print('X-actual_size:', scale_x * (abs(neg_units_x) + pos_units_x))
+        print('Y-actual_size:', scale_y * (abs(neg_units_y) + pos_units_y))
+        print('X-range: ', neg_units_x, '; ', pos_units_x, sep='')
+        print('Y-range: ', neg_units_y, '; ', pos_units_y, sep='')
+        print('X-scale:', scale_x)
+        print('Y-scale:', scale_y)
+        print()
+
+        # Redrawing all figures previously existent in the CoordinateSystem.
+        figures = self.__figures
+        self.__figures = []
+        for figure in figures:
+            if type(figure) == Point:
+                self.create_point(figure.get_coordinates())
+            elif type(figure) == Distance:
+                self.create_distance(figure.get_coordinates_a(), figure.get_coordinates_b())
+            elif type(figure) == Line:
+                self.create_line(figure.get_coordinates_support_vector(), figure.get_coordinates_direction_vector())
+            elif type(figure) == Function:
+                self.create_function_graph(figure.get_function_term())
+
+    def stop(self):
+        """Destroys this Gui."""
+        self.__master.destroy()
+        del self
+
+    def clear_figures(self):
+        """Removes all figures from the CoordinateSystem."""
+        for figure in self.__figures:
+            for tkinter_object in figure.get_tkinter_objects():
+                self.__coordinate_system_canvas.del_tkinter_object(tkinter_object)
+        self.__figures = []
+
+    def get_default_unit_count(self):
+        """Returns the default number of units on the x-and y-axis."""
+        return self.__default_unit_count
+
+    def get_target_size(self):
+        """Returns the size, the CoordinateSystem should match."""
+        return self.__target_size
+
+    def get_units(self):
+        """Returns the amount of units on the negative and positive x-and y-axis."""
+        return self.__units
+
+    def get_scale(self):
+        """Returns the scale of the x-and y-axis.."""
+        return self.__scale
+
+    def get_figures(self):
+        """Returns a list of all figures in this Gui."""
+        return self.__figures
 
     def get_master(self):
+        """Returns the parent tkinter element of this CoordinateSystem."""
         return self.__master
 
-    def get_canvas(self):
-        return self.__canvas
+    def create_point(self, coordinates, debug_output=False):
+        """Creates a point in this CoordinateSystem at the given coordinates."""
+        position, tkinter_object = self.__coordinate_system_canvas.create_point(coordinates)
+        if debug_output:
+            print('Creating Point')
+            print('Coordinates:', coordinates)
+            print('Position:', position)
+            print()
 
-    def get_absolute_position(self, coordinates):
-        x, y = coordinates
-        origin_x, origin_y = self.__origin
-        scale_x, scale_y = self.__unit_size
-        abs_pos_x = origin_x + (x * scale_x)
-        abs_pos_y = origin_y - (y * scale_y)
+        point = Point(coordinates, position, tkinter_object)
+        self.__figures.append(point)
+        return point
 
-        return abs_pos_x, abs_pos_y
+    def create_distance(self, coord_a, coord_b, debug_output=False):
+        """Creates a distance in this CoordinateSystem from point a to point b."""
+        pos_a, pos_b, tkinter_objects = self.__coordinate_system_canvas.create_distance(coord_a, coord_b)
+        if debug_output:
+            print('Creating Distance')
+            print('Coordinates Point A:', coord_a)
+            print('Coordinates Point B:', coord_b)
+            print('Position Point A:', pos_a)
+            print('Position Point B:', pos_b)
+            print()
 
-    def get_coordinates(self, position):
-        position_x, position_y = position
-        origin_x, origin_y = self.__origin
-        unit_size_x, unit_size_y = self.__unit_size
+        distance = Distance(coord_a, coord_b, pos_a, pos_b, tkinter_objects)
+        self.__figures.append(distance)
+        return distance
 
-        delta_x = position_x - origin_x
-        coordinate_x = delta_x / unit_size_x
+    def create_line(self, support_vector, direction_vector, debug_output=False):
+        """Creates a line in this CoordinateSystem with a support vector and a direction vector."""
+        pos_sup, pos_dir, tkinter = self.__coordinate_system_canvas.create_vector_line(support_vector, direction_vector)
+        line = Line(support_vector, direction_vector, pos_sup, pos_dir, tkinter)
+        if debug_output:
+            print('Creating Line')
+            print('Coordinates Support Vector:', support_vector)
+            print('Coordinates Direction Vector:', direction_vector)
+            print('Position Support Vector:', pos_sup)
+            print('Position Direction Vector:', pos_dir)
+            print()
 
-        delta_y = origin_y - position_y
-        coordinate_y = delta_y / unit_size_y
+        self.__figures.append(line)
+        return line
 
-        return coordinate_x, coordinate_y
+    def create_function_graph(self, function_term, debug_output=False):
+        """Creates a function graph in this CoordinateSystem."""
+        if debug_output:
+            print('Creating Function Graph')
+            print('Function Term:', function_term)
+            print()
 
-    def create_point(self, coordinates):
-        x, y = self.get_absolute_position(coordinates)
-        tkinter = self.__canvas.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
-        return (x, y), tkinter
+        tkinter_objects = self.__coordinate_system_canvas.create_function_graph(function_term)
+        function = Function(function_term, tkinter_objects)
+        self.__figures.append(function)
+        return function
 
-    def create_distance(self, coord_a, coord_b):
-        tkinter_objects = []
+    def del_figure(self, figure):
+        """Deletes a figure from this CoordinateSystem."""
+        self.__figures.remove(figure)
+        for tkinter_object in figure.get_tkinter_objects():
+            self.__coordinate_system_canvas.del_tkinter_object(tkinter_object)
 
-        pos_a = self.get_absolute_position(coord_a)
-        pos_b = self.get_absolute_position(coord_b)
 
-        tkinter = self.__canvas.create_line(pos_a, pos_b)
-        tkinter_objects.append(tkinter)
+class InputDialog(object):
+    """Dialog that enables the user the enter the size of a CoordinateSystem."""
+    def __init__(self, displayed_size):
+        """
+        :param displayed_size: The values that should be displayed in the Entry fields.
+        :type displayed_size: tuple
+        """
+        displayed_size_x, displayed_size_y = displayed_size
+        display_list = list((*displayed_size_x, *displayed_size_y))
 
-        x, y = pos_a
-        tkinter = self.__canvas.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
-        tkinter_objects.append(tkinter)
+        for index, item in enumerate(display_list):
+            temp = str(abs(item))
+            display_list[index] = temp.rstrip('0').rstrip('.') if '.' in temp else temp
 
-        x, y = pos_b
-        tkinter = self.__canvas.create_line((x - 3, y), (x + 3, y), (x, y), (x, y - 3), (x, y + 4), fill='red')
-        tkinter_objects.append(tkinter)
+        displayed_size_neg_x, displayed_size_pos_x, displayed_size_neg_y, displayed_size_pos_y = display_list
 
-        return pos_a, pos_b, tkinter_objects
+        def get_size():
+            """Grabs the entries, entered into the input fields and validates whether they are correct."""
+            # Validate the values, entered into the input fields.
+            x = y = False
+            neg_x = self.validate_axis_size(input_neg_x)
+            pos_x = self.validate_axis_size(input_pos_x)
+            if neg_x and pos_x:
+                x = True
+            if not neg_x:
+                input_neg_x.delete(0, END)
+                x = False
+            if not pos_x:
+                input_pos_x.delete(0, END)
 
-    def create_line(self, coord_sup, coord_dir):
-        pos_sup_vec = self.get_absolute_position(coord_sup)
-        pos_dir_vec = self.get_absolute_position(coord_dir)
-        coord_sup_x, coord_sup_y = coord_sup
-        coord_dir_x, coord_dir_y = coord_dir
-        units_x, units_y = self.__gui.get_units()
-        neg_units_x, pos_units_x = units_x
-        neg_units_y, pos_units_y = units_y
+            neg_y = self.validate_axis_size(input_neg_y)
+            pos_y = self.validate_axis_size(input_pos_y)
+            if neg_y and pos_y:
+                y = True
+            if not neg_y:
+                input_neg_y.delete(0, END)
+                y = False
+            if not pos_y:
+                input_pos_y.delete(0, END)
+                y = False
 
-        bound_x = max(pos_units_x, abs(neg_units_x))
-        bound_y = max(pos_units_y, abs(neg_units_y))
+            # If the values for x and y are correctly entered, set the __size_x and __size_y instance variables.
+            if x and y:
+                neg_x = -abs(Calculator.calculate_function_value(neg_x, {}))
+                pos_x = abs(Calculator.calculate_function_value(pos_x, {}))
+                self.__size_x = (neg_x, pos_x)
 
-        x = y = 0
-        t = 1
+                neg_y = -abs(Calculator.calculate_function_value(neg_y, {}))
+                pos_y = abs(Calculator.calculate_function_value(pos_y, {}))
+                self.__size_y = (neg_y, pos_y)
 
-        while abs(x) < bound_x and abs(y) < bound_y:
-            x = coord_sup_x + t * coord_dir_x
-            y = coord_sup_y + t * coord_dir_y
-            t *= 2
-        point_a = (x, y)
+                # Then destroy the tkinter master.
+                master.destroy()
 
-        x = y = 0
-        t = -1
+        self.__size_x = self.__size_y = False
+        master = Tk()
+        master.lift()
+        master.attributes("-topmost", True)
+        master.focus_force()
+        dialog = Frame(master)
+        dialog.grid(pady=2)
+        dialog.focus_set()
 
-        while abs(x) < bound_x and abs(y) < bound_y:
-            x = coord_sup_x + t * coord_dir_x
-            y = coord_sup_y + t * coord_dir_y
-            t *= 2
-        point_b = (x, y)
+        Label(dialog, text='X: [ -').grid(row=1, column=0)
+        Label(dialog, text=';  ').grid(row=1, column=2)
+        Label(dialog, text=']').grid(row=1, column=4)
 
-        pos_a = self.get_absolute_position(point_a)
-        pos_b = self.get_absolute_position(point_b)
+        input_neg_x = Entry(dialog, width=10)
+        input_neg_x.bind('<Return>', lambda event: get_size())
+        input_neg_x.grid(row=1, column=1)
+        input_neg_x.insert(0, displayed_size_neg_x)
+        input_neg_x.focus()
+        input_neg_x.selection_range(0, END)
 
-        tkinter_object = self.__canvas.create_line(pos_a, pos_b)
+        input_pos_x = Entry(dialog, width=10)
+        input_pos_x.bind('<Return>', lambda event: get_size())
+        input_pos_x.grid(row=1, column=3)
+        input_pos_x.insert(0, displayed_size_pos_x)
 
-        return pos_sup_vec, pos_dir_vec, tkinter_object
+        Label(dialog, text='Y: [ -').grid(row=2, column=0, pady=2)
+        Label(dialog, text=';  ').grid(row=2, column=2, pady=2)
+        Label(dialog, text=']').grid(row=2, column=4, pady=2)
 
-    def create_function_graph(self, function_term):
-        parsed_function = self.__calculator.calculate_expression(function_term)
+        input_neg_y = Entry(dialog, width=10)
+        input_neg_y.bind('<Return>', lambda event: get_size())
+        input_neg_y.grid(row=2, column=1, pady=2)
+        input_neg_y.insert(0, displayed_size_neg_y)
 
-        canvas_size_x, canvas_size_y = self.__canvas_size
-        overhang = canvas_size_y * 2
+        input_pos_y = Entry(dialog, width=10)
+        input_pos_y.grid(row=2, column=3, pady=2)
+        input_pos_y.bind('<Return>', lambda event: get_size())
+        input_pos_y.insert(0, displayed_size_pos_y)
 
-        units_x, units_y = self.__gui.get_units()
-        neg_units_x, pos_units_x = units_x
-        scale_x, scale_y = self.__gui.get_scale()
-        full_graph = []
-        current_graph_section = []
+        button = Button(dialog, text='Create', command=get_size, relief='groove')
+        button.bind('<Return>', lambda event: get_size())
+        button.grid(columnspan=5, pady=5)
 
-        if scale_x <= 1:
-            for x in range(int(neg_units_x), int(pos_units_x+1)):
-                dec_x = Decimal(x)
-                try:
-                    y = self.__calculator.calculate_function_value(parsed_function, {'x': dec_x})
-                    position_x, position_y = self.get_absolute_position((dec_x, y))
-                    if position_y < -overhang:
-                        if current_graph_section:
-                            current_graph_section.append((position_x, -overhang))
-                            full_graph.append(current_graph_section)
-                            current_graph_section = []
-                    elif position_y > canvas_size_y + overhang:
-                        if current_graph_section:
-                            current_graph_section.append((position_x, canvas_size_y + overhang))
-                            full_graph.append(current_graph_section)
-                            current_graph_section = []
-                    else:
-                        current_graph_section.append((position_x, position_y))
+        def on_closing():
+            self.__size_x = self.__size_y = False
+            master.destroy()
 
-                except (ZeroDivisionError, ValueError, OverflowError, InvalidOperation):
-                    if current_graph_section:
-                        full_graph.append(current_graph_section)
-                        current_graph_section = []
+        # Call the on_closing function if the tkinter master is being forced to close by the user.
+        master.protocol("WM_DELETE_WINDOW", on_closing)
 
-        else:
-            for unit in range(int(neg_units_x), int(pos_units_x)+1):
-                dec_unit = Decimal(unit)
-                for fraction in range(0, int(scale_x)):
-                    dec_fraction = Decimal(fraction)
-                    x = unit + (fraction / int(scale_x))
-                    dec_x = dec_unit + (dec_fraction / int(scale_x))
-                    try:
-                        y = self.__calculator.calculate_function_value(parsed_function, {'x': dec_x})
-                        position_x, position_y = self.get_absolute_position((dec_x, y))
-                        if position_y < -overhang:
-                            if current_graph_section:
-                                current_graph_section.append((position_x, -overhang))
-                                full_graph.append(current_graph_section)
-                                current_graph_section = []
-                        elif position_y > canvas_size_y + overhang:
-                            if current_graph_section:
-                                current_graph_section.append((position_x, canvas_size_y + overhang))
-                                full_graph.append(current_graph_section)
-                                current_graph_section = []
-                        else:
-                            current_graph_section.append((position_x, position_y))
+        # Wait for the tkinter master to be destroyed
+        master.wait_window(master)
 
-                    except (ZeroDivisionError, ValueError, OverflowError, InvalidOperation):
-                        if current_graph_section:
-                            full_graph.append(current_graph_section)
-                            current_graph_section = []
+    def get_gui_size(self):
+        """Returns the values entered into the Entry fields."""
+        return self.__size_x, self.__size_y
 
-        if current_graph_section:
-            full_graph.append(current_graph_section)
-
-        tkinter_objects = []
-        for a in full_graph:
-            tkinter_objects.append(self.__canvas.create_line(a, fill='black'))
-
-        return tkinter_objects
-
-    def del_tkinter_object(self, tkinter_object):
-        self.__canvas.delete(tkinter_object)
+    @staticmethod
+    def validate_axis_size(entry_dialog):
+        """Parses the string entered into an Entry field and returns it as ParserTree.
+        Returns False, if the string cannot be parsed."""
+        try:
+            return Calculator.parse_expression(entry_dialog.get())
+        except (ValueError, IndexError):
+            return False
