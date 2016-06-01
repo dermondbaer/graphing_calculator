@@ -12,7 +12,8 @@ class Function_storage(object):
         self.__function_count = 10
 
         # actual function storage
-        self.__function = [[] for i in range(10)]
+        self.__function = ["" for i in range(self.__function_count)]
+        self.__function[0] = "9 x * 3 - 6"
 
         # function storage master frame
         self.__function_storage_frame = Frame(master=self.__master, bg=self.__gui.bg)
@@ -27,6 +28,12 @@ class Function_storage(object):
         self.__entry_selection = [Checkbutton(master=self.__function_storage_frame, text="f"+str(i)+":", bg=self.__gui.bg, activebackground=self.__gui.bg, command=self.reformat_table, variable=self.__selection[i]) for i in range(self.__function_count)]
         for i in range(self.__function_count):
             self.__entry_selection[i].grid(row=i+1, column=0, sticky="NSW", padx=self.__gui.pad_general,
+                                               pady=self.__gui.pad_general)
+
+        # function storage labels
+        self.__lbl_function_storage = [Label(master=self.__function_storage_frame, text=self.__function[i], bg=self.__gui.bg) for i in range(self.__function_count)]
+        for i in range(self.__function_count):
+            self.__lbl_function_storage[i].grid(row=i+1, column=1, sticky="NSW", padx=self.__gui.pad_general,
                                                pady=self.__gui.pad_general)
         # # function storage name label
         # self.__lbl_function_storage = [Label(master=self.__function_storage_frame, text="f"+str(i)+":", bg=self.__gui.bg) for i in range(self.__function_count)]
@@ -58,4 +65,12 @@ class Function_storage(object):
         for index, item in enumerate(self.__selection):
             if item.get() == True:
                 functions.append(index)
-        self.__value_table.redraw(functions)
+        self.__gui.value_table.redraw(functions)
+
+    def get_function(self, index):
+        return self.__function[index]
+
+    def set_function(self, index, function=""):
+        self.__function[index] = function
+        for i in range(self.__function_count):
+            self.__lbl_function_storage[i].configure(text=function)

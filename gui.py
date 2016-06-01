@@ -14,7 +14,7 @@ class Gui(object):
     def __init__(self, main, title):
         # attributes
         self.__main = main
-        self.__parse_expr = ""         # Not empty because of bug in Parser.py
+        self.__parse_expr = ""
         self.__expr = []
 
         # GUI setup
@@ -41,8 +41,8 @@ class Gui(object):
 
         # main frames
         self.__functions_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
-        self.__functions_master.grid(row=0, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
-                                       rowspan=3)
+        self.__functions_master.grid(row=1, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
+                                       rowspan=2)
         self.__output = Frame(master=self.__tk, bg=self.bg, relief=GROOVE)
         self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NESW")
 
@@ -57,8 +57,8 @@ class Gui(object):
                             sticky="NESW")
 
         self.__value_table_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
-        self.__value_table_master.grid(row=0, column=4, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
-                                       rowspan=3)
+        self.__value_table_master.grid(row=0, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
+                                       rowspan=1)
         
         # output
         self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
@@ -161,12 +161,12 @@ class Gui(object):
             .grid(row=1, column=5, sticky="NESW")
 
         # value table
-        self.__value_table = Valuetable(self, self.__value_table_master, 25, 1, 0, 1)
+        self.value_table = Valuetable(self, self.__value_table_master, 10, 1, 0, 1)
         # hide the value table
         self.__value_table_master.grid_remove()
 
         # saved functions
-        self.__functions = Function_storage(self, self.__functions_master, self.__value_table)
+        self.functions = Function_storage(self, self.__functions_master, self.value_table)
         # hide saved functions frame
         self.__functions_master.grid_remove()
 

@@ -3,6 +3,7 @@
 # value table
 
 from tkinter import *
+from math_calculator import *
 
 class Valuetable(object):
     def __init__(self, gui, master_frame, rows, columns, initial_start, initial_delta):
@@ -11,6 +12,10 @@ class Valuetable(object):
 
         self.__columns = columns
         self.__rows = rows
+        self.__delta = StringVar()
+        self.__delta.set(str(initial_delta))
+        self.__start = StringVar()
+        self.__start.set(str(initial_start))
         # table delta info label
         self.__lbl_value_table_delta_info = Label(master=self.__master, text="delta:", bg=self.__gui.bg)
         self.__lbl_value_table_delta_info.grid(row=1, column=0, sticky="NES", padx=self.__gui.pad_general,
@@ -23,7 +28,7 @@ class Valuetable(object):
         # table delta entry
         self.__entry_value_table_delta = Spinbox(master=self.__master, bg=self.__gui.bg, from_=0, to=1000000,
                                                  width=10, justify=RIGHT, cursor="XTERM", insertontime=0,
-                                                 validate="key", invcmd="bell", command=self.recalculate)
+                                                 validate="all", invcmd="bell", textvariable=self.__delta, command=self.recalculate)
         vcmd_delta = (self.__master.register(self.on_validate), '%P', 0, 1000000, "delta")
         self.__entry_value_table_delta['validatecommand'] = vcmd_delta
         self.__entry_value_table_delta.delete(0, END)
@@ -33,7 +38,7 @@ class Valuetable(object):
         # table start entry
         self.__entry_value_table_start = Spinbox(master=self.__master, bg=self.__gui.bg, from_=-1000000000000000,
                                                  to=1000000000000000, width=20, justify=RIGHT, cursor="XTERM",
-                                                 insertontime=0, validate="all", invcmd="bell", command=self.recalculate)
+                                                 insertontime=0, validate="all", invcmd="bell", textvariable=self.__start, command=self.recalculate)
         vcmd_start = (self.__master.register(self.on_validate), '%P', -1000000000000000, 1000000000000000, "start")
         self.__entry_value_table_start['validatecommand'] = vcmd_start
         self.__entry_value_table_start.delete(0, END)
@@ -41,7 +46,7 @@ class Valuetable(object):
         self.__entry_value_table_start.grid(row=0, column=1, sticky="NESW", padx=self.__gui.pad_general,
                                                 pady=self.__gui.pad_general)
         # table
-        self.__value_table_frame = Frame(master=self.__master, bg=self.__gui.bg, relief=RIDGE, borderwidth=2)
+        self.__value_table_frame = Frame(master=self.__master, bg=self.__gui.bg, relief=SUNKEN, borderwidth=1)
         self.__value_table_frame.grid(row=2, column=0, padx=self.__gui.pad_general, pady=self.__gui.pad_general, sticky="NESW",
                                 columnspan=2)
         self.__column_list = ["x"]
@@ -53,7 +58,7 @@ class Valuetable(object):
         self.__rows = rows
         self.__columns = columns
         self.__value_table_frame.destroy()
-        self.__value_table_frame = Frame(master=self.__master, bg=self.__gui.bg, relief=RIDGE, borderwidth=2)
+        self.__value_table_frame = Frame(master=self.__master, bg=self.__gui.bg, relief=SUNKEN, borderwidth=1)
         self.__value_table_frame.grid(row=2, column=0, padx=self.__gui.pad_general, pady=self.__gui.pad_general, sticky="NESW",
                                 columnspan=2)
         header_list[0] = "x"
@@ -92,7 +97,7 @@ class Valuetable(object):
         for index, row in enumerate(self.__column_list):
             for i in range(self.__rows):
                 if self.__column_list[index] == "x":
-                    self.__value_table_entry[i][index].configure(text=str(i))
+                    self.__value_table_entry[i][index].configure(text=str(int(self.__start.get())+i*int(self.__delta.get())))
                 else:
                     self.__value_table_entry[i][index].configure(text="")
 
