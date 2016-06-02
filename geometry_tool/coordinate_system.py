@@ -63,7 +63,7 @@ class CoordinateSystem(Frame):
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
         Frame.__init__(self)
-        self.pack()
+        self.grid()
         self.__master.lift()
         self.__master.focus_force()
 
