@@ -44,7 +44,7 @@ class Gui(object):
         self.__functions_master.grid(row=1, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
                                        rowspan=2)
         self.__output = Frame(master=self.__tk, bg=self.bg, relief=GROOVE)
-        self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NESW")
+        self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NEW")
 
         self.__keypad = Frame(master=self.__tk, bg="blue")
         self.__keypad.grid(row=2, column=1, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
@@ -57,8 +57,7 @@ class Gui(object):
                             sticky="NESW")
 
         self.__value_table_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
-        self.__value_table_master.grid(row=0, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
-                                       rowspan=1)
+        self.__value_table_master.grid(row=0, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
         
         # output
         self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
@@ -134,11 +133,11 @@ class Gui(object):
         
         # additional math buttons
         # first row
-        self.__btn_pi = Button(master=self.__mathbtn, text="PI", command=partial(self.press, "pi")) \
+        self.__btn_pi = Button(master=self.__mathbtn, text="PI", command=partial(self.press, " pi ")) \
             .grid(row=0, column=0, sticky="NESW")
-        self.__btn_e = Button(master=self.__mathbtn, text="e", command=partial(self.press, "e")) \
+        self.__btn_e = Button(master=self.__mathbtn, text="e", command=partial(self.press, " e ")) \
             .grid(row=0, column=1, sticky="NESW")
-        self.__btn_x = Button(master=self.__mathbtn, text="x", command=partial(self.press, "x")) \
+        self.__btn_x = Button(master=self.__mathbtn, text="x", command=partial(self.press, " x ")) \
             .grid(row=0, column=2, sticky="NESW")
         self.__btn_sqrt = Button(master=self.__mathbtn, text="sqrt()", command=partial(self.press, "sqrt ( ")) \
             .grid(row=0, column=3, sticky="NESW")
@@ -161,7 +160,7 @@ class Gui(object):
             .grid(row=1, column=5, sticky="NESW")
 
         # value table
-        self.value_table = Valuetable(self, self.__value_table_master, 10, 1, 0, 1)
+        self.value_table = Valuetable(self, self.__value_table_master, 10, 0, 1)
         # hide the value table
         self.__value_table_master.grid_remove()
 
@@ -185,18 +184,15 @@ class Gui(object):
             self.__basemathbtn.grid_rowconfigure(index=i, minsize=50, weight=1)
 
         # resize proportional
-        for i in range(self.__tk.grid_size()[0]):
-            self.__tk.grid_columnconfigure(index=i, weight=1)
-        for i in range(self.__tk.grid_size()[1]):
-            self.__tk.grid_rowconfigure(index=i, weight=1)
+        # for i in range(self.__tk.grid_size()[0]):
+        #     self.__tk.grid_columnconfigure(index=i, weight=1)
+        # for i in range(self.__tk.grid_size()[1]):
+        #     self.__tk.grid_rowconfigure(index=i, weight=1)
 
         # set minimal size
         self.__tk.update()
-        self.__tk.wm_minsize(self.__parsegeometry(self.__tk.winfo_geometry())[0],
-                             self.__parsegeometry(self.__tk.winfo_geometry())[1])
-
-        # parser setup
-        # self.__parser = Parser()
+        #self.__tk.wm_minsize(self.__parsegeometry(self.__tk.winfo_geometry())[0],
+        #                     self.__parsegeometry(self.__tk.winfo_geometry())[1])
 
         # calculator setup
         self.__calc = Calculator()
@@ -264,13 +260,11 @@ class Gui(object):
     def equals(self):
         try:
             expr = self.convert_list_to_string(self.__expr)
-            tmp = self.__parser.make_expression_postfix(expr)
+            tmp = self.__calc.make_expression_postfix(expr)
             self.__lbl_postf_expr.configure(text=tmp)
+
             result = self.__calc.calculate_expression(expr)
-            if result.get_root() is not None:
-                self.__lbl_result.configure(text=str(result.get_root().get_value()))
-            else:
-                self.__lbl_result.configure(text="")
+            self.__lbl_result.configure(text=str(result.to_string()))
             self.__lbl_err.configure(text="")
         except ValueError:
             self.__lbl_err.configure(text="Syntax isn't correct; check your parenthesis!")
