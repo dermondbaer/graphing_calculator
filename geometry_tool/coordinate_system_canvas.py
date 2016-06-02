@@ -43,7 +43,7 @@ class CoordinateSystemCanvas(Canvas):
 
         # When the mouse is moved, the set_mouse_position function is being executed.
         self.bind('<Motion>', set_mouse_position)
-        self.pack()
+        self.grid()
 
         # Draw the lines, representing the x-and y-axis.
         self.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))
