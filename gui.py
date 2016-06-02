@@ -38,10 +38,13 @@ class Gui(object):
         # menu
         self.__menu = Menu(master=self.__tk)
         self.__menu.add_command(label="Quit", command=self.stop)
-        self.__menu.add_command(label="Show Functions", command=self.expand_functions)
+        # "view" menu
+        self.__menu_view = Menu(master=self.__menu, tearoff=0)
+        self.__menu_view.add_checkbutton(label="Show Functions", command=self.expand_functions)
         self.__show_hide_functions_index = 2
-        self.__menu.add_command(label="Show Value Table", command=self.expand_table)
+        self.__menu_view.add_checkbutton(label="Show Value Table", command=self.expand_table)
         self.__show_hide_table_index = 3
+        self.__menu.add_cascade(label="View", menu=self.__menu_view)
         # "save expression to..." menu
         self.__menu_save_function = Menu(master=self.__menu, tearoff=0)
         for index in range(self.__function_count):
@@ -207,19 +210,23 @@ class Gui(object):
         #                     self.__parsegeometry(self.__tk.winfo_geometry())[1])
 
     def expand_table(self):
-        self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Hide Value Table", command=self.collapse_table)
+        #self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Hide Value Table", command=self.collapse_table)
+        self.__menu_view.entryconfigure(index=1, command=self.collapse_table)
         self.__value_table_master.grid()
 
     def collapse_table(self):
-        self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Show Value Table", command=self.expand_table)
+        #self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Show Value Table", command=self.expand_table)
+        self.__menu_view.entryconfigure(index=1, command=self.expand_table)
         self.__value_table_master.grid_remove()
 
     def expand_functions(self):
-        self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Hide Functions", command=self.collapse_functions)
+        #self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Hide Functions", command=self.collapse_functions)
+        self.__menu_view.entryconfigure(index=0, command=self.collapse_functions)
         self.__functions_master.grid()
 
     def collapse_functions(self):
-        self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Show Functions", command=self.expand_functions)
+        #self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Show Functions", command=self.expand_functions)
+        self.__menu_view.entryconfigure(index=0, command=self.expand_functions)
         self.__functions_master.grid_remove()
 
     def reset_functions(self):
