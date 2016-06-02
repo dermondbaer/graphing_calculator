@@ -226,7 +226,7 @@ class CoordinateSystem(Frame):
             print('Function Term:', function_term)
             print()
 
-        tkinter_objects = self.__coordinate_system_canvas.create_function_graph(function_term)
+        tkinter_objects = self.__coordinate_system_canvas.create_function_graph(function_term, debug_output)
         function = Function(function_term, tkinter_objects)
         self.__figures.append(function)
         return function

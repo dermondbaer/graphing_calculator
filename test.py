@@ -21,7 +21,7 @@ class TestApplication(Calculator, CoordinateSystem):
                 temp = line.split(';')
                 expression = temp[0]
                 expected_result = temp[1]
-                self.calculate_expression(expression)
+                self.calculate_expression(expression, True)
                 print('{:<14}'.format('Expected:'), expected_result, sep='')
                 print()
                 print()
@@ -30,7 +30,7 @@ class TestApplication(Calculator, CoordinateSystem):
         test_file = open('test_files/test_geometry_tool')
         for function in test_file.read().splitlines():
             if function[0:2] != '# ':
-                self.create_function_graph(function)
+                self.create_function_graph(function, True)
 
 
 app = TestApplication()

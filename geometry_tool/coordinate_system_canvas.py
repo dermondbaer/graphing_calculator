@@ -228,9 +228,9 @@ class CoordinateSystemCanvas(Canvas):
 
         return pos_sup_vec, pos_dir_vec, tkinter_object
 
-    def create_function_graph(self, function_term):
+    def create_function_graph(self, function_term, debug_output=False):
         """Creates a function graph in this CoordinateSystem."""
-        parsed_function = self.__calculator.calculate_expression(function_term)
+        parsed_function = self.__calculator.calculate_expression(function_term, debug_output)
 
         canvas_size_x, canvas_size_y = self.__canvas_size
         overhang = canvas_size_y / 2
