@@ -3,7 +3,7 @@
 # value table
 
 from tkinter import *
-from math_calculator import *
+import decimal
 
 class Valuetable(object):
     def __init__(self, gui, master_frame, rows, initial_start, initial_delta):
@@ -122,9 +122,14 @@ class Valuetable(object):
     def recalculate(self):
         for index in range(self.__rows):
             self.__value_table_entry[index][0].configure(text=str(int(self.__start.get())+index*int(self.__delta.get())))
+        calc_expression = self.__gui.calc.calculate_expression
+        calc_function = self.__gui.calc.calculate_function_value
+        func = self.__gui.functions.get_function
         for index in range(1, self.__columns):
+            function = calc_expression(func(self.__column_list[index-1]))
+            # calc_function(calc_expression())
             for i in range(self.__rows):
-                self.__value_table_entry[i][index].configure(text="")
+                self.__value_table_entry[i][index].configure(text=calc_function(function, dict(x=decimal.Decimal(str(int(self.__start.get())+int(i)*int(self.__delta.get()))))))
 
     def set_columns(self, column_list):
         self.__column_list = column_list

@@ -17,12 +17,16 @@ class Gui(object):
         self.__parse_expr = ""
         self.__expr = []
 
+        # calculator setup
+        self.calc = Calculator()
+
         # GUI setup
         # padding
         self.grid_keypad_ipadx = 35
         self.grid_keypad_ipady = 25
         self.pad_general = 5
         self.bg = "grey"
+        self.__function_count = 10
         
         # root window
         self.__tk = Tk()
@@ -30,6 +34,7 @@ class Gui(object):
         self.__tk.wm_resizable(0, 0)
         self.__tk.title(title)
         self.__tk.configure(bg=self.bg)
+
         # menu
         self.__menu = Menu(master=self.__tk)
         self.__menu.add_command(label="Quit", command=self.stop)
@@ -37,6 +42,13 @@ class Gui(object):
         self.__show_hide_functions_index = 2
         self.__menu.add_command(label="Show Value Table", command=self.expand_table)
         self.__show_hide_table_index = 3
+        # "save expression to..." menu
+        self.__menu_save_function = Menu(master=self.__menu, tearoff=0)
+        for index in range(self.__function_count):
+            self.__menu_save_function.add_command(label="function "+str(index), command= partial(self.save_to, index))
+        self.__menu_save_function.add_separator()
+        self.__menu_save_function.add_command(label="Reset all functions", command=self.reset_functions)
+        self.__menu.add_cascade(label="Save Expression To...", menu=self.__menu_save_function)
         self.__tk.config(menu=self.__menu)
 
         # main frames
@@ -159,15 +171,15 @@ class Gui(object):
         self.__btn_clbr = Button(master=self.__mathbtn, text=")", command=partial(self.press, " ) ")) \
             .grid(row=1, column=5, sticky="NESW")
 
+        # saved functions
+        self.functions = Function_storage(self, self.__functions_master, self.__function_count)
+        # hide saved functions frame
+        self.__functions_master.grid_remove()
+
         # value table
         self.value_table = Valuetable(self, self.__value_table_master, 10, 0, 1)
         # hide the value table
         self.__value_table_master.grid_remove()
-
-        # saved functions
-        self.functions = Function_storage(self, self.__functions_master, self.value_table)
-        # hide saved functions frame
-        self.__functions_master.grid_remove()
 
         # fill up space
         for i in range(self.__mathbtn.grid_size()[0]):
@@ -194,9 +206,6 @@ class Gui(object):
         #self.__tk.wm_minsize(self.__parsegeometry(self.__tk.winfo_geometry())[0],
         #                     self.__parsegeometry(self.__tk.winfo_geometry())[1])
 
-        # calculator setup
-        self.__calc = Calculator()
-
     def expand_table(self):
         self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Hide Value Table", command=self.collapse_table)
         self.__value_table_master.grid()
@@ -212,6 +221,13 @@ class Gui(object):
     def collapse_functions(self):
         self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Show Functions", command=self.expand_functions)
         self.__functions_master.grid_remove()
+
+    def reset_functions(self):
+        self.functions.reset()
+
+    def save_to(self, index=0):
+        print("save expression \""+self.convert_list_to_string(self.__expr)+"\" to f"+str(index))
+        self.functions.set_function(index, self.convert_list_to_string(self.__expr))
 
     @staticmethod
     def __parsegeometry(geometry):
@@ -260,10 +276,10 @@ class Gui(object):
     def equals(self):
         try:
             expr = self.convert_list_to_string(self.__expr)
-            tmp = self.__calc.make_expression_postfix(expr)
+            tmp = self.calc.make_expression_postfix(expr)
             self.__lbl_postf_expr.configure(text=tmp)
 
-            result = self.__calc.calculate_expression(expr)
+            result = self.calc.calculate_expression(expr)
             self.__lbl_result.configure(text=str(result.to_string()))
             self.__lbl_err.configure(text="")
         except ValueError:
