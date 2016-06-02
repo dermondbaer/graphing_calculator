@@ -46,7 +46,6 @@ class Function_storage(object):
                 self.__entry_selection[i].deselect()
         # get the value table to update
         self.__gui.value_table.set_columns(functions)
-        self.__gui.value_table.redraw()
 
     def get_function(self, index):
         return self.__function[index]
