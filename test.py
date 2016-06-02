@@ -14,6 +14,13 @@ class TestApplication(Calculator, CoordinateSystem):
         self.__master.resizable(0, 0)
         CoordinateSystem.__init__(self, self.__master, target_size_x=900, target_size_y=900)
 
+        # Creating a menu bar.
+        self.__menu = Menu(master=self)
+        self.__menu.add_command(label='Quit (ESC)', command=self.stop)
+        self.__menu.add_command(label='Clear (DEL)', command=self.clear_figures)
+        self.__menu.add_command(label='Restart (F5)', command=self.restart)
+        self.__master.config(menu=self.__menu)
+
     def test_calculator(self):
         test_file = open('test_files/test_calculator', mode='r')
         for line in test_file.read().splitlines():
