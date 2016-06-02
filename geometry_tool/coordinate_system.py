@@ -68,11 +68,11 @@ class CoordinateSystem(Frame):
         self.__master.focus_force()
 
         # Creating a menu bar.
-        self.__menu = Menu(master=self, bg='red')
-        self.__menu.add_command(label='Quit (ESC)', command=self.stop)
-        self.__menu.add_command(label='Clear (DEL)', command=self.clear_figures)
-        self.__menu.add_command(label='Restart (F5)', command=self.restart)
-        self.__master.config(menu=self.__menu)
+        # self.__menu = Menu(master=self)
+        # self.__menu.add_command(label='Quit (ESC)', command=self.stop)
+        # self.__menu.add_command(label='Clear (DEL)', command=self.clear_figures)
+        # self.__menu.add_command(label='Restart (F5)', command=self.restart)
+        # self.__master.config(menu=self.__menu)
 
         # Creating the CoordinateSystemCanvas.
         self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
@@ -226,7 +226,7 @@ class CoordinateSystem(Frame):
             print('Function Term:', function_term)
             print()
 
-        tkinter_objects = self.__coordinate_system_canvas.create_function_graph(function_term)
+        tkinter_objects = self.__coordinate_system_canvas.create_function_graph(function_term, debug_output)
         function = Function(function_term, tkinter_objects)
         self.__figures.append(function)
         return function

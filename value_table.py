@@ -89,9 +89,6 @@ class Valuetable(object):
         # draw value table
         self.redraw()
 
-    def printasdf(self):
-        print("asdf")
-
     def redraw(self):
         # create a local copy of self.__column_list that we can edit
         column_list = []

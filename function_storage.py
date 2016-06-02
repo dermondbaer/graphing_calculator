@@ -5,6 +5,7 @@
 from tkinter import *
 
 class Function_storage(object):
+
     def __init__(self, gui, master_frame, function_count):
         self.__master = master_frame
         self.__gui = gui

@@ -14,26 +14,31 @@ decimal.getcontext().prec = 64
 
 class Calculator(math_parser.Parser):
     @staticmethod
-    def calculate_expression(expression):
+    def calculate_expression(expression, debug_output=False):
         """
         Calculates the solution of a mathematical expression.
         If there are variables in the expression, it is being simplified as far as possible.
 
         :param expression: The expression to calculate.
         :type expression: str
+        :param debug_output: Whether the system shall display output in the console or not.
+        :type debug_output: bool
         :rtype: ParserTree
         """
-        print('{:<14}'.format('Calculating:'), '"', expression, '"', sep='')
+        if debug_output:
+            print('{:<14}'.format('Calculating:'), '"', expression, '"', sep='')
 
         parser_tree = Calculator.parse_expression(expression)
 
-        print('{:<14}'.format('Postfix:'), '"', parser_tree.to_string(), '"', sep='')
+        if debug_output:
+            print('{:<14}'.format('Postfix:'), '"', parser_tree.to_string(), '"', sep='')
 
         if parser_tree.get_root() is not None:
             Calculator._simplify(parser_tree, parser_tree.get_root())
 
-        print('{:<14}'.format('Result:'), '"', parser_tree.to_string(), '"', sep='')
-        print()
+        if debug_output:
+            print('{:<14}'.format('Result:'), '"', parser_tree.to_string(), '"', sep='')
+            print()
 
         return parser_tree
 
@@ -47,6 +52,8 @@ class Calculator(math_parser.Parser):
         :type parser_tree: ParserTree
         :param variables: The variables used in the expression.
         :type variables: dict
+        :param precision: The number of decimal places after the decimal point.
+        :type precision: int
         :rtype: Decimal
         """
         if parser_tree.get_root() is not None:
