@@ -12,7 +12,7 @@ class Function_storage(object):
         self.__function_count = function_count
 
         # actual function storage
-        self.__function = ["" for i in range(self.__function_count)]
+        self.__function = ["x * x" for i in range(self.__function_count)]
         # self.__function[0] = "2 x"
 
         # function storage master frame

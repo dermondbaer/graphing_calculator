@@ -35,6 +35,8 @@ class Gui(object):
         self.__tk.wm_resizable(0, 0)
         self.__tk.title(title)
         self.__tk.configure(bg=self.bg)
+        self.__tk.wm_protocol("WM_DELETE_WINDOW", self.stop)
+
 
         # menu
         self.__menu = Menu(master=self.__tk)
@@ -42,14 +44,13 @@ class Gui(object):
         # "view" menu
         self.__menu_view = Menu(master=self.__menu, tearoff=0)
         self.__menu_view.add_checkbutton(label="Show Functions", command=self.expand_functions)
-        self.__show_hide_functions_index = 2
         self.__menu_view.add_checkbutton(label="Show Value Table", command=self.expand_table)
-        self.__show_hide_table_index = 3
+        self.__menu_view.add_checkbutton(label="Show Coordinate System", command=self.display_cs)
         self.__menu.add_cascade(label="View", menu=self.__menu_view)
         # "save expression to..." menu
         self.__menu_save_function = Menu(master=self.__menu, tearoff=0)
         for index in range(self.__function_count):
-            self.__menu_save_function.add_command(label="function "+str(index), command= partial(self.save_to, index))
+            self.__menu_save_function.add_command(label="function "+str(index), command=partial(self.save_to, index))
         self.__menu_save_function.add_separator()
         self.__menu_save_function.add_command(label="Reset all functions", command=self.reset_functions)
         self.__menu.add_cascade(label="Save Expression To...", menu=self.__menu_save_function)
@@ -75,10 +76,25 @@ class Gui(object):
         self.__value_table_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
         self.__value_table_master.grid(row=0, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
 
+        # child window
         self.__graph_window = Toplevel()
+        self.__graph_window.withdraw()
         self.__graph_window.title = title
+        self.__graph_window.wm_resizable(0, 0)
+        self.__graph_window.wm_protocol("WM_DELETE_WINDOW", partial(self.__menu_view.invoke, 2))
+        # menu of the child window
+        self.__menu_graph_window = Menu(master=self.__graph_window, tearoff=0)
+        self.__menu_graph_window_selection = Menu(master=self.__graph_window, tearoff=0)
+        self.__graph_window_selection = [BooleanVar() for i in range(self.__function_count)]
+        for index in range(self.__function_count):
+            self.__menu_graph_window_selection.add_checkbutton(label="function "+str(index),
+                                                               command=partial(self.display_func, index),
+                                                               variable=self.__graph_window_selection[index])
+        self.__menu_graph_window.add_cascade(label="Select Functions...", menu=self.__menu_graph_window_selection)
+        self.__graph_window.configure(menu=self.__menu_graph_window)
         self.__graph = CoordinateSystem(self.__graph_window, 600, 600)
-        
+        self.__graph_window_function = [None for i in range(self.__function_count)]
+
         # output
         self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
         self.__lbl_parse_expr_info = Label(master=self.__output, text="Current expression: ", bg=self.bg)
@@ -211,6 +227,9 @@ class Gui(object):
 
         # set minimal size
         self.__tk.update()
+        # debug
+        for i in range(2):
+            self.__menu_view.invoke(i)
         #self.__tk.wm_minsize(self.__parsegeometry(self.__tk.winfo_geometry())[0],
         #                     self.__parsegeometry(self.__tk.winfo_geometry())[1])
 
@@ -233,6 +252,28 @@ class Gui(object):
         #self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Show Functions", command=self.expand_functions)
         self.__menu_view.entryconfigure(index=0, command=self.expand_functions)
         self.__functions_master.grid_remove()
+
+    def display_cs(self):
+        self.__menu_view.entryconfigure(index=2, command=self.hide_cs)
+        self.__graph_window.deiconify()
+
+    def hide_cs(self):
+        self.__menu_view.entryconfigure(index=2, command=self.display_cs)
+        self.__graph_window.withdraw()
+
+    def display_func(self, index):
+        if  self.functions.get_function(index) != "":
+            self.__graph_window_function[index] = self.__graph.create_function_graph(self.functions.get_function(index))
+            self.__menu_graph_window_selection.entryconfigure(index=index, command=partial(self.hide_func, index))
+        else:
+            self.__graph_window_selection[index].set(False)
+
+    def hide_func(self, index):
+        if self.__graph_window_function[index] != None:
+            self.__graph.del_figure(self.__graph_window_function[index])
+            self.__menu_graph_window_selection.entryconfigure(index=index, command=partial(self.display_func, index))
+        else:
+            self.__menu_graph_window_selection[index].set(True)
 
     def reset_functions(self):
         self.functions.reset()
@@ -259,8 +300,7 @@ class Gui(object):
         self.__tk.mainloop()
 
     def stop(self):
-        self.__tk.destroy()
-        self.__main.stop()
+        self.__main.stop_application()
 
     def press(self, value):
         self.__expr.append(value)
