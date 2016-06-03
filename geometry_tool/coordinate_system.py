@@ -12,7 +12,8 @@ from geometry_tool.figure_dialog import PointDialog, DistanceInput, LineInput
 
 class CoordinateSystem(Frame):
     """Class that is used to interact between the underlying program and the CoordinateSystemCanvas."""
-    def __init__(self, master, target_size_x=1000, target_size_y=1000, default_units_x=10, default_units_y=10):
+    def __init__(self, master, target_size_x=1000, target_size_y=1000, default_units_x=10, default_units_y=10,
+                 debug=False):
         """
         :arg master: The parent tkinter element of this CoordinateSystem.
         :arg target_size_x: The estimated width of the CoordinateSystem in Pixels.
@@ -27,9 +28,10 @@ class CoordinateSystem(Frame):
         self.__figures = []
 
         # Binding keys to important functionalities of the CoordinateSystem.
-        self.__master.bind('<F5>', lambda event: self.restart())
-        self.__master.bind('<Delete>', lambda event: self.clear_figures())
-        self.__master.bind('<Escape>', lambda event: self.stop())
+        if debug:
+            self.__master.bind('<F5>', lambda event: self.restart())
+            self.__master.bind('<Delete>', lambda event: self.clear_figures())
+            self.__master.bind('<Escape>', lambda event: self.stop())
 
         units_x = (-default_units_x, default_units_x)
         units_y = (-default_units_y, default_units_y)
