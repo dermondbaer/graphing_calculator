@@ -31,6 +31,7 @@ class Gui(object):
         self.grid_keypad_ipady = 25
         self.pad_general = 5
         self.bg = "grey"
+        self.obg = "white"
         self.__function_count = 10
         
         # root window
@@ -64,8 +65,8 @@ class Gui(object):
         self.__functions_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
         self.__functions_master.grid(row=1, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
                                        rowspan=2)
-        self.__output = Frame(master=self.__tk, bg=self.bg, relief=GROOVE)
-        self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NEW")
+        self.__output = Frame(master=self.__tk, bg=self.obg, relief=GROOVE)
+        self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NESW")
 
         self.__keypad = Frame(master=self.__tk, bg="blue")
         self.__keypad.grid(row=2, column=1, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
@@ -113,31 +114,31 @@ class Gui(object):
         self.__graph_window_figure = []
 
         # output
-        self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_parse_expr_info = Label(master=self.__output, text="Current expression: ", bg=self.bg)
-        self.__lbl_postf_expr = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_postf_expr_info = Label(master=self.__output, text="Postfix notation: ", bg=self.bg)
-        self.__lbl_result = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_result_info = Label(master=self.__output, text="Result: ", bg=self.bg)
-        self.__lbl_err = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_err_info = Label(master=self.__output, text="Errors: ", bg=self.bg)
-        self.__output_expr = Frame(master=self.__output, bg="white", relief=GROOVE)
-        self.__output_expr.grid(row=0, column=1, columnspan=2, sticky="NESW")
+        self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_parse_expr_info = Label(master=self.__output, text="Current expression: ", bg=self.obg)
+        self.__lbl_postf_expr = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_postf_expr_info = Label(master=self.__output, text="Postfix notation: ", bg=self.obg)
+        self.__lbl_result = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_result_info = Label(master=self.__output, text="Result: ", bg=self.obg)
+        self.__lbl_err = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_err_info = Label(master=self.__output, text="Errors: ", bg=self.obg)
+        #self.__output_expr = Frame(master=self.__output, bg="white", relief=GROOVE)
+        #self.__output_expr.grid(row=0, column=1, columnspan=2, sticky="NESW")
         
         # layout
-        self.__lbl_parse_expr.grid(row=1, column=1, sticky="NES")
-        self.__lbl_parse_expr_info.grid(row=1, column=0, sticky="NES")
-        self.__lbl_postf_expr.grid(row=2, column=1, sticky="NES")
+        self.__lbl_parse_expr.grid(row=1, column=1, sticky="NES", padx=(0,20))
+        self.__lbl_parse_expr_info.grid(row=1, column=0, sticky="NES", padx=(20,0))
+        self.__lbl_postf_expr.grid(row=2, column=1, sticky="NES", padx=(0,20))
         self.__lbl_postf_expr_info.grid(row=2, column=0, sticky="NES")
-        self.__lbl_result.grid(row=3, column=1, sticky="NES")
+        self.__lbl_result.grid(row=3, column=1, sticky="NES", padx=(0,20))
         self.__lbl_result_info.grid(row=3, column=0, sticky="NES")
-        self.__lbl_err.grid(row=4, column=1, sticky="NESW")
+        self.__lbl_err.grid(row=4, column=1, sticky="NESW", padx=(0,20))
         self.__lbl_err_info.grid(row=4, column=0, sticky="NES")
         
         self.__output.grid_columnconfigure(index=1, minsize=100, weight=1)
         for i in range(self.__output.grid_size()[1]):
-            self.__output.grid_rowconfigure(index=i, minsize=40, weight=1)
-        self.__output.grid_rowconfigure(index=0, minsize=100)
+            self.__output.grid_rowconfigure(index=i, minsize=40, weight=0)
+        #self.__output.grid_rowconfigure(index=0, minsize=100)
 
         # keypad
         self.__btn_9 = Button(master=self.__keypad, text="9", command=partial(self.press, "9")) \
@@ -176,7 +177,7 @@ class Gui(object):
             .grid(row=1, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_equals = Button(master=self.__basemathbtn, text="=", command=self.equals) \
             .grid(row=3, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW",
-                  rowspan=1)
+                  rowspan=2)
         # self.__btn_exp = Button(master=self.__basemathbtn, text="^", command=partial(self.press, " ^ ")) \
         #    .grid(row=1, column=1, ipadx=self.__grid_keypad_ipadx, ipady=self.__grid_keypad_ipady, sticky="NESW")
         self.__btn_clr = Button(master=self.__basemathbtn, text="C", command=self.clear, bg="orange") \
@@ -185,6 +186,15 @@ class Gui(object):
             .grid(row=0, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_comma = Button(self.__basemathbtn, text=",", command=partial(self.press, " , ")) \
             .grid(row=3, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+        self.__btn_parenthesis_frame = Frame(self.__basemathbtn, bg="grey")
+        self.__btn_parenthesis_frame.grid(row=4, column=0, sticky="NESW")
+        self.__btn_parenthesis_frame.grid_columnconfigure(index=0, weight=1)
+        self.__btn_parenthesis_frame.grid_columnconfigure(index=1, weight=1)
+        self.__btn_parenthesis_frame.grid_rowconfigure(index=0, weight=1)
+        self.__btn_opening_paren = Button(self.__btn_parenthesis_frame, text="(", command=partial(self.press, " ( ")) \
+            .grid(row=0, column=0, sticky="NESW")
+        self.__btn_closing_paren = Button(self.__btn_parenthesis_frame, text=")", command=partial(self.press, " ) ")) \
+            .grid(row=0, column=1, sticky="NESW")
 
         # dropdown menu with saved functions
         self.__menu_functions = Menu(master=self.__menu, tearoff=0)
@@ -194,27 +204,43 @@ class Gui(object):
 
         # dropdown menu with mathematical functions
         self.__menu_math_functions = Menu(master=self.__menu, tearoff=0)
-        self.__menu_math_functions.add_command(label="sinh( x )", command=partial(self.press, " sinh ("))
-        self.__menu_math_functions.add_command(label="asinh( x )", command=partial(self.press, " asinh ("))
-        self.__menu_math_functions.add_command(label="cosh( x )", command=partial(self.press, " cosh ("))
-        self.__menu_math_functions.add_command(label="acosh( x )", command=partial(self.press, " acosh ("))
-        self.__menu_math_functions.add_command(label="tanh( x )", command=partial(self.press, " tanh ("))
-        self.__menu_math_functions.add_command(label="atanh( x )", command=partial(self.press, " atanh ("))
+        self.__menu_math_functions.add_command(label="sinh( x )", command=partial(self.press, " sinh ( "))
+        self.__menu_math_functions.add_command(label="asinh( x )", command=partial(self.press, " asinh ( "))
+        self.__menu_math_functions.add_command(label="cosh( x )", command=partial(self.press, " cosh ( "))
+        self.__menu_math_functions.add_command(label="acosh( x )", command=partial(self.press, " acosh ( "))
+        self.__menu_math_functions.add_command(label="tanh( x )", command=partial(self.press, " tanh ( "))
+        self.__menu_math_functions.add_command(label="atanh( x )", command=partial(self.press, " atanh ( "))
         self.__menu_math_functions.add_separator()
-        self.__menu_math_functions.add_command(label="ncr( x )", command=partial(self.press, " ncr ("))
-        self.__menu_math_functions.add_command(label="npr( x )", command=partial(self.press, " npr ("))
-        self.__menu_math_functions.add_command(label="binompdf( n, p, k )", command=partial(self.press, " binompdf ("))
-        self.__menu_math_functions.add_command(label="binomcdf( n, p, k )", command=partial(self.press, " binomcdf ("))
+        self.__menu_math_functions.add_command(label="log2( x )", command=partial(self.press, " log2 ( "))
         self.__menu_math_functions.add_separator()
-        self.__menu_math_functions.add_command(label="min( a, b )", command=partial(self.press, " min ("))
-        self.__menu_math_functions.add_command(label="max( a, b )", command=partial(self.press, " max ("))
+        self.__menu_math_functions.add_command(label="ncr( x )", command=partial(self.press, " ncr ( "))
+        self.__menu_math_functions.add_command(label="npr( x )", command=partial(self.press, " npr ( "))
+        self.__menu_math_functions.add_command(label="binompdf( n, p, k )", command=partial(self.press, " binompdf ( "))
+        self.__menu_math_functions.add_command(label="binomcdf( n, p, k )", command=partial(self.press, " binomcdf ( "))
         self.__menu_math_functions.add_separator()
-        self.__menu_math_functions.add_command(label="nderiv( f(x), x )", command=partial(self.press, " nderiv ("))
-        self.__menu_math_functions.add_command(label="fnint( f(x), a, b )", command=partial(self.press, " fnint ("))
+        self.__menu_math_functions.add_command(label="min( a, b )", command=partial(self.press, " min ( "))
+        self.__menu_math_functions.add_command(label="max( a, b )", command=partial(self.press, " max ( "))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="nderiv( f(x), x )", command=partial(self.press, " nderiv ( "))
+        self.__menu_math_functions.add_command(label="fnint( f(x), a, b )", command=partial(self.press, " fnint ( "))
         self.__menu.add_cascade(label="Mathematical Functions", menu=self.__menu_math_functions)
 
         # additional math buttons
-        math_btn = [[]]
+        math_btn = [[["radian(x)"," radians ( "], ["degree(x)"," degrees ( "], ["PI", " pi "],["e"," e "], ["log( x, n )"," log ( "], ["x"," x "]],
+                    [["sin(x)"," sin ( "],["cos(x)"," cos ( "],["tan(x)"," tan ( "],["log10(x)"," log10 ( "],["ln(x)"," ln ( "],["^", " ^ "]],
+                    [["asin(x)"," asin ( "],["acos(x)"," acos ( "],["atan(x)"," atan ( "],["|x|"," abs ( "],["!x"," factorial ( "],["sqrt(x)"," sqrt ( "]]]
+
+        self.__additional_mathbtn = [[None for i in range(len(math_btn[0]))] for i in range(len(math_btn))]
+        #print(self.__additional_mathbtn)
+        for row, array in enumerate(math_btn):
+            self.__mathbtn.grid_rowconfigure(index=row, weight=1)
+            for col, item in enumerate(array):
+                self.__additional_mathbtn[row][col] = Button(self.__mathbtn, text=math_btn[row][col][0],
+                                                            command=partial(self.press, math_btn[row][col][1]))
+                self.__additional_mathbtn[row][col].grid(row=row, column=col, ipadx=0,
+                                                        ipady=0, sticky="NESW")
+                self.__mathbtn.grid_columnconfigure(index=col, weight=1)
+        #print(self.__additional_mathbtn)
 
         # additional math buttons
         # # first row
@@ -256,7 +282,7 @@ class Gui(object):
 
         # fill up space
         for i in range(self.__mathbtn.grid_size()[0]):
-            self.__mathbtn.grid_columnconfigure(index=i, minsize=50, weight=1)
+            self.__mathbtn.grid_columnconfigure(index=i, minsize=80, weight=1)
         for i in range(self.__mathbtn.grid_size()[1]):
             self.__mathbtn.grid_rowconfigure(index=i, minsize=50, weight=1)
         for i in range(self.__keypad.grid_size()[0]):
@@ -264,9 +290,9 @@ class Gui(object):
         for i in range(self.__keypad.grid_size()[1]):
             self.__keypad.grid_rowconfigure(index=i, minsize=50, weight=1)
         for i in range(self.__basemathbtn.grid_size()[0]):
-            self.__basemathbtn.grid_columnconfigure(index=i, minsize=50, weight=1)
+            self.__basemathbtn.grid_columnconfigure(index=i, minsize=60, weight=1)
         for i in range(self.__basemathbtn.grid_size()[1]):
-            self.__basemathbtn.grid_rowconfigure(index=i, minsize=50, weight=1)
+            self.__basemathbtn.grid_rowconfigure(index=i, minsize=70, weight=1)
 
         # set minimal size
         self.__tk.update()
@@ -341,7 +367,7 @@ class Gui(object):
         self.functions.reset()
 
     def save_to(self, index=0):
-        print("save expression \""+self.convert_list_to_string(self.__expr)+"\" to f"+str(index))
+        # print("save expression \""+self.convert_list_to_string(self.__expr)+"\" to f"+str(index))
         self.functions.set_function(index, self.convert_list_to_string(self.__expr), copy.deepcopy(self.__expr))
 
     def recall(self, index):
@@ -389,7 +415,10 @@ class Gui(object):
     def clear_last(self):
         if not len(self.__expr) == 0:
             self.__expr.pop()
-            self.redraw()
+        self.__err = ""
+        self.__postfix_expr = ""
+        self.__result = ""
+        self.redraw()
 
     @staticmethod
     def is_numeral(value):
@@ -412,7 +441,13 @@ class Gui(object):
             self.__postfix_expr = ""
             self.redraw()
         except ZeroDivisionError:
-            pass
+            self.__err = "Division by Zero!"
+            self.__postfix_expr = ""
+            self.redraw()
+        except:
+            self.__err = "Error - check your Input!"
+            self.__postfix_expr = ""
+            self.redraw()
 
     def render_expression(self):
         pass
@@ -442,5 +477,5 @@ class Gui(object):
             elif type(item) == list:
                 for i in range(1, len(item)):
                     string += item[i]
-        print(string)
+        #print(string)
         return string

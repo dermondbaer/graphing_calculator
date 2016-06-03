@@ -155,11 +155,28 @@ class Valuetable(object):
         calc_function = self.__gui.calc.calculate_function_value
         func = self.__gui.functions.get_function
         for index in range(1, self.__columns):
-            function = calc_expression(func(self.__column_list[index-1]))
+            try:
+                function = calc_expression(func(self.__column_list[index-1]))
+            except ValueError:
+                for i in range(self.__rows):
+                    self.__value_table_entry[i][index].configure(text="ValueError")
+            except ZeroDivisionError:
+                for i in range(self.__rows):
+                    self.__value_table_entry[i][index].configure(text="ZeroDivError")
+            except:
+                for i in range(self.__rows):
+                    self.__value_table_entry[i][index].configure(text="Error")
             # calc_function(calc_expression())
             for i in range(self.__rows):
-                self.__value_table_entry[i][index].configure(text=calc_function(function, dict(
-                    x=decimal.Decimal(str(round(float(self.__start.get())+int(i)*float(self.__delta.get()), 8))))))
+                try:
+                    self.__value_table_entry[i][index].configure(text=calc_function(function, dict(
+                        x=decimal.Decimal(str(round(float(self.__start.get())+int(i)*float(self.__delta.get()), 8))))))
+                except ValueError:
+                    self.__value_table_entry[i][index].configure(text="ValueError")
+                except ZeroDivisionError:
+                    self.__value_table_entry[i][index].configure(text="ZeroDivError")
+                except:
+                    self.__value_table_entry[i][index].configure(text="Error")
 
     def set_columns(self, column_list):
         self.__column_list = column_list
