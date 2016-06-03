@@ -75,7 +75,9 @@ class Gui(object):
         self.__value_table_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
         self.__value_table_master.grid(row=0, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
 
-        self.__graph = CoordinateSystem(self.__tk)
+        self.__graph_window = Toplevel()
+        self.__graph_window.title = title
+        self.__graph = CoordinateSystem(self.__graph_window, 600, 600)
         
         # output
         self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
