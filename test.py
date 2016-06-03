@@ -43,4 +43,5 @@ class TestApplication(Calculator, CoordinateSystem):
 app = TestApplication()
 app.test_geometry_tool()
 app.test_calculator()
+app.create_line()
 app.start()
