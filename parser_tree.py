@@ -292,3 +292,6 @@ class ParserTree(object):
         key = re.sub('\s+', ' ', key)
 
         return key
+
+    def is_empty(self):
+        return self.__root is None

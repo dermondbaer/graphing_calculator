@@ -7,6 +7,7 @@ from decimal import *
 from math_calculator import Calculator
 from geometry_tool.coordinate_system_canvas import CoordinateSystemCanvas
 from geometry_tool.figures import Point, Distance, Line, Function
+from geometry_tool.figure_dialog import PointDialog, DistanceInput, LineInput
 
 
 class CoordinateSystem(Frame):
@@ -176,48 +177,69 @@ class CoordinateSystem(Frame):
         """Returns the parent tkinter element of this CoordinateSystem."""
         return self.__master
 
-    def create_point(self, coordinates, debug_output=False):
+    def create_point(self, coordinates=False, debug_output=False):
         """Creates a point in this CoordinateSystem at the given coordinates."""
-        position, tkinter_object = self.__coordinate_system_canvas.create_point(coordinates)
-        if debug_output:
-            print('Creating Point')
-            print('Coordinates:', coordinates)
-            print('Position:', position)
-            print()
+        if not coordinates:
+            dialog = PointDialog()
+            coordinates = dialog.get_coordinates()
+        if coordinates:
+            position, tkinter_object = self.__coordinate_system_canvas.create_point(coordinates)
 
-        point = Point(coordinates, position, tkinter_object)
-        self.__figures.append(point)
-        return point
+            if debug_output:
+                print('Creating Point')
+                print('Coordinates:', coordinates)
+                print('Position:', position)
+                print()
 
-    def create_distance(self, coord_a, coord_b, debug_output=False):
+            point = Point(coordinates, position, tkinter_object)
+            self.__figures.append(point)
+            return point
+        else:
+            return False
+
+    def create_distance(self, coord_a=False, coord_b=False, debug_output=False):
         """Creates a distance in this CoordinateSystem from point a to point b."""
-        pos_a, pos_b, tkinter_objects = self.__coordinate_system_canvas.create_distance(coord_a, coord_b)
-        if debug_output:
-            print('Creating Distance')
-            print('Coordinates Point A:', coord_a)
-            print('Coordinates Point B:', coord_b)
-            print('Position Point A:', pos_a)
-            print('Position Point B:', pos_b)
-            print()
+        if not coord_a or not coord_b:
+            dialog = DistanceInput()
+            coord_a, coord_b = dialog.get_coordinates()
+        if coord_a and coord_b:
+            pos_a, pos_b, tkinter_objects = self.__coordinate_system_canvas.create_distance(coord_a, coord_b)
 
-        distance = Distance(coord_a, coord_b, pos_a, pos_b, tkinter_objects)
-        self.__figures.append(distance)
-        return distance
+            if debug_output:
+                print('Creating Distance')
+                print('Coordinates Point A:', coord_a)
+                print('Coordinates Point B:', coord_b)
+                print('Position Point A:', pos_a)
+                print('Position Point B:', pos_b)
+                print()
 
-    def create_line(self, support_vector, direction_vector, debug_output=False):
+            distance = Distance(coord_a, coord_b, pos_a, pos_b, tkinter_objects)
+            self.__figures.append(distance)
+            return distance
+        else:
+            return False
+
+    def create_line(self, support_vector=False, direction_vector=False, debug_output=False):
         """Creates a line in this CoordinateSystem with a support vector and a direction vector."""
-        pos_sup, pos_dir, tkinter = self.__coordinate_system_canvas.create_vector_line(support_vector, direction_vector)
-        line = Line(support_vector, direction_vector, pos_sup, pos_dir, tkinter)
-        if debug_output:
-            print('Creating Line')
-            print('Coordinates Support Vector:', support_vector)
-            print('Coordinates Direction Vector:', direction_vector)
-            print('Position Support Vector:', pos_sup)
-            print('Position Direction Vector:', pos_dir)
-            print()
+        if not support_vector or not direction_vector:
+            dialog = LineInput()
+            support_vector, direction_vector = dialog.get_coordinates()
+        if support_vector and direction_vector:
+            pos_sup, pos_dir, tkinter = self.__coordinate_system_canvas.\
+                create_vector_line(support_vector, direction_vector)
 
-        self.__figures.append(line)
-        return line
+            if debug_output:
+                print('Creating Line')
+                print('Coordinates Support Vector:', support_vector)
+                print('Coordinates Direction Vector:', direction_vector)
+                print('Position Support Vector:', pos_sup)
+                print('Position Direction Vector:', pos_dir)
+                print()
+            line = Line(support_vector, direction_vector, pos_sup, pos_dir, tkinter)
+            self.__figures.append(line)
+            return line
+        else:
+            return False
 
     def create_function_graph(self, function_term, debug_output=False):
         """Creates a function graph in this CoordinateSystem."""
@@ -246,7 +268,8 @@ class InputDialog(object):
         :type displayed_size: tuple
         """
         displayed_size_x, displayed_size_y = displayed_size
-        display_list = list((*displayed_size_x, *displayed_size_y))
+        neg_x, pos_x, neg_y, pos_y = displayed_size_x, displayed_size_y
+        display_list = list((neg_x, pos_x, neg_y, pos_y))
 
         for index, item in enumerate(display_list):
             temp = str(abs(item))
@@ -258,36 +281,36 @@ class InputDialog(object):
             """Grabs the entries, entered into the input fields and validates whether they are correct."""
             # Validate the values, entered into the input fields.
             x = y = False
-            neg_x = self.validate_axis_size(input_neg_x)
-            pos_x = self.validate_axis_size(input_pos_x)
-            if neg_x and pos_x:
+            negative_x = self.validate_axis_size(input_neg_x)
+            positive_x = self.validate_axis_size(input_pos_x)
+            if negative_x and positive_x:
                 x = True
-            if not neg_x:
+            if not negative_x:
                 input_neg_x.delete(0, END)
                 x = False
-            if not pos_x:
+            if not positive_x:
                 input_pos_x.delete(0, END)
 
-            neg_y = self.validate_axis_size(input_neg_y)
-            pos_y = self.validate_axis_size(input_pos_y)
-            if neg_y and pos_y:
+            negative_y = self.validate_axis_size(input_neg_y)
+            positive_x = self.validate_axis_size(input_pos_y)
+            if negative_y and positive_x:
                 y = True
-            if not neg_y:
+            if not negative_y:
                 input_neg_y.delete(0, END)
                 y = False
-            if not pos_y:
+            if not positive_x:
                 input_pos_y.delete(0, END)
                 y = False
 
             # If the values for x and y are correctly entered, set the __size_x and __size_y instance variables.
             if x and y:
-                neg_x = -abs(Calculator.calculate_function_value(neg_x, {}))
-                pos_x = abs(Calculator.calculate_function_value(pos_x, {}))
-                self.__size_x = (neg_x, pos_x)
+                negative_x = -abs(Calculator.calculate_function_value(negative_x, {}))
+                positive_x = abs(Calculator.calculate_function_value(positive_x, {}))
+                self.__size_x = (negative_x, positive_x)
 
-                neg_y = -abs(Calculator.calculate_function_value(neg_y, {}))
-                pos_y = abs(Calculator.calculate_function_value(pos_y, {}))
-                self.__size_y = (neg_y, pos_y)
+                negative_y = -abs(Calculator.calculate_function_value(negative_y, {}))
+                positive_x = abs(Calculator.calculate_function_value(positive_x, {}))
+                self.__size_y = (negative_y, positive_x)
 
                 # Then destroy the tkinter master.
                 master.destroy()
