@@ -288,13 +288,13 @@ class Gui(object):
             self.__menu_graph_window_selection[index].set(True)
 
     def graph_add_point(self):
-        pass
+        self.__graph_window_figure.append(self.graph.create_point())
 
     def graph_add_line(self):
-        pass
+        self.__graph_window_figure.append(self.graph.create_line())
 
     def graph_add_distance(self):
-        pass
+        self.__graph_window_figure.append(self.graph.create_distance())
 
     def graph_clear_figures(self):
         for figure in self.__graph_window_figure:
