@@ -79,7 +79,7 @@ class CoordinateSystem(Frame):
         # self.__master.config(menu=self.__menu)
 
         # Creating the CoordinateSystemCanvas.
-        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, self, absolute_size)
+        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
 
     def start(self):
         """Calls the mainloop for this CoordinateSystem."""
@@ -118,7 +118,7 @@ class CoordinateSystem(Frame):
         self.__scale = (scale_x, scale_y)
         self.__units = (units_x, units_y)
         self.__coordinate_system_canvas.destroy()
-        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, self, absolute_size)
+        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
 
         print('Recreating Coordinate System')
         print('X-target_size:', target_size_x)
