@@ -100,7 +100,8 @@ class Gui(object):
         self.__menu_graph_window_add_figure.add_separator()
         self.__menu_graph_window_add_figure.add_command(label="Clear all figures", command=self.graph_clear_figures)
         self.__menu_graph_window.add_cascade(label="Draw...", menu=self.__menu_graph_window_add_figure)
-
+        # Resize Menu
+        self.__menu_graph_window.add_command(label="Resize...", command=self.graph_resize)
         self.__graph_window.configure(menu=self.__menu_graph_window)
         self.graph = CoordinateSystem(self.__graph_window, 600, 600, 10, 10)
         # reference to the drawn figures
@@ -231,12 +232,6 @@ class Gui(object):
         for i in range(self.__basemathbtn.grid_size()[1]):
             self.__basemathbtn.grid_rowconfigure(index=i, minsize=50, weight=1)
 
-        # resize proportional
-        # for i in range(self.__tk.grid_size()[0]):
-        #     self.__tk.grid_columnconfigure(index=i, weight=1)
-        # for i in range(self.__tk.grid_size()[1]):
-        #     self.__tk.grid_rowconfigure(index=i, weight=1)
-
         # set minimal size
         self.__tk.update()
         # debug
@@ -246,22 +241,18 @@ class Gui(object):
         #                     self.__parsegeometry(self.__tk.winfo_geometry())[1])
 
     def expand_table(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Hide Value Table", command=self.collapse_table)
         self.__menu_view.entryconfigure(index=1, command=self.collapse_table)
         self.__value_table_master.grid()
 
     def collapse_table(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Show Value Table", command=self.expand_table)
         self.__menu_view.entryconfigure(index=1, command=self.expand_table)
         self.__value_table_master.grid_remove()
 
     def expand_functions(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Hide Functions", command=self.collapse_functions)
         self.__menu_view.entryconfigure(index=0, command=self.collapse_functions)
         self.__functions_master.grid()
 
     def collapse_functions(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Show Functions", command=self.expand_functions)
         self.__menu_view.entryconfigure(index=0, command=self.expand_functions)
         self.__functions_master.grid_remove()
 
@@ -288,17 +279,27 @@ class Gui(object):
             self.__menu_graph_window_selection[index].set(True)
 
     def graph_add_point(self):
-        self.__graph_window_figure.append(self.graph.create_point())
+        figure = self.graph.create_point()
+        if figure != False:
+            self.__graph_window_figure.append(figure)
 
     def graph_add_line(self):
-        self.__graph_window_figure.append(self.graph.create_line())
+        figure = self.graph.create_line()
+        if figure != False:
+            self.__graph_window_figure.append(figure)
 
     def graph_add_distance(self):
-        self.__graph_window_figure.append(self.graph.create_distance())
+        figure = self.graph.create_distance()
+        if figure != False:
+            self.__graph_window_figure.append(figure)
 
     def graph_clear_figures(self):
         for figure in self.__graph_window_figure:
-            self.graph.del_figure(figure)
+           self.graph.del_figure(figure)
+        self.__graph_window_figure = []
+
+    def graph_resize(self):
+        self.graph.restart(True)
 
     def reset_functions(self):
         self.functions.reset()
