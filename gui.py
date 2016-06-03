@@ -122,8 +122,6 @@ class Gui(object):
         self.__lbl_result_info = Label(master=self.__output, text="Result: ", bg=self.obg)
         self.__lbl_err = Label(master=self.__output, text="", bg=self.obg)
         self.__lbl_err_info = Label(master=self.__output, text="Errors: ", bg=self.obg)
-        #self.__output_expr = Frame(master=self.__output, bg="white", relief=GROOVE)
-        #self.__output_expr.grid(row=0, column=1, columnspan=2, sticky="NESW")
         
         # layout
         self.__lbl_parse_expr.grid(row=1, column=1, sticky="NES", padx=(0,20))
@@ -134,11 +132,9 @@ class Gui(object):
         self.__lbl_result_info.grid(row=3, column=0, sticky="NES")
         self.__lbl_err.grid(row=4, column=1, sticky="NESW", padx=(0,20))
         self.__lbl_err_info.grid(row=4, column=0, sticky="NES")
-        
-        self.__output.grid_columnconfigure(index=1, minsize=100, weight=1)
+
         for i in range(self.__output.grid_size()[1]):
             self.__output.grid_rowconfigure(index=i, minsize=40, weight=0)
-        #self.__output.grid_rowconfigure(index=0, minsize=100)
 
         # keypad
         self.__btn_9 = Button(master=self.__keypad, text="9", command=partial(self.press, "9")) \
@@ -178,8 +174,6 @@ class Gui(object):
         self.__btn_equals = Button(master=self.__basemathbtn, text="=", command=self.equals) \
             .grid(row=3, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW",
                   rowspan=2)
-        # self.__btn_exp = Button(master=self.__basemathbtn, text="^", command=partial(self.press, " ^ ")) \
-        #    .grid(row=1, column=1, ipadx=self.__grid_keypad_ipadx, ipady=self.__grid_keypad_ipady, sticky="NESW")
         self.__btn_clr = Button(master=self.__basemathbtn, text="C", command=self.clear, bg="orange") \
             .grid(row=0, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_clr_last = Button(master=self.__basemathbtn, text="AC", command=self.clear_last) \
@@ -231,7 +225,6 @@ class Gui(object):
                     [["asin(x)"," asin ( "],["acos(x)"," acos ( "],["atan(x)"," atan ( "],["|x|"," abs ( "],["!x"," factorial ( "],["sqrt(x)"," sqrt ( "]]]
 
         self.__additional_mathbtn = [[None for i in range(len(math_btn[0]))] for i in range(len(math_btn))]
-        #print(self.__additional_mathbtn)
         for row, array in enumerate(math_btn):
             self.__mathbtn.grid_rowconfigure(index=row, weight=1)
             for col, item in enumerate(array):
@@ -240,35 +233,6 @@ class Gui(object):
                 self.__additional_mathbtn[row][col].grid(row=row, column=col, ipadx=0,
                                                         ipady=0, sticky="NESW")
                 self.__mathbtn.grid_columnconfigure(index=col, weight=1)
-        #print(self.__additional_mathbtn)
-
-        # additional math buttons
-        # # first row
-        # self.__btn_pi = Button(master=self.__mathbtn, text="PI", command=partial(self.press, " pi ")) \
-        #     .grid(row=0, column=0, sticky="NESW")
-        # self.__btn_e = Button(master=self.__mathbtn, text="e", command=partial(self.press, " e ")) \
-        #     .grid(row=0, column=1, sticky="NESW")
-        # self.__btn_x = Button(master=self.__mathbtn, text="x", command=partial(self.press, " x ")) \
-        #     .grid(row=0, column=2, sticky="NESW")
-        # self.__btn_sqrt = Button(master=self.__mathbtn, text="sqrt()", command=partial(self.press, "sqrt ( ")) \
-        #     .grid(row=0, column=3, sticky="NESW")
-        # self.__btn_root = Button(master=self.__mathbtn, text="root()", command=partial(self.press, "root ( ")) \
-        #     .grid(row=0, column=4, sticky="NESW")
-        # self.__btn_log = Button(master=self.__mathbtn, text="log()", command=partial(self.press, "log ( ")) \
-        #     .grid(row=0, column=5, sticky="NESW")
-        # # second row
-        # self.__btn_sin = Button(master=self.__mathbtn, text="sin()", command=partial(self.press, "sin ( ")) \
-        #     .grid(row=1, column=0, sticky="NESW")
-        # self.__btn_cos = Button(master=self.__mathbtn, text="cos()", command=partial(self.press, "cos ( ")) \
-        #     .grid(row=1, column=1, sticky="NESW")
-        # self.__btn_tan = Button(master=self.__mathbtn, text="tan()", command=partial(self.press, "tan ( ")) \
-        #     .grid(row=1, column=2, sticky="NESW")
-        # self.__btn_max = Button(master=self.__mathbtn, text="max()", command=partial(self.press, "max ( ")) \
-        #     .grid(row=1, column=3, sticky="NESW")
-        # self.__btn_opbr = Button(master=self.__mathbtn, text="(", command=partial(self.press, " ( ")) \
-        #     .grid(row=1, column=4, sticky="NESW")
-        # self.__btn_clbr = Button(master=self.__mathbtn, text=")", command=partial(self.press, " ) ")) \
-        #     .grid(row=1, column=5, sticky="NESW")
 
         # saved functions
         self.functions = Function_storage(self, self.__functions_master, self.__function_count)
@@ -297,10 +261,8 @@ class Gui(object):
         # set minimal size
         self.__tk.update()
         # debug
-        for i in range(2):
-            self.__menu_view.invoke(i)
-        #self.__tk.wm_minsize(self.__parsegeometry(self.__tk.winfo_geometry())[0],
-        #                     self.__parsegeometry(self.__tk.winfo_geometry())[1])
+        #for i in range(2):
+        #    self.__menu_view.invoke(i)
 
     def expand_table(self):
         self.__menu_view.entryconfigure(index=1, command=self.collapse_table)
@@ -367,18 +329,12 @@ class Gui(object):
         self.functions.reset()
 
     def save_to(self, index=0):
-        # print("save expression \""+self.convert_list_to_string(self.__expr)+"\" to f"+str(index))
         self.functions.set_function(index, self.convert_list_to_string(self.__expr), copy.deepcopy(self.__expr))
 
     def recall(self, index):
-        # function = ["f"+str(index)]
-        # for i, item in enumerate(self.functions.get_function_list(index)):
-        #     function.append(item)
-        # print(function)
-        # self.__expr.append(function)
-        if self.functions.get_function_list(index) != []:
-            self.__expr = self.functions.get_function_list(index)
-            self.redraw()
+        for item in self.functions.get_function_list(index):
+            self.__expr.append(item)
+        self.redraw()
 
     @staticmethod
     def __parsegeometry(geometry):

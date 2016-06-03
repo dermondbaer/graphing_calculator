@@ -8,8 +8,6 @@ import decimal
 class Valuetable(object):
     def __init__(self, gui, master_frame, rows, initial_start, initial_delta):
         self.__master = master_frame
-        #self.__master.grid_columnconfigure(index=3, weight=1)
-        #self.__master.grid_rowconfigure(index=2, weight=1)
         self.__gui = gui
 
         self.__columns = 1
@@ -31,15 +29,11 @@ class Valuetable(object):
         self.__lbl_value_table_rows_info = Label(master=self.__master, text="rows:", bg=self.__gui.bg)
         self.__lbl_value_table_rows_info.grid(row=0, column=2, sticky="NES", padx=self.__gui.pad_general,
                                                pady=self.__gui.pad_general)
-        # # table columns info label
-        # self.__lbl_value_table_columns_info = Label(master=self.__master, text="columns:", bg=self.__gui.bg)
-        # self.__lbl_value_table_columns_info.grid(row=1, column=2, sticky="NES", padx=self.__gui.pad_general,
-        #                                        pady=self.__gui.pad_general)
         # register validate_command callback function
         # table delta entry
         delta = StringVar()
         self.__entry_value_table_delta = Spinbox(master=self.__master, bg=self.__gui.bg, from_=0, to=1000000,
-                                                 width=10, justify=RIGHT, cursor="XTERM", increment=0.1,
+                                                 width=10, justify=RIGHT, cursor="", increment=0.1,
                                                  validate="all", invcmd="bell", textvariable=self.__delta,
                                                  command=self.recalculate)
         vcmd_delta = (self.__master.register(self.on_validate), 0, 1000000, '%P')
@@ -50,7 +44,7 @@ class Valuetable(object):
                                                 pady=self.__gui.pad_general)
         # table start entry
         self.__entry_value_table_start = Spinbox(master=self.__master, bg=self.__gui.bg, from_=-1000000000000000,
-                                                 to=1000000000000000, width=20, justify=RIGHT, cursor="XTERM",
+                                                 to=1000000000000000, width=20, justify=RIGHT, cursor="",
                                                  validate="all", invcmd="bell", textvariable=self.__start,
                                                  command=self.recalculate)
         vcmd_start = (self.__master.register(self.on_validate), -1000000000000000, 1000000000000000, '%P')
@@ -61,7 +55,7 @@ class Valuetable(object):
                                                 pady=self.__gui.pad_general)
         # # table rows entry
         self.__entry_value_table_rows = Spinbox(master=self.__master, bg=self.__gui.bg, from_=1, to=50, width=20,
-                                                   justify=RIGHT, cursor="XTERM", validate="all",
+                                                   justify=RIGHT, cursor="", validate="all",
                                                    invcmd="bell", command=self.redraw)
         vcmd_rows = (self.__master.register(self.on_validate), 0, 50, '%P')
         self.__entry_value_table_rows['validatecommand'] = vcmd_rows
@@ -166,7 +160,6 @@ class Valuetable(object):
             except:
                 for i in range(self.__rows):
                     self.__value_table_entry[i][index].configure(text="Error")
-            # calc_function(calc_expression())
             for i in range(self.__rows):
                 try:
                     self.__value_table_entry[i][index].configure(text=calc_function(function, dict(
