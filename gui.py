@@ -9,6 +9,7 @@ from value_table import *
 from function_storage import *
 from geometry_tool.coordinate_system import *
 import re
+import copy
 
 
 class Gui(object):
@@ -17,6 +18,9 @@ class Gui(object):
         self.__main = main
         self.__parse_expr = ""
         self.__expr = []
+        self.__result = ""
+        self.__err = ""
+        self.__postfix_expr = ""
 
         # calculator setup
         self.calc = Calculator()
@@ -27,6 +31,7 @@ class Gui(object):
         self.grid_keypad_ipady = 25
         self.pad_general = 5
         self.bg = "grey"
+        self.obg = "white"
         self.__function_count = 10
         
         # root window
@@ -60,8 +65,8 @@ class Gui(object):
         self.__functions_master = Frame(master=self.__tk, bg=self.bg, relief=GROOVE, borderwidth=2)
         self.__functions_master.grid(row=1, column=3, padx=self.pad_general, pady=self.pad_general, sticky="NESW",
                                        rowspan=2)
-        self.__output = Frame(master=self.__tk, bg=self.bg, relief=GROOVE)
-        self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NEW")
+        self.__output = Frame(master=self.__tk, bg=self.obg, relief=GROOVE)
+        self.__output.grid(row=0, column=1, padx=(15, 15), pady=(10, self.pad_general), columnspan=2, sticky="NESW")
 
         self.__keypad = Frame(master=self.__tk, bg="blue")
         self.__keypad.grid(row=2, column=1, padx=self.pad_general, pady=self.pad_general, sticky="NESW")
@@ -100,7 +105,8 @@ class Gui(object):
         self.__menu_graph_window_add_figure.add_separator()
         self.__menu_graph_window_add_figure.add_command(label="Clear all figures", command=self.graph_clear_figures)
         self.__menu_graph_window.add_cascade(label="Draw...", menu=self.__menu_graph_window_add_figure)
-
+        # Resize Menu
+        self.__menu_graph_window.add_command(label="Resize...", command=self.graph_resize)
         self.__graph_window.configure(menu=self.__menu_graph_window)
         self.graph = CoordinateSystem(self.__graph_window, 600, 600, 10, 10)
         # reference to the drawn figures
@@ -108,31 +114,27 @@ class Gui(object):
         self.__graph_window_figure = []
 
         # output
-        self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_parse_expr_info = Label(master=self.__output, text="Current expression: ", bg=self.bg)
-        self.__lbl_postf_expr = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_postf_expr_info = Label(master=self.__output, text="Postfix notation: ", bg=self.bg)
-        self.__lbl_result = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_result_info = Label(master=self.__output, text="Result: ", bg=self.bg)
-        self.__lbl_err = Label(master=self.__output, text="", bg=self.bg)
-        self.__lbl_err_info = Label(master=self.__output, text="Errors: ", bg=self.bg)
-        self.__output_expr = Frame(master=self.__output, bg="white", relief=GROOVE)
-        self.__output_expr.grid(row=0, column=1, columnspan=2, sticky="NESW")
+        self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_parse_expr_info = Label(master=self.__output, text="Current expression: ", bg=self.obg)
+        self.__lbl_postf_expr = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_postf_expr_info = Label(master=self.__output, text="Postfix notation: ", bg=self.obg)
+        self.__lbl_result = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_result_info = Label(master=self.__output, text="Result: ", bg=self.obg)
+        self.__lbl_err = Label(master=self.__output, text="", bg=self.obg)
+        self.__lbl_err_info = Label(master=self.__output, text="Errors: ", bg=self.obg)
         
         # layout
-        self.__lbl_parse_expr.grid(row=1, column=1, sticky="NES")
-        self.__lbl_parse_expr_info.grid(row=1, column=0, sticky="NES")
-        self.__lbl_postf_expr.grid(row=2, column=1, sticky="NES")
+        self.__lbl_parse_expr.grid(row=1, column=1, sticky="NES", padx=(0,20))
+        self.__lbl_parse_expr_info.grid(row=1, column=0, sticky="NES", padx=(20,0))
+        self.__lbl_postf_expr.grid(row=2, column=1, sticky="NES", padx=(0,20))
         self.__lbl_postf_expr_info.grid(row=2, column=0, sticky="NES")
-        self.__lbl_result.grid(row=3, column=1, sticky="NES")
+        self.__lbl_result.grid(row=3, column=1, sticky="NES", padx=(0,20))
         self.__lbl_result_info.grid(row=3, column=0, sticky="NES")
-        self.__lbl_err.grid(row=4, column=1, sticky="NESW")
+        self.__lbl_err.grid(row=4, column=1, sticky="NESW", padx=(0,20))
         self.__lbl_err_info.grid(row=4, column=0, sticky="NES")
-        
-        self.__output.grid_columnconfigure(index=1, minsize=100, weight=1)
+
         for i in range(self.__output.grid_size()[1]):
-            self.__output.grid_rowconfigure(index=i, minsize=40, weight=1)
-        self.__output.grid_rowconfigure(index=0, minsize=200)
+            self.__output.grid_rowconfigure(index=i, minsize=40, weight=0)
 
         # keypad
         self.__btn_9 = Button(master=self.__keypad, text="9", command=partial(self.press, "9")) \
@@ -162,50 +164,75 @@ class Gui(object):
         
         # base math buttons
         self.__btn_divide = Button(self.__basemathbtn, text="/", command=partial(self.press, " / ")) \
-            .grid(row=0, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+            .grid(row=2, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_multiply = Button(self.__basemathbtn, text="*", command=partial(self.press, " * ")) \
-            .grid(row=1, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+            .grid(row=1, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_subtract = Button(self.__basemathbtn, text="-", command=partial(self.press, " - ")) \
             .grid(row=2, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_add = Button(self.__basemathbtn, text="+", command=partial(self.press, " + ")) \
-            .grid(row=3, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+            .grid(row=1, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_equals = Button(master=self.__basemathbtn, text="=", command=self.equals) \
-            .grid(row=2, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW",
+            .grid(row=3, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW",
                   rowspan=2)
-        # self.__btn_exp = Button(master=self.__basemathbtn, text="^", command=partial(self.press, " ^ ")) \
-        #    .grid(row=1, column=1, ipadx=self.__grid_keypad_ipadx, ipady=self.__grid_keypad_ipady, sticky="NESW")
         self.__btn_clr = Button(master=self.__basemathbtn, text="C", command=self.clear, bg="orange") \
             .grid(row=0, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_clr_last = Button(master=self.__basemathbtn, text="AC", command=self.clear_last) \
-            .grid(row=1, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
-        
-        # additional math buttons
-        # first row
-        self.__btn_pi = Button(master=self.__mathbtn, text="PI", command=partial(self.press, " pi ")) \
+            .grid(row=0, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+        self.__btn_comma = Button(self.__basemathbtn, text=",", command=partial(self.press, " , ")) \
+            .grid(row=3, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+        self.__btn_parenthesis_frame = Frame(self.__basemathbtn, bg="grey")
+        self.__btn_parenthesis_frame.grid(row=4, column=0, sticky="NESW")
+        self.__btn_parenthesis_frame.grid_columnconfigure(index=0, weight=1)
+        self.__btn_parenthesis_frame.grid_columnconfigure(index=1, weight=1)
+        self.__btn_parenthesis_frame.grid_rowconfigure(index=0, weight=1)
+        self.__btn_opening_paren = Button(self.__btn_parenthesis_frame, text="(", command=partial(self.press, " ( ")) \
             .grid(row=0, column=0, sticky="NESW")
-        self.__btn_e = Button(master=self.__mathbtn, text="e", command=partial(self.press, " e ")) \
+        self.__btn_closing_paren = Button(self.__btn_parenthesis_frame, text=")", command=partial(self.press, " ) ")) \
             .grid(row=0, column=1, sticky="NESW")
-        self.__btn_x = Button(master=self.__mathbtn, text="x", command=partial(self.press, " x ")) \
-            .grid(row=0, column=2, sticky="NESW")
-        self.__btn_sqrt = Button(master=self.__mathbtn, text="sqrt()", command=partial(self.press, "sqrt ( ")) \
-            .grid(row=0, column=3, sticky="NESW")
-        self.__btn_root = Button(master=self.__mathbtn, text="root()", command=partial(self.press, "root ( ")) \
-            .grid(row=0, column=4, sticky="NESW")
-        self.__btn_log = Button(master=self.__mathbtn, text="log()", command=partial(self.press, "log ( ")) \
-            .grid(row=0, column=5, sticky="NESW")
-        # second row
-        self.__btn_sin = Button(master=self.__mathbtn, text="sin()", command=partial(self.press, "sin ( ")) \
-            .grid(row=1, column=0, sticky="NESW")
-        self.__btn_cos = Button(master=self.__mathbtn, text="cos()", command=partial(self.press, "cos ( ")) \
-            .grid(row=1, column=1, sticky="NESW")
-        self.__btn_tan = Button(master=self.__mathbtn, text="tan()", command=partial(self.press, "tan ( ")) \
-            .grid(row=1, column=2, sticky="NESW")
-        self.__btn_max = Button(master=self.__mathbtn, text="max()", command=partial(self.press, "max ( ")) \
-            .grid(row=1, column=3, sticky="NESW")
-        self.__btn_opbr = Button(master=self.__mathbtn, text="(", command=partial(self.press, " ( ")) \
-            .grid(row=1, column=4, sticky="NESW")
-        self.__btn_clbr = Button(master=self.__mathbtn, text=")", command=partial(self.press, " ) ")) \
-            .grid(row=1, column=5, sticky="NESW")
+
+        # dropdown menu with saved functions
+        self.__menu_functions = Menu(master=self.__menu, tearoff=0)
+        for i in range(self.__function_count):
+            self.__menu_functions.add_command(label="function "+str(i), command=partial(self.recall, i))
+        self.__menu.add_cascade(label="Recall Function", menu=self.__menu_functions)
+
+        # dropdown menu with mathematical functions
+        self.__menu_math_functions = Menu(master=self.__menu, tearoff=0)
+        self.__menu_math_functions.add_command(label="sinh( x )", command=partial(self.press, " sinh ( "))
+        self.__menu_math_functions.add_command(label="asinh( x )", command=partial(self.press, " asinh ( "))
+        self.__menu_math_functions.add_command(label="cosh( x )", command=partial(self.press, " cosh ( "))
+        self.__menu_math_functions.add_command(label="acosh( x )", command=partial(self.press, " acosh ( "))
+        self.__menu_math_functions.add_command(label="tanh( x )", command=partial(self.press, " tanh ( "))
+        self.__menu_math_functions.add_command(label="atanh( x )", command=partial(self.press, " atanh ( "))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="log2( x )", command=partial(self.press, " log2 ( "))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="ncr( x )", command=partial(self.press, " ncr ( "))
+        self.__menu_math_functions.add_command(label="npr( x )", command=partial(self.press, " npr ( "))
+        self.__menu_math_functions.add_command(label="binompdf( n, p, k )", command=partial(self.press, " binompdf ( "))
+        self.__menu_math_functions.add_command(label="binomcdf( n, p, k )", command=partial(self.press, " binomcdf ( "))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="min( a, b )", command=partial(self.press, " min ( "))
+        self.__menu_math_functions.add_command(label="max( a, b )", command=partial(self.press, " max ( "))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="nderiv( f(x), x )", command=partial(self.press, " nderiv ( "))
+        self.__menu_math_functions.add_command(label="fnint( f(x), a, b )", command=partial(self.press, " fnint ( "))
+        self.__menu.add_cascade(label="Mathematical Functions", menu=self.__menu_math_functions)
+
+        # additional math buttons
+        math_btn = [[["radian(x)"," radians ( "], ["degree(x)"," degrees ( "], ["PI", " pi "],["e"," e "], ["log( x, n )"," log ( "], ["x"," x "]],
+                    [["sin(x)"," sin ( "],["cos(x)"," cos ( "],["tan(x)"," tan ( "],["log10(x)"," log10 ( "],["ln(x)"," ln ( "],["^", " ^ "]],
+                    [["asin(x)"," asin ( "],["acos(x)"," acos ( "],["atan(x)"," atan ( "],["|x|"," abs ( "],["!x"," factorial ( "],["sqrt(x)"," sqrt ( "]]]
+
+        self.__additional_mathbtn = [[None for i in range(len(math_btn[0]))] for i in range(len(math_btn))]
+        for row, array in enumerate(math_btn):
+            self.__mathbtn.grid_rowconfigure(index=row, weight=1)
+            for col, item in enumerate(array):
+                self.__additional_mathbtn[row][col] = Button(self.__mathbtn, text=math_btn[row][col][0],
+                                                            command=partial(self.press, math_btn[row][col][1]))
+                self.__additional_mathbtn[row][col].grid(row=row, column=col, ipadx=0,
+                                                        ipady=0, sticky="NESW")
+                self.__mathbtn.grid_columnconfigure(index=col, weight=1)
 
         # saved functions
         self.functions = Function_storage(self, self.__functions_master, self.__function_count)
@@ -219,7 +246,7 @@ class Gui(object):
 
         # fill up space
         for i in range(self.__mathbtn.grid_size()[0]):
-            self.__mathbtn.grid_columnconfigure(index=i, minsize=50, weight=1)
+            self.__mathbtn.grid_columnconfigure(index=i, minsize=80, weight=1)
         for i in range(self.__mathbtn.grid_size()[1]):
             self.__mathbtn.grid_rowconfigure(index=i, minsize=50, weight=1)
         for i in range(self.__keypad.grid_size()[0]):
@@ -227,41 +254,29 @@ class Gui(object):
         for i in range(self.__keypad.grid_size()[1]):
             self.__keypad.grid_rowconfigure(index=i, minsize=50, weight=1)
         for i in range(self.__basemathbtn.grid_size()[0]):
-            self.__basemathbtn.grid_columnconfigure(index=i, minsize=50, weight=1)
+            self.__basemathbtn.grid_columnconfigure(index=i, minsize=60, weight=1)
         for i in range(self.__basemathbtn.grid_size()[1]):
-            self.__basemathbtn.grid_rowconfigure(index=i, minsize=50, weight=1)
-
-        # resize proportional
-        # for i in range(self.__tk.grid_size()[0]):
-        #     self.__tk.grid_columnconfigure(index=i, weight=1)
-        # for i in range(self.__tk.grid_size()[1]):
-        #     self.__tk.grid_rowconfigure(index=i, weight=1)
+            self.__basemathbtn.grid_rowconfigure(index=i, minsize=70, weight=1)
 
         # set minimal size
         self.__tk.update()
         # debug
-        for i in range(2):
-            self.__menu_view.invoke(i)
-        #self.__tk.wm_minsize(self.__parsegeometry(self.__tk.winfo_geometry())[0],
-        #                     self.__parsegeometry(self.__tk.winfo_geometry())[1])
+        #for i in range(2):
+        #    self.__menu_view.invoke(i)
 
     def expand_table(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Hide Value Table", command=self.collapse_table)
         self.__menu_view.entryconfigure(index=1, command=self.collapse_table)
         self.__value_table_master.grid()
 
     def collapse_table(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_table_index, label="Show Value Table", command=self.expand_table)
         self.__menu_view.entryconfigure(index=1, command=self.expand_table)
         self.__value_table_master.grid_remove()
 
     def expand_functions(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Hide Functions", command=self.collapse_functions)
         self.__menu_view.entryconfigure(index=0, command=self.collapse_functions)
         self.__functions_master.grid()
 
     def collapse_functions(self):
-        #self.__menu.entryconfigure(index=self.__show_hide_functions_index, label="Show Functions", command=self.expand_functions)
         self.__menu_view.entryconfigure(index=0, command=self.expand_functions)
         self.__functions_master.grid_remove()
 
@@ -288,24 +303,38 @@ class Gui(object):
             self.__menu_graph_window_selection[index].set(True)
 
     def graph_add_point(self):
-        self.__graph_window_figure.append(self.graph.create_point())
+        figure = self.graph.create_point()
+        if figure != False:
+            self.__graph_window_figure.append(figure)
 
     def graph_add_line(self):
-        self.__graph_window_figure.append(self.graph.create_line())
+        figure = self.graph.create_line()
+        if figure != False:
+            self.__graph_window_figure.append(figure)
 
     def graph_add_distance(self):
-        self.__graph_window_figure.append(self.graph.create_distance())
+        figure = self.graph.create_distance()
+        if figure != False:
+            self.__graph_window_figure.append(figure)
 
     def graph_clear_figures(self):
         for figure in self.__graph_window_figure:
-            self.graph.del_figure(figure)
+           self.graph.del_figure(figure)
+        self.__graph_window_figure = []
+
+    def graph_resize(self):
+        self.graph.restart(True)
 
     def reset_functions(self):
         self.functions.reset()
 
     def save_to(self, index=0):
-        print("save expression \""+self.convert_list_to_string(self.__expr)+"\" to f"+str(index))
-        self.functions.set_function(index, self.convert_list_to_string(self.__expr))
+        self.functions.set_function(index, self.convert_list_to_string(self.__expr), copy.deepcopy(self.__expr))
+
+    def recall(self, index):
+        for item in self.functions.get_function_list(index):
+            self.__expr.append(item)
+        self.redraw()
 
     @staticmethod
     def __parsegeometry(geometry):
@@ -329,19 +358,23 @@ class Gui(object):
 
     def press(self, value):
         self.__expr.append(value)
-        self.__lbl_parse_expr.configure(text=self.convert_list_to_string(self.__expr))
+        self.redraw()
 
     def clear(self):
         self.__parse_expr = ""
         self.__expr.clear()
-        self.__lbl_parse_expr.configure(text="")
-        self.__lbl_postf_expr.configure(text="")
-        self.__lbl_result.configure(text="")
+        self.__postfix_expr = ""
+        self.__result = ""
+        self.__err = ""
+        self.redraw()
 
     def clear_last(self):
         if not len(self.__expr) == 0:
             self.__expr.pop()
-            self.__lbl_parse_expr.configure(text=self.convert_list_to_string(self.__expr))
+        self.__err = ""
+        self.__postfix_expr = ""
+        self.__result = ""
+        self.redraw()
 
     @staticmethod
     def is_numeral(value):
@@ -353,22 +386,52 @@ class Gui(object):
     def equals(self):
         try:
             expr = self.convert_list_to_string(self.__expr)
-            tmp = self.calc.make_expression_postfix(expr)
-            self.__lbl_postf_expr.configure(text=tmp)
-
+            self.__postfix_expr = self.calc.make_expression_postfix(expr)
+            expr = self.convert_list_to_expr(self.__expr)
             result = self.calc.calculate_expression(expr)
-            self.__lbl_result.configure(text=str(result.to_string()))
-            self.__lbl_err.configure(text="")
+            self.__result=str(result.to_string())
+            self.__err = ""
+            self.redraw()
         except ValueError:
-            self.__lbl_err.configure(text="Syntax isn't correct; check your parenthesis!")
-            self.__lbl_postf_expr.configure(text="")
+            self.__err = "Syntax isn't correct; check your parenthesis!"
+            self.__postfix_expr = ""
+            self.redraw()
+        except ZeroDivisionError:
+            self.__err = "Division by Zero!"
+            self.__postfix_expr = ""
+            self.redraw()
+        except:
+            self.__err = "Error - check your Input!"
+            self.__postfix_expr = ""
+            self.redraw()
 
     def render_expression(self):
         pass
+
+    def redraw(self):
+        self.__lbl_parse_expr.configure(text=self.convert_list_to_string(self.__expr))
+        self.__lbl_result.configure(text=self.__result)
+        self.__lbl_postf_expr.configure(text=self.__postfix_expr)
+        self.__lbl_err.configure(text=self.__err)
 
     @staticmethod
     def convert_list_to_string(list_):
         string = ""
         for item in list_:
-            string += item
+            if type(item) == str:
+                string += item
+            elif type(item) == list:
+                string += item[0]
+        return string
+
+    @staticmethod
+    def convert_list_to_expr(list_):
+        string= ""
+        for item in list_:
+            if type(item) == str:
+                string += item
+            elif type(item) == list:
+                for i in range(1, len(item)):
+                    string += item[i]
+        #print(string)
         return string
