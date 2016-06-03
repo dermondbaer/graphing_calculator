@@ -76,7 +76,7 @@ class CoordinateSystem(Frame):
         # self.__master.config(menu=self.__menu)
 
         # Creating the CoordinateSystemCanvas.
-        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, master, absolute_size)
+        self.__coordinate_system_canvas = CoordinateSystemCanvas(self, absolute_size)
 
     def start(self):
         """Calls the mainloop for this CoordinateSystem."""
@@ -152,6 +152,15 @@ class CoordinateSystem(Frame):
             for tkinter_object in figure.get_tkinter_objects():
                 self.__coordinate_system_canvas.del_tkinter_object(tkinter_object)
         self.__figures = []
+
+    def clear_non_graph_figures(self):
+        """Removes all figures from the CoordinateSystem, wich are no function graphs."""
+        figure_list = self.__figures
+        for figure in figure_list:
+            if type(figure) != Function:
+                self.__figures.remove(figure)
+                for tkinter_object in figure.get_tkinter_objects():
+                    self.__coordinate_system_canvas.del_tkinter_object(tkinter_object)
 
     def get_default_unit_count(self):
         """Returns the default number of units on the x-and y-axis."""
@@ -268,7 +277,8 @@ class InputDialog(object):
         :type displayed_size: tuple
         """
         displayed_size_x, displayed_size_y = displayed_size
-        neg_x, pos_x, neg_y, pos_y = displayed_size_x, displayed_size_y
+        neg_x, pos_x = displayed_size_x
+        neg_y, pos_y = displayed_size_y
         display_list = list((neg_x, pos_x, neg_y, pos_y))
 
         for index, item in enumerate(display_list):
@@ -292,13 +302,13 @@ class InputDialog(object):
                 input_pos_x.delete(0, END)
 
             negative_y = self.validate_axis_size(input_neg_y)
-            positive_x = self.validate_axis_size(input_pos_y)
-            if negative_y and positive_x:
+            positive_y = self.validate_axis_size(input_pos_y)
+            if negative_y and positive_y:
                 y = True
             if not negative_y:
                 input_neg_y.delete(0, END)
                 y = False
-            if not positive_x:
+            if not positive_y:
                 input_pos_y.delete(0, END)
                 y = False
 
@@ -309,8 +319,8 @@ class InputDialog(object):
                 self.__size_x = (negative_x, positive_x)
 
                 negative_y = -abs(Calculator.calculate_function_value(negative_y, {}))
-                positive_x = abs(Calculator.calculate_function_value(positive_x, {}))
-                self.__size_y = (negative_y, positive_x)
+                positive_y = abs(Calculator.calculate_function_value(positive_y, {}))
+                self.__size_y = (negative_y, positive_y)
 
                 # Then destroy the tkinter master.
                 master.destroy()
