@@ -12,7 +12,7 @@ class TestApplication(Calculator, CoordinateSystem):
         Calculator.__init__(self)
         self.__master = Tk()
         self.__master.resizable(0, 0)
-        CoordinateSystem.__init__(self, self.__master, target_size_x=900, target_size_y=900)
+        CoordinateSystem.__init__(self, self.__master, target_size_x=900, target_size_y=900, debug=True)
 
         # Creating a menu bar.
         self.__menu = Menu(master=self)
