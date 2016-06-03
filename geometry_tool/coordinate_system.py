@@ -156,8 +156,8 @@ class CoordinateSystem(Frame):
         self.__figures = []
 
     def clear_non_graph_figures(self):
-        """Removes all figures from the CoordinateSystem, wich are no function graphs."""
-        figure_list = self.__figures
+        """Removes all figures from the CoordinateSystem, which are no function graphs."""
+        figure_list = self.__figures[:]
         for figure in figure_list:
             if type(figure) != Function:
                 self.__figures.remove(figure)
