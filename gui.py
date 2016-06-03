@@ -167,22 +167,24 @@ class Gui(object):
         
         # base math buttons
         self.__btn_divide = Button(self.__basemathbtn, text="/", command=partial(self.press, " / ")) \
-            .grid(row=0, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+            .grid(row=2, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_multiply = Button(self.__basemathbtn, text="*", command=partial(self.press, " * ")) \
-            .grid(row=1, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+            .grid(row=1, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_subtract = Button(self.__basemathbtn, text="-", command=partial(self.press, " - ")) \
             .grid(row=2, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_add = Button(self.__basemathbtn, text="+", command=partial(self.press, " + ")) \
-            .grid(row=3, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+            .grid(row=1, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_equals = Button(master=self.__basemathbtn, text="=", command=self.equals) \
-            .grid(row=2, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW",
-                  rowspan=2)
+            .grid(row=3, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW",
+                  rowspan=1)
         # self.__btn_exp = Button(master=self.__basemathbtn, text="^", command=partial(self.press, " ^ ")) \
         #    .grid(row=1, column=1, ipadx=self.__grid_keypad_ipadx, ipady=self.__grid_keypad_ipady, sticky="NESW")
         self.__btn_clr = Button(master=self.__basemathbtn, text="C", command=self.clear, bg="orange") \
             .grid(row=0, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_clr_last = Button(master=self.__basemathbtn, text="AC", command=self.clear_last) \
-            .grid(row=1, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+            .grid(row=0, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
+        self.__btn_comma = Button(self.__basemathbtn, text=",", command=partial(self.press, " , ")) \
+            .grid(row=3, column=0, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
 
         # dropdown menu with saved functions
         self.__menu_functions = Menu(master=self.__menu, tearoff=0)
@@ -210,6 +212,9 @@ class Gui(object):
         self.__menu_math_functions.add_command(label="nderiv( f(x), x )", command=partial(self.press, " nderiv ("))
         self.__menu_math_functions.add_command(label="fnint( f(x), a, b )", command=partial(self.press, " fnint ("))
         self.__menu.add_cascade(label="Mathematical Functions", menu=self.__menu_math_functions)
+
+        # additional math buttons
+        math_btn = [[]]
 
         # additional math buttons
         # # first row
@@ -345,8 +350,9 @@ class Gui(object):
         #     function.append(item)
         # print(function)
         # self.__expr.append(function)
-        self.__expr = self.functions.get_function_list(index)
-        self.redraw()
+        if self.functions.get_function_list(index) != []:
+            self.__expr = self.functions.get_function_list(index)
+            self.redraw()
 
     @staticmethod
     def __parsegeometry(geometry):
