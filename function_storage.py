@@ -3,6 +3,7 @@
 # function storage
 
 from tkinter import *
+import copy
 
 class Function_storage(object):
 
@@ -57,10 +58,11 @@ class Function_storage(object):
         return self.__function[index]
 
     def get_function_list(self, index):
-        return self.__function_list[index]
+        return copy.deepcopy(self.__function_list[index])
 
-    def set_function(self, index, function=""):
+    def set_function(self, index, function="", function_list=[]):
         self.__function[index] = function
+        self.__function_list[index] = function_list
         # for i in range(self.__function_count):
         #     self.__lbl_function_storage[i].configure(text=function)
         self.__lbl_function_storage[index].configure(text=function)

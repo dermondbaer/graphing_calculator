@@ -9,6 +9,7 @@ from value_table import *
 from function_storage import *
 from geometry_tool.coordinate_system import *
 import re
+import copy
 
 
 class Gui(object):
@@ -17,6 +18,9 @@ class Gui(object):
         self.__main = main
         self.__parse_expr = ""
         self.__expr = []
+        self.__result = ""
+        self.__err = ""
+        self.__postfix_expr = ""
 
         # calculator setup
         self.calc = Calculator()
@@ -184,7 +188,7 @@ class Gui(object):
         self.__menu_functions = Menu(master=self.__menu, tearoff=0)
         for i in range(self.__function_count):
             self.__menu_functions.add_command(label="function "+str(i), command=partial(self.recall, i))
-        self.__menu.add_cascade(label="Recall Functions", menu=self.__menu_functions)
+        self.__menu.add_cascade(label="Recall Function", menu=self.__menu_functions)
 
         # dropdown menu with mathematical functions
         self.__menu_math_functions = Menu(master=self.__menu, tearoff=0)
@@ -333,12 +337,16 @@ class Gui(object):
 
     def save_to(self, index=0):
         print("save expression \""+self.convert_list_to_string(self.__expr)+"\" to f"+str(index))
-        self.functions.set_function(index, self.convert_list_to_string(self.__expr))
+        self.functions.set_function(index, self.convert_list_to_string(self.__expr), copy.deepcopy(self.__expr))
 
     def recall(self, index):
-        function = ["f"+str(index)]
-        for i, item in enumerate(self.functions.get_function(index).)
-        print(function)
+        # function = ["f"+str(index)]
+        # for i, item in enumerate(self.functions.get_function_list(index)):
+        #     function.append(item)
+        # print(function)
+        # self.__expr.append(function)
+        self.__expr = self.functions.get_function_list(index)
+        self.redraw()
 
     @staticmethod
     def __parsegeometry(geometry):
@@ -362,19 +370,20 @@ class Gui(object):
 
     def press(self, value):
         self.__expr.append(value)
-        self.__lbl_parse_expr.configure(text=self.convert_list_to_string(self.__expr))
+        self.redraw()
 
     def clear(self):
         self.__parse_expr = ""
         self.__expr.clear()
-        self.__lbl_parse_expr.configure(text="")
-        self.__lbl_postf_expr.configure(text="")
-        self.__lbl_result.configure(text="")
+        self.__postfix_expr = ""
+        self.__result = ""
+        self.__err = ""
+        self.redraw()
 
     def clear_last(self):
         if not len(self.__expr) == 0:
             self.__expr.pop()
-            self.__lbl_parse_expr.configure(text=self.convert_list_to_string(self.__expr))
+            self.redraw()
 
     @staticmethod
     def is_numeral(value):
@@ -386,22 +395,46 @@ class Gui(object):
     def equals(self):
         try:
             expr = self.convert_list_to_string(self.__expr)
-            tmp = self.calc.make_expression_postfix(expr)
-            self.__lbl_postf_expr.configure(text=tmp)
-
+            self.__postfix_expr = self.calc.make_expression_postfix(expr)
+            expr = self.convert_list_to_expr(self.__expr)
             result = self.calc.calculate_expression(expr)
-            self.__lbl_result.configure(text=str(result.to_string()))
-            self.__lbl_err.configure(text="")
+            self.__result=str(result.to_string())
+            self.__err = ""
+            self.redraw()
         except ValueError:
-            self.__lbl_err.configure(text="Syntax isn't correct; check your parenthesis!")
-            self.__lbl_postf_expr.configure(text="")
+            self.__err = "Syntax isn't correct; check your parenthesis!"
+            self.__postfix_expr = ""
+            self.redraw()
+        except ZeroDivisionError:
+            pass
 
     def render_expression(self):
         pass
+
+    def redraw(self):
+        self.__lbl_parse_expr.configure(text=self.convert_list_to_string(self.__expr))
+        self.__lbl_result.configure(text=self.__result)
+        self.__lbl_postf_expr.configure(text=self.__postfix_expr)
+        self.__lbl_err.configure(text=self.__err)
 
     @staticmethod
     def convert_list_to_string(list_):
         string = ""
         for item in list_:
-            string += item
+            if type(item) == str:
+                string += item
+            elif type(item) == list:
+                string += item[0]
+        return string
+
+    @staticmethod
+    def convert_list_to_expr(list_):
+        string= ""
+        for item in list_:
+            if type(item) == str:
+                string += item
+            elif type(item) == list:
+                for i in range(1, len(item)):
+                    string += item[i]
+        print(string)
         return string
