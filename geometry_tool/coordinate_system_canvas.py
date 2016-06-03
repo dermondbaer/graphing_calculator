@@ -8,13 +8,13 @@ from math_calculator import Calculator
 
 
 class CoordinateSystemCanvas(Canvas):
-    def __init__(self, coordinate_system, axis_size):
+    def __init__(self, coordinate_system, master, axis_size):
         """
         :arg coordinate_system: The CoordinateSystem, this Canvas belongs to.
         :arg axis_size: The absolute axis size of this CoordinateSystemCanvas.
         """
         self.__coordinate_system = coordinate_system
-        self.__master = coordinate_system
+        self.__master = master
         self.__calculator = Calculator()
 
         self.__axis_size = axis_size
@@ -43,7 +43,7 @@ class CoordinateSystemCanvas(Canvas):
 
         # When the mouse is moved, the set_mouse_position function is being executed.
         self.bind('<Motion>', set_mouse_position)
-        self.pack()
+        self.grid()
 
         # Draw the lines, representing the x-and y-axis.
         self.create_line((abs(neg_size_x), 0), (abs(neg_size_x), canvas_height))

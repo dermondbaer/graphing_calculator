@@ -5,6 +5,7 @@
 from tkinter import *
 
 class Function_storage(object):
+
     def __init__(self, gui, master_frame, function_count):
         self.__master = master_frame
         self.__gui = gui
@@ -46,7 +47,6 @@ class Function_storage(object):
                 self.__entry_selection[i].deselect()
         # get the value table to update
         self.__gui.value_table.set_columns(functions)
-        self.__gui.value_table.redraw()
 
     def get_function(self, index):
         return self.__function[index]
