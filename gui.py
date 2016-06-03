@@ -84,6 +84,7 @@ class Gui(object):
         self.__graph_window.wm_protocol("WM_DELETE_WINDOW", partial(self.__menu_view.invoke, 2))
         # menu of the child window
         self.__menu_graph_window = Menu(master=self.__graph_window, tearoff=0)
+        # dropdown selection menu
         self.__menu_graph_window_selection = Menu(master=self.__graph_window, tearoff=0)
         self.__graph_window_selection = [BooleanVar() for i in range(self.__function_count)]
         for index in range(self.__function_count):
@@ -91,9 +92,20 @@ class Gui(object):
                                                                command=partial(self.display_func, index),
                                                                variable=self.__graph_window_selection[index])
         self.__menu_graph_window.add_cascade(label="Select Functions...", menu=self.__menu_graph_window_selection)
+        # dropdown "add figure" menu
+        self.__menu_graph_window_add_figure = Menu(master=self.__graph_window, tearoff=0)
+        self.__menu_graph_window_add_figure.add_command(label="Add point...", command=self.graph_add_point)
+        self.__menu_graph_window_add_figure.add_command(label="Add line...", command=self.graph_add_line)
+        self.__menu_graph_window_add_figure.add_command(label="Add line segment...", command=self.graph_add_distance)
+        self.__menu_graph_window_add_figure.add_separator()
+        self.__menu_graph_window_add_figure.add_command(label="Clear all figures", command=self.graph_clear_figures)
+        self.__menu_graph_window.add_cascade(label="Draw...", menu=self.__menu_graph_window_add_figure)
+
         self.__graph_window.configure(menu=self.__menu_graph_window)
-        self.__graph = CoordinateSystem(self.__graph_window, 600, 600)
+        self.graph = CoordinateSystem(self.__graph_window, 600, 600, 10, 10)
+        # reference to the drawn figures
         self.__graph_window_function = [None for i in range(self.__function_count)]
+        self.__graph_window_figure = []
 
         # output
         self.__lbl_parse_expr = Label(master=self.__output, text="", bg=self.bg)
@@ -263,17 +275,30 @@ class Gui(object):
 
     def display_func(self, index):
         if  self.functions.get_function(index) != "":
-            self.__graph_window_function[index] = self.__graph.create_function_graph(self.functions.get_function(index))
+            self.__graph_window_function[index] = self.graph.create_function_graph(self.functions.get_function(index))
             self.__menu_graph_window_selection.entryconfigure(index=index, command=partial(self.hide_func, index))
         else:
             self.__graph_window_selection[index].set(False)
 
     def hide_func(self, index):
         if self.__graph_window_function[index] != None:
-            self.__graph.del_figure(self.__graph_window_function[index])
+            self.graph.del_figure(self.__graph_window_function[index])
             self.__menu_graph_window_selection.entryconfigure(index=index, command=partial(self.display_func, index))
         else:
             self.__menu_graph_window_selection[index].set(True)
+
+    def graph_add_point(self):
+        pass
+
+    def graph_add_line(self):
+        pass
+
+    def graph_add_distance(self):
+        pass
+
+    def graph_clear_figures(self):
+        for figure in self.__graph_window_figure:
+            self.graph.del_figure(figure)
 
     def reset_functions(self):
         self.functions.reset()
