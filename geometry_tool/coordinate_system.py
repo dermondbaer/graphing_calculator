@@ -1,5 +1,6 @@
 #   Pascal Mehnert
 #   19.05.2016
+#   A class inherited from the tkinter Frame, used to communicate between the program and the Canvas.
 #   V 1.0
 
 from tkinter import *

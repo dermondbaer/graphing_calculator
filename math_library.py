@@ -1,7 +1,7 @@
 # Max T.
 # 23.04.2016
 # Collection of mathematical functions, using decimals instead of floats.
-# V 1.0
+# V 2.0
 
 import math
 import builtins

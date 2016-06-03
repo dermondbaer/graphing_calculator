@@ -1,7 +1,7 @@
 # Pascal Mehnert
 # 03.06.2016
 # Dialogs used to input figure information.
-# V 0.1
+# V 1.0
 
 from tkinter import *
 import math_calculator
