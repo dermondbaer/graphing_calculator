@@ -9,13 +9,13 @@ from math_calculator import Calculator
 
 
 class CoordinateSystemCanvas(Canvas):
-    def __init__(self, coordinate_system, master, axis_size):
+    def __init__(self, coordinate_system, axis_size):
         """
         :arg coordinate_system: The CoordinateSystem, this Canvas belongs to.
         :arg axis_size: The absolute axis size of this CoordinateSystemCanvas.
         """
         self.__coordinate_system = coordinate_system
-        self.__master = master
+        self.__master = coordinate_system
         self.__calculator = Calculator()
 
         self.__axis_size = axis_size
