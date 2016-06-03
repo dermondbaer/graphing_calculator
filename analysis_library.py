@@ -1,7 +1,7 @@
 # Max T.
 # 19.05.2016
-# Collection of differential functions, using decimals.
-# V 0.1
+# Collection of analysis functions, using decimals.
+# V 1.0
 
 import math_calculator as c
 from decimal import *
