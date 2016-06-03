@@ -1,6 +1,6 @@
 # Pascal Mehnert
 # 19.05.2016
-# Functions used to simplify and calculate mathematical expressions
+# Functions used to simplify and calculate mathematical expressions.
 # V 2.0
 
 import math_library

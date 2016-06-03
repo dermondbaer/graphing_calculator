@@ -42,10 +42,10 @@ class TestApplication(Calculator, CoordinateSystem):
 
 
 app = TestApplication()
-# app.test_geometry_tool()
-# app.test_calculator()
-app.create_point((1, 2))
-app.create_distance((-3, -2), (-7, -1))
-app.create_line((1, 2), (5, 7))
+app.test_geometry_tool()
+app.test_calculator()
+# app.create_point((1, 2))
+# app.create_distance((-3, -2), (-7, -1))
+# app.create_line((1, 2), (5, 7))
 app.clear_non_graph_figures()
 app.start()

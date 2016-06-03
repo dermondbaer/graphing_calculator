@@ -1,5 +1,6 @@
 #   Pascal Mehnert
 #   29.05.2016
+#   A class inherited from the tkinter Canvas, used to draw figures.
 #   V 2.0
 
 from tkinter import *
