@@ -12,8 +12,8 @@ class Function_storage(object):
         self.__function_count = function_count
 
         # actual function storage
-        self.__function = ["x * x" for i in range(self.__function_count)]
-        # self.__function[0] = "2 x"
+        self.__function = ["" for i in range(self.__function_count)]
+        self.__function_list = [[] for i in range(self.__function_count)]
 
         # function storage master frame
         self.__function_storage_frame = Frame(master=self.__master, bg=self.__gui.bg)
@@ -22,18 +22,23 @@ class Function_storage(object):
         self.__function_storage_frame.grid_columnconfigure(index=2, minsize=120)
 
         # function storage info label
-        self.__lbl_function_storage_info = Label(master=self.__function_storage_frame, text="Saved functions:", bg=self.__gui.bg)
+        self.__lbl_function_storage_info = Label(master=self.__function_storage_frame, text="Saved functions:",
+                                                 bg=self.__gui.bg)
         self.__lbl_function_storage_info.grid(row=0, column=0, sticky="NSW", padx=self.__gui.pad_general,
                                                pady=self.__gui.pad_general, columnspan=2)
         # function storage selection
         self.__selection = [BooleanVar() for i in range(self.__function_count)]
-        self.__entry_selection = [Checkbutton(master=self.__function_storage_frame, text="f"+str(i)+":", bg=self.__gui.bg, activebackground=self.__gui.bg, command=self.reformat_table, variable=self.__selection[i]) for i in range(self.__function_count)]
+        self.__entry_selection = [Checkbutton(master=self.__function_storage_frame, text="f"+str(i)+":",
+                                              bg=self.__gui.bg, activebackground=self.__gui.bg,
+                                              command=self.reformat_table,
+                                              variable=self.__selection[i]) for i in range(self.__function_count)]
         for i in range(self.__function_count):
             self.__entry_selection[i].grid(row=i+1, column=0, sticky="NSW", padx=self.__gui.pad_general,
                                                pady=self.__gui.pad_general)
 
         # function storage labels
-        self.__lbl_function_storage = [Label(master=self.__function_storage_frame, text=self.__function[i], bg=self.__gui.bg) for i in range(self.__function_count)]
+        self.__lbl_function_storage = [Label(master=self.__function_storage_frame, text=self.__function[i],
+                                             bg=self.__gui.bg) for i in range(self.__function_count)]
         for i in range(self.__function_count):
             self.__lbl_function_storage[i].grid(row=i+1, column=1, sticky="NSW", padx=self.__gui.pad_general,
                                                pady=self.__gui.pad_general)
@@ -50,6 +55,9 @@ class Function_storage(object):
 
     def get_function(self, index):
         return self.__function[index]
+
+    def get_function_list(self, index):
+        return self.__function_list[index]
 
     def set_function(self, index, function=""):
         self.__function[index] = function

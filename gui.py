@@ -133,7 +133,7 @@ class Gui(object):
         self.__output.grid_columnconfigure(index=1, minsize=100, weight=1)
         for i in range(self.__output.grid_size()[1]):
             self.__output.grid_rowconfigure(index=i, minsize=40, weight=1)
-        self.__output.grid_rowconfigure(index=0, minsize=200)
+        self.__output.grid_rowconfigure(index=0, minsize=100)
 
         # keypad
         self.__btn_9 = Button(master=self.__keypad, text="9", command=partial(self.press, "9")) \
@@ -179,34 +179,61 @@ class Gui(object):
             .grid(row=0, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
         self.__btn_clr_last = Button(master=self.__basemathbtn, text="AC", command=self.clear_last) \
             .grid(row=1, column=1, ipadx=self.grid_keypad_ipadx, ipady=self.grid_keypad_ipady, sticky="NESW")
-        
+
+        # dropdown menu with saved functions
+        self.__menu_functions = Menu(master=self.__menu, tearoff=0)
+        for i in range(self.__function_count):
+            self.__menu_functions.add_command(label="function "+str(i), command=partial(self.recall, i))
+        self.__menu.add_cascade(label="Recall Functions", menu=self.__menu_functions)
+
+        # dropdown menu with mathematical functions
+        self.__menu_math_functions = Menu(master=self.__menu, tearoff=0)
+        self.__menu_math_functions.add_command(label="sinh( x )", command=partial(self.press, " sinh ("))
+        self.__menu_math_functions.add_command(label="asinh( x )", command=partial(self.press, " asinh ("))
+        self.__menu_math_functions.add_command(label="cosh( x )", command=partial(self.press, " cosh ("))
+        self.__menu_math_functions.add_command(label="acosh( x )", command=partial(self.press, " acosh ("))
+        self.__menu_math_functions.add_command(label="tanh( x )", command=partial(self.press, " tanh ("))
+        self.__menu_math_functions.add_command(label="atanh( x )", command=partial(self.press, " atanh ("))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="ncr( x )", command=partial(self.press, " ncr ("))
+        self.__menu_math_functions.add_command(label="npr( x )", command=partial(self.press, " npr ("))
+        self.__menu_math_functions.add_command(label="binompdf( n, p, k )", command=partial(self.press, " binompdf ("))
+        self.__menu_math_functions.add_command(label="binomcdf( n, p, k )", command=partial(self.press, " binomcdf ("))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="min( a, b )", command=partial(self.press, " min ("))
+        self.__menu_math_functions.add_command(label="max( a, b )", command=partial(self.press, " max ("))
+        self.__menu_math_functions.add_separator()
+        self.__menu_math_functions.add_command(label="nderiv( f(x), x )", command=partial(self.press, " nderiv ("))
+        self.__menu_math_functions.add_command(label="fnint( f(x), a, b )", command=partial(self.press, " fnint ("))
+        self.__menu.add_cascade(label="Mathematical Functions", menu=self.__menu_math_functions)
+
         # additional math buttons
-        # first row
-        self.__btn_pi = Button(master=self.__mathbtn, text="PI", command=partial(self.press, " pi ")) \
-            .grid(row=0, column=0, sticky="NESW")
-        self.__btn_e = Button(master=self.__mathbtn, text="e", command=partial(self.press, " e ")) \
-            .grid(row=0, column=1, sticky="NESW")
-        self.__btn_x = Button(master=self.__mathbtn, text="x", command=partial(self.press, " x ")) \
-            .grid(row=0, column=2, sticky="NESW")
-        self.__btn_sqrt = Button(master=self.__mathbtn, text="sqrt()", command=partial(self.press, "sqrt ( ")) \
-            .grid(row=0, column=3, sticky="NESW")
-        self.__btn_root = Button(master=self.__mathbtn, text="root()", command=partial(self.press, "root ( ")) \
-            .grid(row=0, column=4, sticky="NESW")
-        self.__btn_log = Button(master=self.__mathbtn, text="log()", command=partial(self.press, "log ( ")) \
-            .grid(row=0, column=5, sticky="NESW")
-        # second row
-        self.__btn_sin = Button(master=self.__mathbtn, text="sin()", command=partial(self.press, "sin ( ")) \
-            .grid(row=1, column=0, sticky="NESW")
-        self.__btn_cos = Button(master=self.__mathbtn, text="cos()", command=partial(self.press, "cos ( ")) \
-            .grid(row=1, column=1, sticky="NESW")
-        self.__btn_tan = Button(master=self.__mathbtn, text="tan()", command=partial(self.press, "tan ( ")) \
-            .grid(row=1, column=2, sticky="NESW")
-        self.__btn_max = Button(master=self.__mathbtn, text="max()", command=partial(self.press, "max ( ")) \
-            .grid(row=1, column=3, sticky="NESW")
-        self.__btn_opbr = Button(master=self.__mathbtn, text="(", command=partial(self.press, " ( ")) \
-            .grid(row=1, column=4, sticky="NESW")
-        self.__btn_clbr = Button(master=self.__mathbtn, text=")", command=partial(self.press, " ) ")) \
-            .grid(row=1, column=5, sticky="NESW")
+        # # first row
+        # self.__btn_pi = Button(master=self.__mathbtn, text="PI", command=partial(self.press, " pi ")) \
+        #     .grid(row=0, column=0, sticky="NESW")
+        # self.__btn_e = Button(master=self.__mathbtn, text="e", command=partial(self.press, " e ")) \
+        #     .grid(row=0, column=1, sticky="NESW")
+        # self.__btn_x = Button(master=self.__mathbtn, text="x", command=partial(self.press, " x ")) \
+        #     .grid(row=0, column=2, sticky="NESW")
+        # self.__btn_sqrt = Button(master=self.__mathbtn, text="sqrt()", command=partial(self.press, "sqrt ( ")) \
+        #     .grid(row=0, column=3, sticky="NESW")
+        # self.__btn_root = Button(master=self.__mathbtn, text="root()", command=partial(self.press, "root ( ")) \
+        #     .grid(row=0, column=4, sticky="NESW")
+        # self.__btn_log = Button(master=self.__mathbtn, text="log()", command=partial(self.press, "log ( ")) \
+        #     .grid(row=0, column=5, sticky="NESW")
+        # # second row
+        # self.__btn_sin = Button(master=self.__mathbtn, text="sin()", command=partial(self.press, "sin ( ")) \
+        #     .grid(row=1, column=0, sticky="NESW")
+        # self.__btn_cos = Button(master=self.__mathbtn, text="cos()", command=partial(self.press, "cos ( ")) \
+        #     .grid(row=1, column=1, sticky="NESW")
+        # self.__btn_tan = Button(master=self.__mathbtn, text="tan()", command=partial(self.press, "tan ( ")) \
+        #     .grid(row=1, column=2, sticky="NESW")
+        # self.__btn_max = Button(master=self.__mathbtn, text="max()", command=partial(self.press, "max ( ")) \
+        #     .grid(row=1, column=3, sticky="NESW")
+        # self.__btn_opbr = Button(master=self.__mathbtn, text="(", command=partial(self.press, " ( ")) \
+        #     .grid(row=1, column=4, sticky="NESW")
+        # self.__btn_clbr = Button(master=self.__mathbtn, text=")", command=partial(self.press, " ) ")) \
+        #     .grid(row=1, column=5, sticky="NESW")
 
         # saved functions
         self.functions = Function_storage(self, self.__functions_master, self.__function_count)
@@ -307,6 +334,11 @@ class Gui(object):
     def save_to(self, index=0):
         print("save expression \""+self.convert_list_to_string(self.__expr)+"\" to f"+str(index))
         self.functions.set_function(index, self.convert_list_to_string(self.__expr))
+
+    def recall(self, index):
+        function = ["f"+str(index)]
+        for i, item in enumerate(self.functions.get_function(index).)
+        print(function)
 
     @staticmethod
     def __parsegeometry(geometry):

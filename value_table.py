@@ -40,7 +40,8 @@ class Valuetable(object):
         delta = StringVar()
         self.__entry_value_table_delta = Spinbox(master=self.__master, bg=self.__gui.bg, from_=0, to=1000000,
                                                  width=10, justify=RIGHT, cursor="XTERM", increment=0.1,
-                                                 validate="all", invcmd="bell", textvariable=self.__delta, command=self.recalculate)
+                                                 validate="all", invcmd="bell", textvariable=self.__delta,
+                                                 command=self.recalculate)
         vcmd_delta = (self.__master.register(self.on_validate), 0, 1000000, '%P')
         self.__entry_value_table_delta['validatecommand'] = vcmd_delta
         self.__entry_value_table_delta.delete(0, END)
@@ -50,7 +51,8 @@ class Valuetable(object):
         # table start entry
         self.__entry_value_table_start = Spinbox(master=self.__master, bg=self.__gui.bg, from_=-1000000000000000,
                                                  to=1000000000000000, width=20, justify=RIGHT, cursor="XTERM",
-                                                 validate="all", invcmd="bell", textvariable=self.__start, command=self.recalculate)
+                                                 validate="all", invcmd="bell", textvariable=self.__start,
+                                                 command=self.recalculate)
         vcmd_start = (self.__master.register(self.on_validate), -1000000000000000, 1000000000000000, '%P')
         self.__entry_value_table_start['validatecommand'] = vcmd_start
         self.__entry_value_table_start.delete(0, END)
@@ -81,7 +83,8 @@ class Valuetable(object):
         self.__value_table_frame_hscrollbar.configure(command=self.__value_table_canvas.xview)
         self.__master.grid_rowconfigure(2, weight=1)
         self.__master.grid_columnconfigure(0, weight=1)
-        self.__value_table_frame = Frame(master=self.__value_table_canvas, bg=self.__gui.bg, relief=SUNKEN, borderwidth=1)
+        self.__value_table_frame = Frame(master=self.__value_table_canvas,
+                                         bg=self.__gui.bg, relief=SUNKEN, borderwidth=1)
         self.__value_table_frame.grid(row=0, column=0, sticky="NESW", columnspan=4)
         self.__value_table_canvas.create_window(0, 0, anchor=NW, window=self.__value_table_frame)
         self.__value_table_frame.update_idletasks()
@@ -116,7 +119,8 @@ class Valuetable(object):
         self.__value_table_canvas.grid_columnconfigure(0, weight=1)
 
         # table header
-        self.__value_table_header = [Label(master=self.__value_table_frame, text=column_list[i], bg="orange red") for i in range(self.__columns)]
+        self.__value_table_header = [Label(master=self.__value_table_frame, text=column_list[i],
+                                           bg="orange red") for i in range(self.__columns)]
         for column in range(len(self.__value_table_header)):
             self.__value_table_header[column].grid(row=0, column=column, sticky="NESW", padx=1, pady=1)
             self.__value_table_frame.grid_columnconfigure(column, minsize=60)
@@ -126,7 +130,8 @@ class Valuetable(object):
         self.__value_table_entry_frame.grid(row=2, column=0, padx=0, pady=0, sticky="NESW",
                                 columnspan=self.__columns)
         # table entries
-        self.__value_table_entry = [[Label(master=self.__value_table_entry_frame, text="", bg="white") for i in range(self.__columns)] for i in range(self.__rows)]
+        self.__value_table_entry = [[Label(master=self.__value_table_entry_frame, text="",
+                                           bg="white") for i in range(self.__columns)] for i in range(self.__rows)]
         for row in range(len(self.__value_table_entry)):
             for column in range(len(self.__value_table_entry[row])):
                 self.__value_table_entry[row][column].grid(row=row, column=column, sticky="NESW", padx=1,
@@ -144,7 +149,8 @@ class Valuetable(object):
 
     def recalculate(self):
         for i in range(self.__rows):
-            self.__value_table_entry[i][0].configure(text=str(round(float(self.__start.get())+int(i)*float(self.__delta.get()), 8)))
+            self.__value_table_entry[i][0].configure(
+                text=str(round(float(self.__start.get())+int(i)*float(self.__delta.get()), 8)))
         calc_expression = self.__gui.calc.calculate_expression
         calc_function = self.__gui.calc.calculate_function_value
         func = self.__gui.functions.get_function
@@ -152,7 +158,8 @@ class Valuetable(object):
             function = calc_expression(func(self.__column_list[index-1]))
             # calc_function(calc_expression())
             for i in range(self.__rows):
-                self.__value_table_entry[i][index].configure(text=calc_function(function, dict(x=decimal.Decimal(str(round(float(self.__start.get())+int(i)*float(self.__delta.get()), 8))))))
+                self.__value_table_entry[i][index].configure(text=calc_function(function, dict(
+                    x=decimal.Decimal(str(round(float(self.__start.get())+int(i)*float(self.__delta.get()), 8))))))
 
     def set_columns(self, column_list):
         self.__column_list = column_list
